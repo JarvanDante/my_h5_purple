@@ -140,6 +140,7 @@ const promos = [
   { title: '熟女约会', tone: 1 },
   { title: '包养信息', tone: 0 },
   { title: '外围模特', tone: 2 },
+  { title: '同城约会', tone: 3 },
 ]
 
 const circles = [
@@ -392,29 +393,30 @@ onMounted(() => {
 
 .promo-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 8px 12px 4px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px 6px;
+  padding: 8px 10px 4px;
 }
 
 .promo {
   border: 0;
   background: transparent;
   padding: 0;
-  text-align: left;
+  text-align: center;
 
   span {
     display: block;
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 4px;
+    font-size: 11px;
     color: #333;
+    line-height: 1.2;
   }
 }
 
 .thumb {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .tone-0 { background: linear-gradient(180deg, #f3c9b8, #c47a6a); }
