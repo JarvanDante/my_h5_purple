@@ -2,6 +2,7 @@
   <div class="page-shell comic-page">
     <header class="comic-header">
       <div class="channel-row">
+        <span class="site-name">{{ appName }}</span>
         <button
           v-for="item in channels"
           :key="item"
@@ -83,11 +84,13 @@ import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaGrid from '@/components/MediaGrid.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
+import { useConfigStore } from '@/stores/config'
 import { comics, type CoverItem } from '@/data/mock'
 
 defineOptions({ name: 'Comic' })
 
 const router = useRouter()
+const appName = computed(() => useConfigStore().appName)
 const channels = ['漫画', '动漫', '小说', '短剧']
 const subTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
 const channelSlide = useTabSlide(channels)
@@ -146,7 +149,14 @@ const open = (item: CoverItem) => {
 }
 
 .channel-row {
-  gap: 16px;
+  gap: 12px;
+}
+
+.site-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: $secondary-color;
+  flex-shrink: 0;
 }
 
 .channel-item {

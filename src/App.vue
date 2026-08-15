@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div class="app-container">
+      <div v-if="maintenance" class="maintain-bar">站点维护中 · {{ appName }}</div>
       <div class="page-view" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
         <router-view v-slot="{ Component, route }">
           <transition :name="transitionName">
@@ -19,6 +20,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useConfigStore } from '@/stores/config'
 import { TAB_PATHS, tabIndex, useNavStore } from '@/stores/nav'
 import AppTabbar from '@/components/AppTabbar.vue'
 
@@ -29,6 +31,9 @@ const navStore = useNavStore()
 const cacheViews = computed(() => appStore.cacheViews)
 const transitionName = computed(() => navStore.transitionName)
 const showTabbar = computed(() => route.meta.tabbar === true)
+const configStore = useConfigStore()
+const maintenance = computed(() => configStore.maintenance)
+const appName = computed(() => configStore.appName)
 
 let startX = 0
 let startY = 0
@@ -85,6 +90,16 @@ const onTouchEnd = (e: TouchEvent) => {
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
   position: relative;
   overflow: hidden;
+}
+
+.maintain-bar {
+  position: relative;
+  z-index: 20;
+  background: #f59e0b;
+  color: #3d1a5e;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 8px;
 }
 
 .page-view {

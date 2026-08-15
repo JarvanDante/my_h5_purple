@@ -19,6 +19,12 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5174,
+    proxy: {
+      '/front': {
+        target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: 'dist',
