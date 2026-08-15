@@ -54,6 +54,13 @@ export function buyVip(packageId: number) {
   })
 }
 
+export function bindInviteCode(code: string) {
+  return request<Record<string, never>>('/user/bind-code', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
+  })
+}
+
 export function fetchRechargePackages() {
   return request<{ list: RechargePackage[] }>('/user/recharge')
 }
