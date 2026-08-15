@@ -2,7 +2,8 @@
   <div class="page-shell">
     <header class="head">
       <div class="user" @click="go('/vip')">
-        <div class="avatar" :style="avatarStyle" />
+        <img v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
+        <div v-else class="avatar" />
         <div>
           <h1>{{ user?.nickname || '未登录' }}</h1>
           <p>{{ subText }}</p>
@@ -37,6 +38,7 @@
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
+import { mediaUrl } from '@/utils/request'
 
 defineOptions({ name: 'Me' })
 
@@ -50,11 +52,7 @@ const subText = computed(() => {
   return user.value.group_name || '普通用户 · 点击开通 VIP'
 })
 
-const avatarStyle = computed(() => {
-  const img = user.value?.img
-  if (img) return { backgroundImage: `url(${img})`, backgroundSize: 'cover' }
-  return {}
-})
+const avatarSrc = computed(() => mediaUrl(user.value?.img))
 
 const menus = [
   { title: 'VIP 会员', path: '/vip' },
@@ -95,7 +93,9 @@ onMounted(() => {
   width: 56px;
   height: 56px;
   border-radius: 50%;
+  object-fit: cover;
   background: linear-gradient(160deg, #fdb927, #8a6bb3);
+  flex-shrink: 0;
 }
 
 h1 {

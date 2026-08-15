@@ -24,6 +24,10 @@ export default defineConfig({
         target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
         changeOrigin: true,
       },
+      '/static': {
+        target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
+        changeOrigin: true,
+      },
     },
   },
   build: {

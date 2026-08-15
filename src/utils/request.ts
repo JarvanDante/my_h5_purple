@@ -54,3 +54,10 @@ export function toastError(err: unknown) {
   const msg = err instanceof Error ? err.message : '请求失败'
   showToast(msg)
 }
+
+/** 相对路径走同域 /static（开发由 Vite 代理到 my_service）。 */
+export function mediaUrl(path?: string) {
+  if (!path) return ''
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith('data:')) return path
+  return path.startsWith('/') ? path : `/${path}`
+}
