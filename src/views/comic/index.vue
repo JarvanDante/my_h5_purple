@@ -12,7 +12,7 @@
         >
           {{ item }}
         </button>
-        <button type="button" class="checkin-btn" @click="soon('签到')">
+        <button type="button" class="checkin-btn" @click="go('/checkin')">
           <span class="gift">🎁</span>
           签到
         </button>
@@ -32,15 +32,15 @@
       </div>
 
       <div class="search-row">
-        <div class="search-box" @click="soon('搜索')">
+        <div class="search-box" @click="go('/search')">
           <span class="search-icon">⌕</span>
           <span>搜索更多{{ channel }}</span>
         </div>
-        <button type="button" class="side-action vip" @click="soon('VIP')">
+        <button type="button" class="side-action vip" @click="go('/vip')">
           <span>VIP</span>
           充值
         </button>
-        <button type="button" class="side-action fav" @click="soon('收藏')">
+        <button type="button" class="side-action fav" @click="go('/favorite')">
           <span>★</span>
           收藏
         </button>
@@ -48,15 +48,15 @@
     </header>
 
     <section class="banner-row">
-      <div v-for="n in 4" :key="n" class="banner-card">
-        <div class="banner-cover" />
-        <p class="ellipsis">精选推荐 {{ n }}</p>
+      <div v-for="item in comics.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
+        <div class="banner-cover" :class="`tone-${item.tone}`" />
+        <p class="ellipsis">{{ item.title }}</p>
         <span class="ad-tag">广告</span>
       </div>
     </section>
 
     <section class="quick-row">
-      <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="soon(item.label)">
+      <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
         <span class="quick-icon">{{ item.icon }}</span>
         <span>{{ item.label }}</span>
       </button>
@@ -65,41 +65,41 @@
     <section class="block">
       <div class="block-head">
         <h3>今日上新：新作品已经准时送达</h3>
-        <button type="button" @click="soon('更多')">更多 ›</button>
+        <button type="button" @click="go('/list?type=daily')">更多 ›</button>
       </div>
-      <div class="cover-grid">
-        <article v-for="n in 6" :key="n" class="cover-card" @click="soon('作品详情')">
-          <div class="cover-thumb">
-            <span class="free-tag">Free</span>
-          </div>
-          <p class="ellipsis">占位作品 {{ n }}</p>
-        </article>
-      </div>
+      <MediaGrid :items="comics" @select="open" />
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { showToast } from 'vant'
+import { useRouter } from 'vue-router'
+import MediaGrid from '@/components/MediaGrid.vue'
+import { comics, type CoverItem } from '@/data/mock'
 
 defineOptions({ name: 'Comic' })
 
+const router = useRouter()
 const channels = ['漫画', '动漫', '小说', '短剧']
 const subTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
 const quicks = [
-  { icon: '📍', label: '专题' },
-  { icon: '🔥', label: '热门' },
-  { icon: '📅', label: '每日' },
-  { icon: '🏆', label: '榜单' },
-  { icon: '📚', label: '分类' },
+  { icon: '📍', label: '专题', path: '/list?type=topic' },
+  { icon: '🔥', label: '热门', path: '/list?type=hot' },
+  { icon: '📅', label: '每日', path: '/list?type=daily' },
+  { icon: '🏆', label: '榜单', path: '/list?type=rank' },
+  { icon: '📚', label: '分类', path: '/list?type=category' },
 ]
 
 const channel = ref('漫画')
 const subTab = ref('新更')
 
-const soon = (name: string) => {
-  showToast(`${name} 即将接入`)
+const go = (path: string) => {
+  router.push(path)
+}
+
+const open = (item: CoverItem) => {
+  router.push(`/comic/${item.id}`)
 }
 </script>
 
@@ -240,18 +240,17 @@ const soon = (name: string) => {
   gap: 8px;
 }
 
-.banner-cover,
-.cover-thumb {
-  background: linear-gradient(160deg, #d9c7ee 0%, #8a6bb3 100%);
+.banner-cover {
+  height: 92px;
   border-radius: 6px;
 }
 
-.banner-cover {
-  height: 92px;
-}
+.tone-0 { background: linear-gradient(160deg, #d9c7ee, #8a6bb3); }
+.tone-1 { background: linear-gradient(160deg, #c7d8ee, #6b8ab3); }
+.tone-2 { background: linear-gradient(160deg, #eec7d4, #b36b86); }
+.tone-3 { background: linear-gradient(160deg, #c7eee0, #6bb39a); }
 
-.banner-card p,
-.cover-card p {
+.banner-card p {
   margin-top: 6px;
   font-size: 11px;
   color: #333;
@@ -312,25 +311,4 @@ const soon = (name: string) => {
   }
 }
 
-.cover-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px 8px;
-}
-
-.cover-thumb {
-  position: relative;
-  height: 132px;
-}
-
-.free-tag {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  background: #3b82f6;
-  color: #fff;
-  font-size: 10px;
-  padding: 1px 5px;
-  border-radius: 3px;
-}
 </style>

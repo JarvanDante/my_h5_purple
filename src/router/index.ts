@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { useNavStore } from '@/stores/nav'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', redirect: '/comic' },
@@ -6,7 +7,7 @@ const routes: RouteRecordRaw[] = [
     path: '/comic',
     name: 'Comic',
     component: () => import('@/views/comic/index.vue'),
-    meta: { title: '二次元', tabbar: true, keepAlive: true },
+    meta: { title: '二次元', tabbar: true },
   },
   {
     path: '/video',
@@ -32,6 +33,48 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/me/index.vue'),
     meta: { title: '我的', tabbar: true },
   },
+  {
+    path: '/comic/:id',
+    name: 'ComicDetail',
+    component: () => import('@/views/comic/detail.vue'),
+    meta: { title: '作品详情' },
+  },
+  {
+    path: '/video/:id',
+    name: 'VideoDetail',
+    component: () => import('@/views/video/detail.vue'),
+    meta: { title: '视频详情' },
+  },
+  {
+    path: '/search',
+    name: 'Search',
+    component: () => import('@/views/common/search.vue'),
+    meta: { title: '搜索' },
+  },
+  {
+    path: '/checkin',
+    name: 'Checkin',
+    component: () => import('@/views/common/checkin.vue'),
+    meta: { title: '签到' },
+  },
+  {
+    path: '/vip',
+    name: 'Vip',
+    component: () => import('@/views/common/vip.vue'),
+    meta: { title: 'VIP' },
+  },
+  {
+    path: '/favorite',
+    name: 'Favorite',
+    component: () => import('@/views/common/favorite.vue'),
+    meta: { title: '收藏' },
+  },
+  {
+    path: '/list',
+    name: 'List',
+    component: () => import('@/views/common/list.vue'),
+    meta: { title: '列表' },
+  },
 ]
 
 const router = createRouter({
@@ -42,9 +85,11 @@ const router = createRouter({
   },
 })
 
-router.beforeEach((to, _from, next) => {
-  const title = (to.meta.title as string | undefined) || 'Purple'
-  document.title = title
+router.beforeEach((to, from, next) => {
+  document.title = (to.meta.title as string | undefined) || 'Purple'
+  if (from.path) {
+    useNavStore().setByRoute(to.path, from.path)
+  }
   next()
 })
 

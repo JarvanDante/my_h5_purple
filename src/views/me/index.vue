@@ -1,6 +1,132 @@
 <template>
   <div class="page-shell">
-    <header class="page-nav">我的</header>
-    <p class="page-empty">个人中心架子，后续接登录 / VIP / 金币</p>
+    <header class="head">
+      <div class="user" @click="go('/vip')">
+        <div class="avatar" />
+        <div>
+          <h1>游客 8821</h1>
+          <p>点击开通 VIP 畅看全站</p>
+        </div>
+      </div>
+      <div class="stats">
+        <button type="button" @click="go('/favorite')">
+          <b>6</b>
+          <span>收藏</span>
+        </button>
+        <button type="button" @click="go('/list?type=hot')">
+          <b>12</b>
+          <span>历史</span>
+        </button>
+        <button type="button" @click="go('/vip')">
+          <b>0</b>
+          <span>购买</span>
+        </button>
+      </div>
+    </header>
+    <section class="menus">
+      <button v-for="item in menus" :key="item.title" type="button" @click="go(item.path)">
+        <span>{{ item.title }}</span>
+        <i>›</i>
+      </button>
+    </section>
   </div>
 </template>
+
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+defineOptions({ name: 'Me' })
+
+const router = useRouter()
+const menus = [
+  { title: 'VIP 会员', path: '/vip' },
+  { title: '金币充值', path: '/vip' },
+  { title: '我的收藏', path: '/favorite' },
+  { title: '观看历史', path: '/list?type=hot' },
+  { title: '每日签到', path: '/checkin' },
+  { title: '意见反馈', path: '/list?type=topic' },
+]
+
+const go = (path: string) => {
+  router.push(path)
+}
+</script>
+
+<style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
+.head {
+  background: $primary-color;
+  color: #fff;
+  padding: 18px 12px 16px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #fdb927, #8a6bb3);
+}
+
+h1 {
+  font-size: 18px;
+}
+
+.user p {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.stats {
+  display: flex;
+  margin-top: 16px;
+
+  button {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: #fff;
+
+    b {
+      display: block;
+      font-size: 18px;
+    }
+
+    span {
+      font-size: 12px;
+      opacity: 0.75;
+    }
+  }
+}
+
+.menus {
+  margin-top: 8px;
+  background: #fff;
+
+  button {
+    width: 100%;
+    height: 50px;
+    border: 0;
+    border-bottom: 1px solid #f5f5f5;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 15px;
+    color: #333;
+
+    i {
+      color: #ccc;
+      font-style: normal;
+    }
+  }
+}
+</style>

@@ -62,7 +62,7 @@ const isActive = (path: string) => route.path === path || (path === '/comic' && 
 
 const go = (path: string) => {
   if (route.path !== path) {
-    router.push(path)
+    router.replace(path)
   }
 }
 </script>
@@ -100,12 +100,18 @@ const go = (path: string) => {
   color: #333;
   cursor: pointer;
 
+  transition: transform 0.16s ease;
+
   &.active {
     color: $secondary-color;
+
+    .tab-icon {
+      transform: scale(1.08);
+    }
   }
 
   &:active {
-    transform: scale(0.96);
+    transform: scale(0.9);
   }
 }
 
@@ -113,6 +119,7 @@ const go = (path: string) => {
   width: 22px;
   height: 22px;
   display: flex;
+  transition: transform 0.16s ease;
 
   svg {
     width: 22px;
