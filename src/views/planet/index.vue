@@ -8,36 +8,46 @@
           :key="item"
           type="button"
           :class="{ active: tab === item }"
-          @click="tab = item"
+          @click="select(item)"
         >
           {{ item }}
         </button>
       </div>
     </header>
-    <article v-for="post in posts" :key="post.id" class="post" @click="goPost">
-      <div class="avatar" :class="`tone-${post.tone}`" />
-      <div class="main">
-        <h3>{{ post.user }}</h3>
-        <p>{{ post.text }}</p>
-        <div class="pic" :class="`tone-${post.tone}`" />
-        <div class="bar">
-          <span>♡ {{ post.likes }}</span>
-          <span>💬 {{ post.comments }}</span>
+    <div class="inner-slide">
+      <transition :name="name">
+        <div :key="tab">
+          <article v-for="post in posts" :key="post.id" class="post" @click="goPost">
+            <div class="avatar" :class="`tone-${post.tone}`" />
+            <div class="main">
+              <h3>{{ post.user }}</h3>
+              <p>{{ post.text }}</p>
+              <div class="pic" :class="`tone-${post.tone}`" />
+              <div class="bar">
+                <span>♡ {{ post.likes }}</span>
+                <span>💬 {{ post.comments }}</span>
+              </div>
+            </div>
+          </article>
         </div>
-      </div>
-    </article>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { showToast } from 'vant'
+import { useTabSlide } from '@/composables/useTabSlide'
 import { posts } from '@/data/mock'
 
 defineOptions({ name: 'Planet' })
 
 const tabs = ['广场', '关注', '最新']
-const tab = ref('广场')
+const slide = useTabSlide(tabs)
+const tab = computed(() => slide.current.value)
+const name = computed(() => slide.name.value)
+const select = (item: string) => slide.select(item)
 
 const goPost = () => {
   showToast('帖子详情稍后接入')
@@ -46,6 +56,12 @@ const goPost = () => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+
+.inner-slide {
+  position: relative;
+  overflow: hidden;
+  min-height: 60vh;
+}
 
 .head {
   background: $primary-color;

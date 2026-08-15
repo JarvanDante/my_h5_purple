@@ -2,28 +2,36 @@
   <div class="page-shell sub-page">
     <PageHeader title="我的收藏" />
     <div class="tabs">
-      <button type="button" :class="{ active: tab === 'comic' }" @click="tab = 'comic'">漫画</button>
-      <button type="button" :class="{ active: tab === 'video' }" @click="tab = 'video'">视频</button>
+      <button type="button" :class="{ active: tab === 'comic' }" @click="select('comic')">漫画</button>
+      <button type="button" :class="{ active: tab === 'video' }" @click="select('video')">视频</button>
     </div>
-    <div class="body">
-      <MediaGrid
-        :items="tab === 'comic' ? comics.slice(0, 6) : videos"
-        :cols="tab === 'video' ? 'cols-2' : 'cols-3'"
-        @select="open"
-      />
+    <div class="inner-slide">
+      <transition :name="name">
+        <div :key="tab" class="body">
+          <MediaGrid
+            :items="tab === 'comic' ? comics.slice(0, 6) : videos"
+            :cols="tab === 'video' ? 'cols-2' : 'cols-3'"
+            @select="open"
+          />
+        </div>
+      </transition>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
+import { useTabSlide } from '@/composables/useTabSlide'
 import { comics, videos, type CoverItem } from '@/data/mock'
 
 const router = useRouter()
-const tab = ref<'comic' | 'video'>('comic')
+const slide = useTabSlide(['comic', 'video'])
+const tab = computed(() => slide.current.value)
+const name = computed(() => slide.name.value)
+const select = (item: string) => slide.select(item)
 
 const open = (item: CoverItem) => {
   if (item.id.startsWith('v')) {
@@ -65,6 +73,12 @@ const open = (item: CoverItem) => {
       }
     }
   }
+}
+
+.inner-slide {
+  position: relative;
+  overflow: hidden;
+  min-height: 50vh;
 }
 
 .body {

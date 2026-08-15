@@ -10,28 +10,36 @@
         :key="item"
         type="button"
         :class="{ active: tab === item }"
-        @click="tab = item"
+        @click="select(item)"
       >
         {{ item }}
       </button>
     </div>
-    <section class="body">
-      <MediaGrid :items="videos" cols="cols-2" @select="open" />
-    </section>
+    <div class="inner-slide">
+      <transition :name="name">
+        <section :key="tab" class="body">
+          <MediaGrid :items="videos" cols="cols-2" @select="open" />
+        </section>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaGrid from '@/components/MediaGrid.vue'
+import { useTabSlide } from '@/composables/useTabSlide'
 import { videos, type CoverItem } from '@/data/mock'
 
 defineOptions({ name: 'Video' })
 
 const router = useRouter()
 const tabs = ['推荐', '最新', '热播', '短视频', '长视频']
-const tab = ref('推荐')
+const slide = useTabSlide(tabs)
+const tab = computed(() => slide.current.value)
+const name = computed(() => slide.name.value)
+const select = (item: string) => slide.select(item)
 
 const go = (path: string) => router.push(path)
 const open = (item: CoverItem) => router.push(`/video/${item.id}`)
@@ -93,6 +101,12 @@ const open = (item: CoverItem) => router.push(`/video/${item.id}`)
       }
     }
   }
+}
+
+.inner-slide {
+  position: relative;
+  overflow: hidden;
+  min-height: 60vh;
 }
 
 .body {

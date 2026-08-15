@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="app-container">
-      <div class="page-view">
+      <div class="page-view" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
         <router-view v-slot="{ Component, route }">
           <transition :name="transitionName">
             <keep-alive :include="cacheViews">
@@ -17,17 +17,52 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
-import { useNavStore } from '@/stores/nav'
+import { TAB_PATHS, tabIndex, useNavStore } from '@/stores/nav'
 import AppTabbar from '@/components/AppTabbar.vue'
 
 const route = useRoute()
+const router = useRouter()
 const appStore = useAppStore()
 const navStore = useNavStore()
 const cacheViews = computed(() => appStore.cacheViews)
 const transitionName = computed(() => navStore.transitionName)
 const showTabbar = computed(() => route.meta.tabbar === true)
+
+let startX = 0
+let startY = 0
+
+const inHScroll = (el: EventTarget | null) => {
+  let node = el as HTMLElement | null
+  while (node && node !== document.body) {
+    const { overflowX } = getComputedStyle(node)
+    if (overflowX === 'auto' || overflowX === 'scroll') return true
+    node = node.parentElement
+  }
+  return false
+}
+
+const onTouchStart = (e: TouchEvent) => {
+  startX = e.changedTouches[0].clientX
+  startY = e.changedTouches[0].clientY
+}
+
+const onTouchEnd = (e: TouchEvent) => {
+  if (!showTabbar.value || inHScroll(e.target)) return
+  const dx = e.changedTouches[0].clientX - startX
+  const dy = e.changedTouches[0].clientY - startY
+  if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy)) return
+  const i = tabIndex(route.path)
+  if (i < 0) return
+  if (dx < 0 && i < TAB_PATHS.length - 1) {
+    router.replace(TAB_PATHS[i + 1])
+    return
+  }
+  if (dx > 0 && i > 0) {
+    router.replace(TAB_PATHS[i - 1])
+  }
+}
 </script>
 
 <style lang="scss">
@@ -76,28 +111,34 @@ const showTabbar = computed(() => route.meta.tabbar === true)
   }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.18s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
+.tab-left-enter-active,
+.tab-left-leave-active,
+.tab-right-enter-active,
+.tab-right-leave-active,
 .slide-left-enter-active,
 .slide-left-leave-active,
 .slide-right-enter-active,
 .slide-right-leave-active {
   position: absolute;
   inset: 0;
-  transition:
-    transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity 0.28s ease;
+  transition: transform 0.28s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+.tab-left-enter-from,
 .slide-left-enter-from {
+  transform: translateX(100%);
+}
+
+.tab-left-leave-to {
+  transform: translateX(-100%);
+}
+
+.tab-right-enter-from {
+  transform: translateX(-100%);
+}
+
+.tab-right-leave-to,
+.slide-right-leave-to {
   transform: translateX(100%);
 }
 
@@ -109,9 +150,5 @@ const showTabbar = computed(() => route.meta.tabbar === true)
 .slide-right-enter-from {
   transform: translateX(-24%);
   opacity: 0.55;
-}
-
-.slide-right-leave-to {
-  transform: translateX(100%);
 }
 </style>

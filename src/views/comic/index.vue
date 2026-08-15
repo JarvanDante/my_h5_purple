@@ -8,7 +8,7 @@
           type="button"
           class="channel-item"
           :class="{ active: channel === item }"
-          @click="channel = item"
+          @click="selectChannel(item)"
         >
           {{ item }}
         </button>
@@ -25,7 +25,7 @@
           type="button"
           class="sub-item"
           :class="{ active: subTab === item }"
-          @click="subTab = item"
+          @click="selectSub(item)"
         >
           {{ item }}
         </button>
@@ -47,35 +47,42 @@
       </div>
     </header>
 
-    <section class="banner-row">
-      <div v-for="item in comics.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
-        <div class="banner-cover" :class="`tone-${item.tone}`" />
-        <p class="ellipsis">{{ item.title }}</p>
-        <span class="ad-tag">广告</span>
-      </div>
-    </section>
+    <div class="inner-slide">
+      <transition :name="innerName">
+        <div :key="channel + '-' + subTab" class="inner-pane">
+          <section class="banner-row">
+            <div v-for="item in comics.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
+              <div class="banner-cover" :class="`tone-${item.tone}`" />
+              <p class="ellipsis">{{ item.title }}</p>
+              <span class="ad-tag">广告</span>
+            </div>
+          </section>
 
-    <section class="quick-row">
-      <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
-        <span class="quick-icon">{{ item.icon }}</span>
-        <span>{{ item.label }}</span>
-      </button>
-    </section>
+          <section class="quick-row">
+            <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
+              <span class="quick-icon">{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </button>
+          </section>
 
-    <section class="block">
-      <div class="block-head">
-        <h3>今日上新：新作品已经准时送达</h3>
-        <button type="button" @click="go('/list?type=daily')">更多 ›</button>
-      </div>
-      <MediaGrid :items="comics" @select="open" />
-    </section>
+          <section class="block">
+            <div class="block-head">
+              <h3>今日上新：新作品已经准时送达</h3>
+              <button type="button" @click="go('/list?type=daily')">更多 ›</button>
+            </div>
+            <MediaGrid :items="comics" @select="open" />
+          </section>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaGrid from '@/components/MediaGrid.vue'
+import { useTabSlide } from '@/composables/useTabSlide'
 import { comics, type CoverItem } from '@/data/mock'
 
 defineOptions({ name: 'Comic' })
@@ -83,6 +90,22 @@ defineOptions({ name: 'Comic' })
 const router = useRouter()
 const channels = ['漫画', '动漫', '小说', '短剧']
 const subTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
+const channelSlide = useTabSlide(channels)
+const subSlide = useTabSlide(subTabs)
+const channel = computed(() => channelSlide.current.value)
+const subTab = computed(() => subSlide.current.value)
+const innerName = ref('tab-left')
+
+const selectChannel = (item: string) => {
+  channelSlide.select(item)
+  innerName.value = channelSlide.name.value
+}
+
+const selectSub = (item: string) => {
+  subSlide.select(item)
+  innerName.value = subSlide.name.value
+}
+
 const quicks = [
   { icon: '📍', label: '专题', path: '/list?type=topic' },
   { icon: '🔥', label: '热门', path: '/list?type=hot' },
@@ -90,9 +113,6 @@ const quicks = [
   { icon: '🏆', label: '榜单', path: '/list?type=rank' },
   { icon: '📚', label: '分类', path: '/list?type=category' },
 ]
-
-const channel = ref('漫画')
-const subTab = ref('新更')
 
 const go = (path: string) => {
   router.push(path)
@@ -105,6 +125,12 @@ const open = (item: CoverItem) => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+
+.inner-slide {
+  position: relative;
+  overflow: hidden;
+  min-height: 60vh;
+}
 
 .comic-header {
   background: $primary-color;
