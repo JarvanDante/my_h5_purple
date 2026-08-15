@@ -1,5 +1,10 @@
 @use './variables.scss' as *;
 
+:root {
+  --van-primary-color: #{$primary-color};
+  --van-danger-color: #{$primary-color};
+}
+
 * {
   margin: 0;
   padding: 0;

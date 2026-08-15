@@ -282,7 +282,7 @@ onMounted(() => {
   }
 
   &.fav span {
-    color: #ffb14a;
+    color: $secondary-color;
   }
 }
 
@@ -304,10 +304,10 @@ onMounted(() => {
   border-radius: 6px;
 }
 
-.tone-0 { background: linear-gradient(160deg, #d9c7ee, #8a6bb3); }
-.tone-1 { background: linear-gradient(160deg, #c7d8ee, #6b8ab3); }
-.tone-2 { background: linear-gradient(160deg, #eec7d4, #b36b86); }
-.tone-3 { background: linear-gradient(160deg, #c7eee0, #6bb39a); }
+.tone-0 { background: linear-gradient(160deg, #ffd0e0, #ff4d88); }
+.tone-1 { background: linear-gradient(160deg, #e4d4ff, #7b5be0); }
+.tone-2 { background: linear-gradient(160deg, #ffc2d4, #e85a9a); }
+.tone-3 { background: linear-gradient(160deg, #ffe0f0, #c45b9a); }
 
 .banner-card p {
   margin-top: 6px;
@@ -344,7 +344,7 @@ onMounted(() => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #f3ecfb;
+  background: $background-surface2;
   display: flex;
   align-items: center;
   justify-content: center;

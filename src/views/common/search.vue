@@ -55,7 +55,7 @@ const open = (item: CoverItem) => {
     height: 36px;
     border: 0;
     border-radius: 18px;
-    background: #f4f4f4;
+    background: $background-surface2;
     padding: 0 14px;
     font-size: 14px;
     outline: none;
@@ -89,7 +89,7 @@ h3 {
 
   button {
     border: 0;
-    background: #f3ecfb;
+    background: $background-surface2;
     color: $primary-color;
     border-radius: 14px;
     padding: 6px 12px;

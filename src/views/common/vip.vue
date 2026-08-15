@@ -87,7 +87,7 @@ onMounted(() => {
 
   &.active {
     border-color: $primary-color;
-    background: #f8f3fc;
+    background: $background-surface2;
   }
 
   h3 {

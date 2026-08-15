@@ -146,9 +146,9 @@ const goPost = () => {
   font-size: 12px;
 }
 
-.tone-0 { background: linear-gradient(160deg, #d9c7ee, #8a6bb3); }
-.tone-1 { background: linear-gradient(160deg, #c7d8ee, #6b8ab3); }
-.tone-2 { background: linear-gradient(160deg, #eec7d4, #b36b86); }
-.tone-3 { background: linear-gradient(160deg, #c7eee0, #6bb39a); }
-.tone-4 { background: linear-gradient(160deg, #eee3c7, #b39a6b); }
+.tone-0 { background: linear-gradient(160deg, #ffd0e0, #ff4d88); }
+.tone-1 { background: linear-gradient(160deg, #e4d4ff, #7b5be0); }
+.tone-2 { background: linear-gradient(160deg, #ffc2d4, #e85a9a); }
+.tone-3 { background: linear-gradient(160deg, #ffe0f0, #c45b9a); }
+.tone-4 { background: linear-gradient(160deg, #ffd9c8, #ff7a9a); }
 </style>

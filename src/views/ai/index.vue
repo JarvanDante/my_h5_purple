@@ -70,7 +70,7 @@ const openItem = (item: CoverItem) => {
   align-items: center;
   gap: 12px;
   border: 0;
-  background: #f8f3fc;
+  background: $background-surface2;
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 10px;
@@ -93,7 +93,7 @@ const openItem = (item: CoverItem) => {
   height: 44px;
   border-radius: 10px;
   background: $primary-color;
-  color: $secondary-color;
+  color: $on-accent;
   display: flex;
   align-items: center;
   justify-content: center;

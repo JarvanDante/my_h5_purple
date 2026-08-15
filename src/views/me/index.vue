@@ -270,7 +270,7 @@ onMounted(() => {
   height: 58px;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(160deg, #fdb927, #8a6bb3);
+  background: linear-gradient(160deg, #ffd6e6, #ff4d88);
   flex-shrink: 0;
 }
 
@@ -289,10 +289,10 @@ onMounted(() => {
   margin-top: 6px;
   height: 22px;
   padding: 0 8px;
-  border: 1px solid #ff4d4f;
+  border: 1px solid $primary-color;
   border-radius: 4px;
   background: #fff;
-  color: #ff4d4f;
+  color: $primary-color;
   font-size: 12px;
   letter-spacing: 0.3px;
 }
@@ -343,11 +343,11 @@ onMounted(() => {
   }
 
   &.vip {
-    background: linear-gradient(120deg, #ff6b7a, #ff3d5a);
+    background: linear-gradient(120deg, #ff7aa6, #ff4d88);
   }
 
   &.wallet {
-    background: linear-gradient(120deg, #ffb347, #ff8a1f);
+    background: linear-gradient(120deg, #9b7cff, #7b5be0);
   }
 }
 
@@ -430,7 +430,7 @@ onMounted(() => {
   margin: 12px;
   padding: 12px 4px;
   border-radius: 14px;
-  background: #f3f6fb;
+  background: $background-surface2;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 
@@ -518,7 +518,7 @@ onMounted(() => {
   height: 26px;
   border: 0;
   border-radius: 13px;
-  background: #ff5a8a;
+  background: $primary-color;
   color: #fff;
   font-size: 11px;
 }

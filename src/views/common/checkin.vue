@@ -40,7 +40,7 @@ const sign = () => {
   margin: 16px 12px;
   padding: 24px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, $primary-color, #7b3fa8);
+  background: linear-gradient(135deg, $primary-color, $secondary-color);
   color: #fff;
   text-align: center;
 
@@ -61,7 +61,7 @@ const sign = () => {
     border: 0;
     border-radius: 20px;
     background: $secondary-color;
-    color: #3d1a5e;
+    color: $on-accent;
     font-weight: 700;
 
     &:disabled {
@@ -93,7 +93,7 @@ const sign = () => {
   }
 
   &.on {
-    background: #f3ecfb;
+    background: $background-surface2;
     color: $primary-color;
 
     b {

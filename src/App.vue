@@ -87,7 +87,7 @@ const onTouchEnd = (e: TouchEvent) => {
   max-width: $phone-max-width;
   height: 100%;
   background: $background-page;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 50px rgba(58, 47, 53, 0.18);
   position: relative;
   overflow: hidden;
 }
@@ -95,8 +95,8 @@ const onTouchEnd = (e: TouchEvent) => {
 .maintain-bar {
   position: relative;
   z-index: 20;
-  background: #f59e0b;
-  color: #3d1a5e;
+  background: $background-surface2;
+  color: $primary-color-deep;
   text-align: center;
   font-size: 12px;
   padding: 6px 8px;

@@ -97,13 +97,13 @@ const go = (path: string) => {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: #333;
+  color: $text-color;
   cursor: pointer;
 
   transition: transform 0.16s ease;
 
   &.active {
-    color: $secondary-color;
+    color: $primary-color;
 
     .tab-icon {
       transform: scale(1.08);
