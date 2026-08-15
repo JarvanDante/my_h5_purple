@@ -64,6 +64,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'VIP' },
   },
   {
+    path: '/wallet',
+    name: 'Wallet',
+    component: () => import('@/views/common/wallet.vue'),
+    meta: { title: '钱包' },
+  },
+  {
     path: '/favorite',
     name: 'Favorite',
     component: () => import('@/views/common/favorite.vue'),

@@ -9,7 +9,7 @@
         </div>
       </div>
       <div class="stats">
-        <button type="button" @click="go('/vip')">
+        <button type="button" @click="go('/wallet')">
           <b>{{ user?.balance ?? 0 }}</b>
           <span>金币</span>
         </button>
@@ -58,7 +58,7 @@ const avatarStyle = computed(() => {
 
 const menus = [
   { title: 'VIP 会员', path: '/vip' },
-  { title: '金币钱包', path: '/vip' },
+  { title: '金币钱包', path: '/wallet' },
   { title: '我的收藏', path: '/favorite' },
   { title: '每日签到', path: '/checkin' },
 ]
