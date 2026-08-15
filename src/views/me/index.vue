@@ -66,13 +66,25 @@
       <p>同城约会</p>
       <button type="button" class="cta" @click="soon('同城约会')">立即约会</button>
     </aside>
+
+    <div v-if="showBind" class="bind-mask" @click.self="showBind = false">
+      <div class="bind-card">
+        <h3>绑定邀请</h3>
+        <p>请输入好友编号</p>
+        <input v-model="bindCode" type="text" maxlength="16" placeholder="如 000C" />
+        <div class="bind-actions">
+          <button type="button" @click="showBind = false">取消</button>
+          <button type="button" class="ok" :disabled="bindBusy" @click="submitBind">确定</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { showPromptDialog, showToast } from 'vant'
+import { showToast } from 'vant'
 import { bindInviteCode } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -86,6 +98,9 @@ const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
 const showPromo = ref(true)
+const showBind = ref(false)
+const bindCode = ref('')
+const bindBusy = ref(false)
 
 const iconClock =
   '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4.2l2.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
@@ -185,19 +200,10 @@ const onCircle = (item: { title: string; path: string }) => {
   soon(item.title)
 }
 
-const onTool = async (item: { title: string; key: string }) => {
+const onTool = (item: { title: string; key: string }) => {
   if (item.key === 'bind') {
-    try {
-      const code = await showPromptDialog({
-        title: '绑定邀请',
-        message: '请输入好友编号',
-      })
-      await bindInviteCode(String(code).trim())
-      showToast('绑定成功')
-    } catch (err) {
-      if (err === 'cancel' || err === undefined) return
-      toastError(err)
-    }
+    bindCode.value = ''
+    showBind.value = true
     return
   }
   if (item.key === 'credential') {
@@ -205,6 +211,24 @@ const onTool = async (item: { title: string; key: string }) => {
     return
   }
   soon(item.title)
+}
+
+const submitBind = async () => {
+  const code = bindCode.value.trim()
+  if (!code) {
+    showToast('请输入好友编号')
+    return
+  }
+  bindBusy.value = true
+  try {
+    await bindInviteCode(code)
+    showBind.value = false
+    showToast('绑定成功')
+  } catch (err) {
+    toastError(err)
+  } finally {
+    bindBusy.value = false
+  }
 }
 
 onMounted(() => {
@@ -495,5 +519,66 @@ onMounted(() => {
   background: #ff5a8a;
   color: #fff;
   font-size: 11px;
+}
+
+.bind-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.bind-card {
+  width: 100%;
+  max-width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 18px 16px 12px;
+
+  h3 {
+    text-align: center;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 8px 0 12px;
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+  }
+
+  input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 15px;
+  }
+}
+
+.bind-actions {
+  display: flex;
+  margin-top: 12px;
+  border-top: 1px solid #f2f2f2;
+
+  button {
+    flex: 1;
+    height: 42px;
+    border: 0;
+    background: transparent;
+    font-size: 15px;
+    color: #666;
+  }
+
+  .ok {
+    color: $primary-color;
+    font-weight: 600;
+    border-left: 1px solid #f2f2f2;
+  }
 }
 </style>
