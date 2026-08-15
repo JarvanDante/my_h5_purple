@@ -15,9 +15,14 @@
 
 ## 本地启动
 
+在 mydocker 的 node 容器里跑（不要在宿主机直接 `pnpm`）：
+
 ```bash
+cd ~/D/mydocker
+docker-compose exec node /bin/sh
+cd /var/www/html/my/my_h5_purple
 pnpm install
 pnpm dev
 ```
 
-默认 `http://127.0.0.1:5174`（避开 `jh_h5` 的 5173）。
+浏览器打开 `http://127.0.0.1:5174`（避开 `jh_h5` 的 5173）。
