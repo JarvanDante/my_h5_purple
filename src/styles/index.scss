@@ -1,0 +1,64 @@
+@use './variables.scss' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $background-dark;
+  color: $text-color;
+}
+
+body {
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+html {
+  scrollbar-width: none;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-shell {
+  min-height: 100%;
+  background: $background-page;
+  padding-bottom: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
+}
+
+.page-nav {
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $primary-color;
+  color: $text-color-light;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.page-empty {
+  padding: 80px 24px 0;
+  text-align: center;
+  color: $text-color-muted;
+  font-size: 14px;
+}
