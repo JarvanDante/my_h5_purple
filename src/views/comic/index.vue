@@ -52,7 +52,7 @@
       <transition :name="innerName">
         <div :key="channel + '-' + subTab" class="inner-pane">
           <section class="banner-row">
-            <div v-for="item in comics.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
+            <div v-for="item in covers.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
               <div class="banner-cover" :class="`tone-${item.tone}`" />
               <p class="ellipsis">{{ item.title }}</p>
               <span class="ad-tag">广告</span>
@@ -71,7 +71,8 @@
               <h3>今日上新：新作品已经准时送达</h3>
               <button type="button" @click="go('/list?type=daily')">更多 ›</button>
             </div>
-            <MediaGrid :items="comics" @select="open" />
+            <p v-if="!covers.length" class="page-empty">暂无漫画，子后台「漫画管理」上架后显示</p>
+            <MediaGrid v-else :items="covers" @select="open" />
           </section>
         </div>
       </transition>
@@ -80,12 +81,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaGrid from '@/components/MediaGrid.vue'
+import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useConfigStore } from '@/stores/config'
-import { comics, type CoverItem } from '@/data/mock'
+import type { CoverItem } from '@/data/mock'
+import { toastError } from '@/utils/request'
 
 defineOptions({ name: 'Comic' })
 
@@ -117,6 +120,18 @@ const quicks = [
   { icon: '📚', label: '分类', path: '/list?type=category' },
 ]
 
+const list = ref<ComicsItem[]>([])
+const covers = computed<CoverItem[]>(() =>
+  list.value.map((c) => ({
+    id: String(c.id),
+    title: c.title,
+    sub: c.author || `${c.chapter_count}话`,
+    tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
+    views: String(c.view_count),
+    tone: c.id % 6,
+  })),
+)
+
 const go = (path: string) => {
   router.push(path)
 }
@@ -124,6 +139,14 @@ const go = (path: string) => {
 const open = (item: CoverItem) => {
   router.push(`/comic/${item.id}`)
 }
+
+onMounted(() => {
+  fetchComicsList(1, 21)
+    .then((data) => {
+      list.value = data.list || []
+    })
+    .catch(toastError)
+})
 </script>
 
 <style scoped lang="scss">

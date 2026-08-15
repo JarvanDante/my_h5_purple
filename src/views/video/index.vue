@@ -18,7 +18,8 @@
     <div class="inner-slide">
       <transition :name="name">
         <section :key="tab" class="body">
-          <MediaGrid :items="videos" cols="cols-2" @select="open" />
+          <p v-if="!covers.length" class="page-empty">暂无视频，子后台「视频管理」上架后显示</p>
+          <MediaGrid v-else :items="covers" cols="cols-2" @select="open" />
         </section>
       </transition>
     </div>
@@ -26,11 +27,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import MediaGrid from '@/components/MediaGrid.vue'
+import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { videos, type CoverItem } from '@/data/mock'
+import type { CoverItem } from '@/data/mock'
+import { toastError } from '@/utils/request'
 
 defineOptions({ name: 'Video' })
 
@@ -40,9 +43,35 @@ const slide = useTabSlide(tabs)
 const tab = computed(() => slide.current.value)
 const name = computed(() => slide.name.value)
 const select = (item: string) => slide.select(item)
+const list = ref<VideoItem[]>([])
+
+const covers = computed<CoverItem[]>(() =>
+  list.value.map((v) => ({
+    id: String(v.id),
+    title: v.title,
+    sub: v.description,
+    duration: formatDuration(v.duration),
+    tone: v.id % 6,
+  })),
+)
+
+const formatDuration = (sec: number) => {
+  if (!sec) return ''
+  const m = Math.floor(sec / 60)
+  const s = sec % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
 
 const go = (path: string) => router.push(path)
 const open = (item: CoverItem) => router.push(`/video/${item.id}`)
+
+onMounted(() => {
+  fetchVideoList(1, 20)
+    .then((data) => {
+      list.value = data.list || []
+    })
+    .catch(toastError)
+})
 </script>
 
 <style scoped lang="scss">

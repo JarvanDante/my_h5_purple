@@ -40,6 +40,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '作品详情' },
   },
   {
+    path: '/comic/:id/read/:chapterId',
+    name: 'ComicRead',
+    component: () => import('@/views/comic/read.vue'),
+    meta: { title: '阅读' },
+  },
+  {
     path: '/video/:id',
     name: 'VideoDetail',
     component: () => import('@/views/video/detail.vue'),

@@ -1,49 +1,94 @@
 <template>
   <div class="page-shell sub-page">
-    <PageHeader :title="item.title" />
-    <div class="hero" :class="`tone-${item.tone}`" />
-    <section class="info">
+    <PageHeader :title="item?.title || '作品详情'" />
+    <div class="hero" :class="`tone-${tone}`" />
+    <section v-if="item" class="info">
       <h2>{{ item.title }}</h2>
-      <p>{{ item.sub }} · {{ item.views }}阅读</p>
+      <p>{{ item.author }} · {{ item.view_count }}阅读 · {{ item.chapter_count }}话</p>
       <div class="tags">
-        <span>{{ item.tag }}</span>
-        <span>连载</span>
-        <span>恋爱</span>
+        <span v-if="item.is_vip">VIP</span>
+        <span v-if="item.price">{{ item.price }}金币</span>
+        <span v-for="tag in item.tags" :key="tag">{{ tag }}</span>
       </div>
-      <p class="intro">
-        一个关于相遇与告别的故事。城市灯火次第亮起时，主角终于决定打开那扇尘封已久的门。
-      </p>
-      <button type="button" class="read-btn" @click="start">开始阅读</button>
+      <p class="intro">{{ item.intro }}</p>
+      <p v-if="item.reason" class="reason">{{ item.reason }}</p>
+      <button v-if="item.need_pay" type="button" class="read-btn" @click="buy">购买整部</button>
+      <button v-else type="button" class="read-btn" @click="startFirst">开始阅读</button>
     </section>
     <section class="chapters">
       <h3>目录</h3>
-      <button v-for="n in 12" :key="n" type="button" class="chapter" @click="start">
-        第 {{ n }} 话
+      <button
+        v-for="ch in chapters"
+        :key="ch.id"
+        type="button"
+        class="chapter"
+        :class="{ lock: !ch.playable }"
+        @click="openChapter(ch)"
+      >
+        {{ ch.title }}
       </button>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
-import { findComic } from '@/data/mock'
+import { buyComics, fetchComicsChapters, fetchComicsDetail, type ChapterItem, type ComicsDetail } from '@/api/comics'
+import { useUserStore } from '@/stores/user'
+import { toastError } from '@/utils/request'
 
 const route = useRoute()
-const item = computed(() => findComic(String(route.params.id)))
+const router = useRouter()
+const userStore = useUserStore()
+const item = ref<ComicsDetail | null>(null)
+const chapters = ref<ChapterItem[]>([])
+const tone = computed(() => (item.value?.id || 0) % 6)
 
-const start = () => {
-  showToast('阅读器稍后接入')
+const load = async () => {
+  const id = Number(route.params.id)
+  const [d, c] = await Promise.all([fetchComicsDetail(id), fetchComicsChapters(id)])
+  item.value = d
+  chapters.value = c.list || []
 }
+
+const buy = async () => {
+  if (!item.value) return
+  try {
+    const res = await buyComics(item.value.id)
+    await userStore.refresh()
+    showToast(`购买成功，余额 ${res.balance}`)
+    await load()
+  } catch (err) {
+    toastError(err)
+  }
+}
+
+const openChapter = (ch: ChapterItem) => {
+  if (!ch.playable) {
+    showToast(item.value?.need_vip ? '请先开通 VIP' : '请先购买')
+    return
+  }
+  router.push(`/comic/${route.params.id}/read/${ch.id}`)
+}
+
+const startFirst = () => {
+  const first = chapters.value.find((c) => c.playable) || chapters.value[0]
+  if (first) openChapter(first)
+}
+
+onMounted(() => {
+  load().catch(toastError)
+})
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
 .hero {
-  height: 220px;
+  height: 180px;
 }
 
 .tone-0 { background: linear-gradient(160deg, #d9c7ee, #8a6bb3); }
@@ -74,8 +119,13 @@ h2 {
   line-height: 1.6;
 }
 
+.reason {
+  color: #c2410c !important;
+}
+
 .tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 10px 0;
 
@@ -120,5 +170,9 @@ h2 {
   border-radius: 6px;
   font-size: 12px;
   color: #333;
+
+  &.lock {
+    color: #bbb;
+  }
 }
 </style>
