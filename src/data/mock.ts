@@ -5,6 +5,7 @@ export type CoverItem = {
   tag?: string
   duration?: string
   views?: string
+  cover?: string
   tone: number
 }
 
