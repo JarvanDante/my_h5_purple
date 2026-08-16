@@ -1,29 +1,43 @@
 <template>
   <div class="page-shell video-page">
     <header class="video-header">
-      <div class="tab-row">
-        <div class="tabs">
+      <div class="channel-row">
+        <span class="site-name">{{ appName }}</span>
+        <div class="channel-tabs">
           <button
-            v-for="item in tabs"
+            v-for="item in channels"
             :key="item"
             type="button"
-            class="tab-item"
-            :class="{ active: tab === item }"
-            @click="select(item)"
+            class="channel-item"
+            :class="{ active: channel === item }"
+            @click="selectChannel(item)"
           >
             {{ item }}
           </button>
         </div>
         <button type="button" class="checkin-btn" @click="go('/checkin')">
-          <span>🎁</span>
+          <span class="gift">🎁</span>
           签到
+        </button>
+      </div>
+
+      <div class="sub-row">
+        <button
+          v-for="item in subTabs"
+          :key="item"
+          type="button"
+          class="sub-item"
+          :class="{ active: subTab === item }"
+          @click="selectSub(item)"
+        >
+          {{ item }}
         </button>
       </div>
 
       <div class="search-row">
         <div class="search-box" @click="go('/search')">
           <span class="search-icon">⌕</span>
-          <span>搜索更多视频</span>
+          <span>搜索更多{{ channel }}</span>
         </div>
         <button type="button" class="side-action vip" @click="go('/vip')">
           <span>VIP</span>
@@ -34,27 +48,21 @@
           收藏
         </button>
       </div>
-
-      <section class="ad-row">
-        <button
-          v-for="item in ads"
-          :key="item.id"
-          type="button"
-          class="ad-card"
-          @click="open(item)"
-        >
-          <div class="ad-cover" :class="`tone-${item.tone}`">
-            <img v-if="item.cover" :src="item.cover" alt="" />
-          </div>
-          <p class="ellipsis">{{ item.title }}</p>
-          <span>广告</span>
-        </button>
-      </section>
     </header>
 
     <div class="inner-slide">
-      <transition :name="name">
-        <div :key="tab" class="inner-pane">
+      <transition :name="innerName">
+        <div :key="channel + '-' + subTab" class="inner-pane">
+          <section class="banner-row">
+            <div v-for="item in ads.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
+              <div class="banner-cover" :class="`tone-${item.tone}`">
+                <img v-if="item.cover" :src="item.cover" alt="" />
+              </div>
+              <p class="ellipsis">{{ item.title }}</p>
+              <span class="ad-tag">广告</span>
+            </div>
+          </section>
+
           <section class="quick-grid">
             <button v-for="item in quicks" :key="item.label" type="button" @click="onQuick(item)">
               <span class="q-icon" :style="{ background: item.bg }">{{ item.icon }}</span>
@@ -92,17 +100,32 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
+import { useConfigStore } from '@/stores/config'
 import { videos, type CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Video' })
 
 const router = useRouter()
-const tabs = ['热门', '最新', '热播', '短视频', '长视频']
-const slide = useTabSlide(tabs)
-const tab = computed(() => slide.current.value)
-const name = computed(() => slide.name.value)
-const select = (item: string) => slide.select(item)
+const appName = computed(() => useConfigStore().appName)
+const channels = ['热门', '最新', '热播', '短视频', '长视频']
+const subTabs = ['推荐', '日更', '排行', '金币', '免费', '片商', '分类']
+const channelSlide = useTabSlide(channels)
+const subSlide = useTabSlide(subTabs)
+const channel = computed(() => channelSlide.current.value)
+const subTab = computed(() => subSlide.current.value)
+const innerName = ref('tab-left')
+
+const selectChannel = (item: string) => {
+  channelSlide.select(item)
+  innerName.value = channelSlide.name.value
+}
+
+const selectSub = (item: string) => {
+  subSlide.select(item)
+  innerName.value = subSlide.name.value
+}
+
 const list = ref<VideoItem[]>([])
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -171,41 +194,83 @@ onMounted(() => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-$video-red: $primary-color;
-
 .video-header {
-  background: $video-red;
+  background: $primary-color;
   color: #fff;
-  padding: 8px 0 12px;
+  padding: 8px 12px 12px;
 }
 
-.tab-row,
+.channel-row,
+.sub-row,
 .search-row {
   display: flex;
   align-items: center;
-  padding: 0 12px;
 }
 
-.tabs {
+.channel-row {
+  gap: 10px;
+}
+
+.channel-tabs {
   flex: 1;
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 12px;
   overflow-x: auto;
   min-width: 0;
 }
 
-.tab-item {
+.site-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: $secondary-color;
+  flex-shrink: 0;
+}
+
+.channel-item {
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 18px;
+  font-weight: 600;
+  padding: 4px 0;
+
+  &.active {
+    color: #fff;
+  }
+}
+
+.checkin-btn {
+  margin-left: 0;
+  flex-shrink: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.sub-row {
+  margin-top: 8px;
+  gap: 14px;
+  overflow-x: auto;
+}
+
+.sub-item {
   flex-shrink: 0;
   border: 0;
   background: transparent;
   color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-  font-weight: 600;
-  padding: 6px 0 8px;
+  font-size: 13px;
+  padding: 6px 0;
   position: relative;
 
   &.active {
     color: #fff;
+    font-weight: 600;
 
     &::after {
       content: '';
@@ -220,26 +285,8 @@ $video-red: $primary-color;
   }
 }
 
-.checkin-btn {
-  margin-left: 8px;
-  border: 0;
-  background: transparent;
-  color: #fff;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  flex-shrink: 0;
-
-  span {
-    font-size: 18px;
-    line-height: 1;
-  }
-}
-
 .search-row {
-  margin-top: 8px;
+  margin-top: 10px;
   gap: 8px;
 }
 
@@ -247,8 +294,8 @@ $video-red: $primary-color;
   flex: 1;
   height: 34px;
   border-radius: 17px;
-  background: rgba(0, 0, 0, 0.28);
-  color: rgba(255, 255, 255, 0.75);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.72);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -277,46 +324,22 @@ $video-red: $primary-color;
     font-weight: 700;
   }
 
-  &.vip span {
-    color: $secondary-color;
-  }
-
+  &.vip span,
   &.fav span {
     color: $secondary-color;
   }
 }
 
-.ad-row {
-  display: flex;
+.banner-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  overflow-x: auto;
-  padding: 12px 12px 0;
+  background: #fff;
+  padding: 12px;
 }
 
-.ad-card {
-  width: 72px;
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  padding: 0;
-  text-align: left;
-  color: #fff;
-
-  p {
-    margin-top: 6px;
-    font-size: 11px;
-  }
-
-  span {
-    display: block;
-    margin-top: 2px;
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.45);
-  }
-}
-
-.ad-cover {
-  height: 96px;
+.banner-cover {
+  height: 92px;
   border-radius: 6px;
   overflow: hidden;
 
@@ -325,6 +348,19 @@ $video-red: $primary-color;
     height: 100%;
     object-fit: cover;
   }
+}
+
+.banner-card p {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #333;
+}
+
+.ad-tag {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 10px;
+  color: #bbb;
 }
 
 .inner-slide {
