@@ -32,3 +32,14 @@ pnpm dev
 |---|---|---|---|---|
 | P1-1 充值订单 | 钱包点套餐 mock 到账 | `POST /user/recharge/do` `POST /user/recharge/mock-pay` | 资金管理 → 充值订单 | 已接 |
 | P1-2 媒资播放 | 视频详情 HLS | `GET /video/detail`（回 my_play 签名地址） | 视频管理 → 视频列表（媒资同步） | 已接 |
+
+## P2 验收对照
+
+| 项 | 前台 | 接口 | 子后台 | 状态 |
+|---|---|---|---|---|
+| P2-1 兑换码 | 我的 → 兑换码 | `POST /user/code/redeem` `GET /user/code/logs` | 运营管理 → 兑换码 | 已接 |
+| P2-2 签到 | 签到页 | `POST /checkin/prize` `POST /checkin/click` | 用户管理 / 成长 | 已接 |
+| P2-3 优惠券 | 我的 → 优惠券 | `GET /coupon/tpls` `POST /coupon/receive` | 资金管理 → 优惠券 | 已接 |
+| P2-4 抽奖 | 我的 → 抽奖 | `GET /lottery/info` `POST /lottery/draw` | 运营管理 → 抽奖 | 已接 |
+| P2-5 社区帖子 | 星球 | `GET /post/list` `GET /post/detail` | 社区管理 → 帖子 | 已接 |
+| P2-6 站内消息 | 我的 → 站内消息 | `GET /message/list` `/unread` | 用户管理 → 站内消息 | 已接 |

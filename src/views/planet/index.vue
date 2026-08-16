@@ -17,15 +17,17 @@
     <div class="inner-slide">
       <transition :name="name">
         <div :key="tab">
-          <article v-for="post in posts" :key="post.id" class="post" @click="goPost">
-            <div class="avatar" :class="`tone-${post.tone}`" />
+          <p v-if="!list.length" class="empty">暂无帖子，子后台「社区管理 → 帖子」审核通过后显示</p>
+          <article v-for="post in list" :key="post.id" class="post" @click="goPost(post.id)">
+            <div class="avatar" :class="`tone-${post.id % 5}`" />
             <div class="main">
-              <h3>{{ post.user }}</h3>
-              <p>{{ post.text }}</p>
-              <div class="pic" :class="`tone-${post.tone}`" />
+              <h3>{{ post.title }}</h3>
+              <p>{{ post.content }}</p>
+              <img v-if="post.pics?.[0]" class="pic" :src="mediaUrl(post.pics[0])" alt="" />
+              <div v-else class="pic" :class="`tone-${post.id % 5}`" />
               <div class="bar">
-                <span>♡ {{ post.likes }}</span>
-                <span>💬 {{ post.comments }}</span>
+                <span>♡ {{ post.like_count }}</span>
+                <span>💬 {{ post.comment_count }}</span>
               </div>
             </div>
           </article>
@@ -36,22 +38,37 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { showToast } from 'vant'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { posts } from '@/data/mock'
+import { fetchPostList, type PostItem } from '@/api/ops'
+import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
 
+const router = useRouter()
 const tabs = ['广场', '关注', '最新']
 const slide = useTabSlide(tabs)
 const tab = computed(() => slide.current.value)
 const name = computed(() => slide.name.value)
+const list = ref<PostItem[]>([])
 const select = (item: string) => slide.select(item)
 
-const goPost = () => {
-  showToast('帖子详情稍后接入')
+const load = () => {
+  const sort = tab.value === '广场' || tab.value === '关注' ? 'hot' : 'new'
+  fetchPostList(sort, 1, 20)
+    .then((data) => {
+      list.value = data.list || []
+    })
+    .catch(toastError)
 }
+
+const goPost = (id: number) => {
+  router.push(`/planet/${id}`)
+}
+
+watch(tab, load)
+onMounted(load)
 </script>
 
 <style scoped lang="scss">
@@ -133,8 +150,16 @@ const goPost = () => {
   }
 }
 
+.empty {
+  padding: 24px 12px;
+  color: #999;
+  font-size: 13px;
+}
+
 .pic {
+  width: 100%;
   height: 140px;
+  object-fit: cover;
   border-radius: 8px;
 }
 

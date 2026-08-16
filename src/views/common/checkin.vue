@@ -3,34 +3,71 @@
     <PageHeader title="每日签到" />
     <section class="hero">
       <p>连续签到</p>
-      <strong>{{ day }} 天</strong>
-      <button type="button" :disabled="done" @click="sign">
-        {{ done ? '今日已签到' : '立即签到' }}
+      <strong>{{ info?.continuously_days ?? 0 }} 天</strong>
+      <button type="button" :disabled="info?.today_checked || busy" @click="sign">
+        {{ info?.today_checked ? '今日已签到' : '立即签到' }}
       </button>
     </section>
     <section class="days">
-      <div v-for="n in 7" :key="n" class="day" :class="{ on: n <= day }">
-        <span>第{{ n }}天</span>
-        <b>+{{ n * 10 }}</b>
+      <div
+        v-for="item in rewards"
+        :key="item.day_num"
+        class="day"
+        :class="{ on: (info?.continuously_days ?? 0) >= item.day_num }"
+      >
+        <span>第{{ item.day_num }}天</span>
+        <b>+{{ item.gold }}</b>
       </div>
     </section>
-    <p class="tip">签到领取金币，可用于解锁章节。此页为本地演示数据。</p>
+    <p class="tip">签到领取金币，规则在子后台「用户管理 / 成长」配置。</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
+import { doCheckin, fetchCheckinInfo, type CheckinInfo } from '@/api/ops'
+import { useUserStore } from '@/stores/user'
+import { toastError } from '@/utils/request'
 
-const day = ref(3)
-const done = ref(false)
+const userStore = useUserStore()
+const info = ref<CheckinInfo | null>(null)
+const busy = ref(false)
+const rewards = computed(() => info.value?.rewards?.length ? info.value.rewards : [
+  { day_num: 1, gold: 10, vip_days: 0 },
+  { day_num: 2, gold: 20, vip_days: 0 },
+  { day_num: 3, gold: 30, vip_days: 0 },
+  { day_num: 7, gold: 70, vip_days: 0 },
+])
 
-const sign = () => {
-  done.value = true
-  day.value += 1
-  showToast('签到成功，金币 +40')
+const load = async () => {
+  info.value = await fetchCheckinInfo()
 }
+
+const sign = async () => {
+  if (busy.value || info.value?.today_checked) return
+  busy.value = true
+  try {
+    await userStore.ensureLogin()
+    const res = await doCheckin()
+    showToast(res.message || '签到成功')
+    await Promise.all([load(), userStore.refresh()])
+  } catch (err) {
+    toastError(err)
+  } finally {
+    busy.value = false
+  }
+}
+
+onMounted(async () => {
+  try {
+    await userStore.ensureLogin()
+    await load()
+  } catch (err) {
+    toastError(err)
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -83,27 +120,26 @@ const sign = () => {
   padding: 10px 6px;
   text-align: center;
   color: #999;
-  font-size: 11px;
+
+  span {
+    display: block;
+    font-size: 11px;
+  }
 
   b {
     display: block;
     margin-top: 4px;
-    color: #333;
-    font-size: 14px;
+    color: $primary-color;
   }
 
   &.on {
-    background: $background-surface2;
+    outline: 1px solid $primary-color;
     color: $primary-color;
-
-    b {
-      color: $primary-color;
-    }
   }
 }
 
 .tip {
-  padding: 16px;
+  margin: 16px 12px;
   color: #999;
   font-size: 12px;
 }

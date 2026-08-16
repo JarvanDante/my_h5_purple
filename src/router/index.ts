@@ -76,6 +76,36 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '钱包' },
   },
   {
+    path: '/redeem',
+    name: 'Redeem',
+    component: () => import('@/views/common/redeem.vue'),
+    meta: { title: '兑换码' },
+  },
+  {
+    path: '/coupon',
+    name: 'Coupon',
+    component: () => import('@/views/common/coupon.vue'),
+    meta: { title: '优惠券' },
+  },
+  {
+    path: '/lottery',
+    name: 'Lottery',
+    component: () => import('@/views/common/lottery.vue'),
+    meta: { title: '抽奖' },
+  },
+  {
+    path: '/message',
+    name: 'Message',
+    component: () => import('@/views/common/message.vue'),
+    meta: { title: '站内消息' },
+  },
+  {
+    path: '/planet/:id',
+    name: 'PostDetail',
+    component: () => import('@/views/planet/detail.vue'),
+    meta: { title: '帖子详情' },
+  },
+  {
     path: '/favorite',
     name: 'Favorite',
     component: () => import('@/views/common/favorite.vue'),

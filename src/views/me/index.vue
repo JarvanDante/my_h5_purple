@@ -151,6 +151,10 @@ const circles = [
 ]
 
 const tools = [
+  { title: '兑换码', key: 'redeem', icon: iconGift },
+  { title: '优惠券', key: 'coupon', icon: iconBag },
+  { title: '抽奖', key: 'lottery', icon: iconStar },
+  { title: '站内消息', key: 'message', icon: iconChat },
   { title: '账户凭证', key: 'credential', icon: iconBadge },
   { title: '绑定邀请', key: 'bind', icon: iconLink },
   { title: '应用中心', key: 'app', icon: iconApp },
@@ -202,6 +206,16 @@ const onCircle = (item: { title: string; path: string }) => {
 }
 
 const onTool = (item: { title: string; key: string }) => {
+  const paths: Record<string, string> = {
+    redeem: '/redeem',
+    coupon: '/coupon',
+    lottery: '/lottery',
+    message: '/message',
+  }
+  if (paths[item.key]) {
+    go(paths[item.key])
+    return
+  }
   if (item.key === 'bind') {
     bindCode.value = ''
     showBind.value = true
