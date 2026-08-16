@@ -25,3 +25,9 @@ pnpm dev
 | P0-3 会员 VIP | VIP 页 | `GET /user/vip` `POST /user/vip/do` | 用户管理 → 会员等级 | 已接 |
 | P0-4 金币钱包 | 我的 / 钱包 | `GET /wallet/balance` `GET /user/recharge` | 资金管理 → 金币钱包 | 已接 |
 | P0-5 主内容 | 二次元 / 视频 | `/comics/list` `/video/list` + detail | 漫画管理 / 视频管理 | 已接 |
+
+## P1 验收对照
+
+| 项 | 前台 | 接口 | 子后台 | 状态 |
+|---|---|---|---|---|
+| P1-1 充值订单 | 钱包点套餐 mock 到账 | `POST /user/recharge/do` `POST /user/recharge/mock-pay` | 资金管理 → 充值订单 | 已接 |

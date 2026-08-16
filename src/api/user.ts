@@ -64,3 +64,17 @@ export function bindInviteCode(code: string) {
 export function fetchRechargePackages() {
   return request<{ list: RechargePackage[] }>('/user/recharge')
 }
+
+export function createRecharge(packageId: number) {
+  return request<{ order_no: string; amount: number; coin: number }>('/user/recharge/do', {
+    method: 'POST',
+    body: JSON.stringify({ package_id: packageId }),
+  })
+}
+
+export function mockPayRecharge(orderNo: string) {
+  return request<Record<string, never>>('/user/recharge/mock-pay', {
+    method: 'POST',
+    body: JSON.stringify({ order_no: orderNo }),
+  })
+}

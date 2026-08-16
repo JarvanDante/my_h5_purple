@@ -8,13 +8,19 @@
     </section>
     <section v-if="packs.length" class="packs">
       <h3>充值套餐</h3>
-      <button v-for="p in packs" :key="p.id" type="button" @click="hint(p.name)">
+      <button
+        v-for="p in packs"
+        :key="p.id"
+        type="button"
+        :disabled="paying"
+        @click="buy(p)"
+      >
         {{ p.name }} · {{ p.coin }}+{{ p.bonus }} 金币 / {{ p.amount }}
       </button>
     </section>
     <section class="waters">
       <h3>流水</h3>
-      <p v-if="!waters.length" class="empty">暂无流水，子后台加币后刷新</p>
+      <p v-if="!waters.length" class="empty">暂无流水，点套餐 mock 支付后会出现</p>
       <div v-for="w in waters" :key="w.id" class="row">
         <div>
           <b>{{ w.remark || w.scene }}</b>
@@ -30,7 +36,7 @@
 import { onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
-import { fetchRechargePackages, type RechargePackage } from '@/api/user'
+import { createRecharge, fetchRechargePackages, mockPayRecharge, type RechargePackage } from '@/api/user'
 import { fetchWalletBalance, fetchWalletWaters, type WalletBalance, type WaterItem } from '@/api/wallet'
 import { useUserStore } from '@/stores/user'
 import { toastError } from '@/utils/request'
@@ -39,21 +45,35 @@ const userStore = useUserStore()
 const wallet = ref<WalletBalance | null>(null)
 const waters = ref<WaterItem[]>([])
 const packs = ref<RechargePackage[]>([])
+const paying = ref(false)
 
-const hint = (name: string) => {
-  showToast(`${name} 支付回调仍弱，验收请走子后台加币`)
+const loadWallet = async () => {
+  const [b, w] = await Promise.all([fetchWalletBalance(), fetchWalletWaters(1, 20)])
+  wallet.value = b
+  waters.value = w.list || []
+}
+
+const buy = async (p: RechargePackage) => {
+  if (paying.value) return
+  paying.value = true
+  try {
+    await userStore.ensureLogin()
+    const order = await createRecharge(p.id)
+    await mockPayRecharge(order.order_no)
+    await Promise.all([loadWallet(), userStore.refresh()])
+    showToast(`已到账 ${order.coin} 金币`)
+  } catch (err) {
+    toastError(err)
+  } finally {
+    paying.value = false
+  }
 }
 
 onMounted(async () => {
   try {
-    const [b, w, r] = await Promise.all([
-      fetchWalletBalance(),
-      fetchWalletWaters(1, 20),
-      fetchRechargePackages(),
-    ])
-    wallet.value = b
-    waters.value = w.list || []
+    const r = await fetchRechargePackages()
     packs.value = r.list || []
+    await loadWallet()
   } catch (err) {
     toastError(err)
   }
