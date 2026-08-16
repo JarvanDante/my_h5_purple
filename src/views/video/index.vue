@@ -73,7 +73,7 @@
           <section class="block">
             <div class="block-head">
               <h3>日更限定//特别放送//🎬🎬🎬</h3>
-              <button type="button" @click="go('/list?type=daily')">更多 ›</button>
+              <button type="button" @click="go('/list?media=video&type=daily')">更多 ›</button>
             </div>
             <p v-if="!covers.length" class="page-empty">暂无视频，子后台「视频管理」上架后显示</p>
             <div v-else class="video-grid">
@@ -155,14 +155,14 @@ const ads = computed<CoverItem[]>(() => {
 const quicks = [
   { icon: '👑', label: '抢先看', bg: '#ffe4ec', path: '/vip' },
   { icon: '📹', label: '直播', bg: '#ffe8f0', path: '' },
-  { icon: '📖', label: '专题', bg: '#fff3e0', path: '/list?type=topic' },
+  { icon: '📖', label: '专题', bg: '#fff3e0', path: '/list?media=video&type=topic' },
   { icon: '🪙', label: '金币专区', bg: '#fff6d8', path: '/wallet' },
-  { icon: '🎁', label: '热门', bg: '#ffe4d6', path: '/list?type=hot' },
-  { icon: '🏆', label: '排行', bg: '#e8f1ff', path: '/list?type=rank' },
-  { icon: '🎬', label: '片商', bg: '#f3e8ff', path: '/list?type=category' },
+  { icon: '🎁', label: '热门', bg: '#ffe4d6', path: '/list?media=video&type=hot' },
+  { icon: '🏆', label: '排行', bg: '#e8f1ff', path: '/list?media=video&type=rank' },
+  { icon: '🎬', label: '片商', bg: '#f3e8ff', path: '/list?media=video&type=category' },
   { icon: '⭐', label: '演员', bg: '#ffe8ea', path: '' },
-  { icon: '📁', label: '分类', bg: '#e8f8ef', path: '/list?type=category' },
-  { icon: '✨', label: '原创', bg: '#e8f4ff', path: '/list?type=daily' },
+  { icon: '📁', label: '分类', bg: '#e8f8ef', path: '/list?media=video&type=category' },
+  { icon: '✨', label: '原创', bg: '#e8f4ff', path: '/list?media=video&type=daily' },
 ]
 
 const go = (path: string) => router.push(path)

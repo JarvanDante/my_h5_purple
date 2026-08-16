@@ -69,7 +69,7 @@
           <section class="block">
             <div class="block-head">
               <h3>今日上新：新作品已经准时送达</h3>
-              <button type="button" @click="go('/list?type=daily')">更多 ›</button>
+              <button type="button" @click="go('/list?media=comic&type=daily')">更多 ›</button>
             </div>
             <p v-if="!covers.length" class="page-empty">暂无漫画，子后台「漫画管理」上架后显示</p>
             <MediaGrid v-else :items="covers" @select="open" />
@@ -88,7 +88,7 @@ import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useConfigStore } from '@/stores/config'
 import type { CoverItem } from '@/data/mock'
-import { toastError } from '@/utils/request'
+import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Comic' })
 
@@ -113,11 +113,11 @@ const selectSub = (item: string) => {
 }
 
 const quicks = [
-  { icon: '📍', label: '专题', path: '/list?type=topic' },
-  { icon: '🔥', label: '热门', path: '/list?type=hot' },
-  { icon: '📅', label: '每日', path: '/list?type=daily' },
-  { icon: '🏆', label: '榜单', path: '/list?type=rank' },
-  { icon: '📚', label: '分类', path: '/list?type=category' },
+  { icon: '📍', label: '专题', path: '/list?media=comic&type=topic' },
+  { icon: '🔥', label: '热门', path: '/list?media=comic&type=hot' },
+  { icon: '📅', label: '每日', path: '/list?media=comic&type=daily' },
+  { icon: '🏆', label: '榜单', path: '/list?media=comic&type=rank' },
+  { icon: '📚', label: '分类', path: '/list?media=comic&type=category' },
 ]
 
 const list = ref<ComicsItem[]>([])
@@ -128,6 +128,7 @@ const covers = computed<CoverItem[]>(() =>
     sub: c.author || `${c.chapter_count}话`,
     tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
     views: String(c.view_count),
+    cover: mediaUrl(c.cover),
     tone: c.id % 6,
   })),
 )

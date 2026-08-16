@@ -2,6 +2,7 @@
   <div class="media-grid" :class="cols">
     <article v-for="item in items" :key="item.id" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
+        <img v-if="item.cover" :src="item.cover" alt="" />
         <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
         <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
@@ -45,6 +46,13 @@ defineEmits<{
   position: relative;
   border-radius: 8px;
   height: 132px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .cols-2 .thumb {
