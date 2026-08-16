@@ -31,3 +31,4 @@ pnpm dev
 | 项 | 前台 | 接口 | 子后台 | 状态 |
 |---|---|---|---|---|
 | P1-1 充值订单 | 钱包点套餐 mock 到账 | `POST /user/recharge/do` `POST /user/recharge/mock-pay` | 资金管理 → 充值订单 | 已接 |
+| P1-2 媒资播放 | 视频详情 HLS | `GET /video/detail`（回 my_play 签名地址） | 视频管理 → 视频列表（媒资同步） | 已接 |

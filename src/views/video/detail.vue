@@ -2,7 +2,7 @@
   <div class="page-shell sub-page">
     <PageHeader :title="item?.title || '视频详情'" />
     <div class="player" :class="`tone-${tone}`">
-      <video v-if="item?.source_url" :src="item.source_url" controls playsinline class="media" />
+      <HlsPlayer v-if="item?.source_url" :src="item.source_url" :poster="item.cover_url" />
       <span v-else>暂无播放地址，请在媒资中心转码后回填</span>
     </div>
     <section class="info">
@@ -16,6 +16,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
+import HlsPlayer from '@/components/HlsPlayer.vue'
 import { fetchVideoDetail, type VideoItem } from '@/api/video'
 import { toastError } from '@/utils/request'
 
@@ -40,12 +41,6 @@ onMounted(() => {
   justify-content: center;
   color: #fff;
   font-size: 14px;
-}
-
-.media {
-  width: 100%;
-  max-height: 240px;
-  background: #000;
 }
 
 .tone-0 { background: linear-gradient(160deg, #ffd0e0, #ff4d88); }
