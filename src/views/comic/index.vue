@@ -1,7 +1,6 @@
 <template>
   <div class="page-shell comic-page">
     <HomeHeader
-      :site-name="appName"
       :channels="channels"
       :channel="channel"
       :sub-tabs="subTabs"
@@ -48,14 +47,12 @@ import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { useConfigStore } from '@/stores/config'
 import type { CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Comic' })
 
 const router = useRouter()
-const appName = computed(() => useConfigStore().appName)
 const channels = ['漫画', '动漫', '小说', '短剧']
 const subTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
 const channelSlide = useTabSlide(channels)

@@ -1,7 +1,6 @@
 <template>
   <div class="page-shell video-page">
     <HomeHeader
-      :site-name="appName"
       :channels="channels"
       :channel="channel"
       :sub-tabs="subTabs"
@@ -56,7 +55,6 @@ import { showToast } from 'vant'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { useConfigStore } from '@/stores/config'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -64,7 +62,6 @@ import { mediaUrl, toastError } from '@/utils/request'
 defineOptions({ name: 'Video' })
 
 const router = useRouter()
-const appName = computed(() => useConfigStore().appName)
 const channels = ['热门', '最新', '热播', '短视频', '长视频']
 const subTabs = ['推荐', '日更', '排行', '金币', '免费', '片商', '分类']
 const channelSlide = useTabSlide(channels)

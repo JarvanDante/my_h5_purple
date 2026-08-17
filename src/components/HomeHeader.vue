@@ -1,7 +1,6 @@
 <template>
   <header class="home-header">
     <div class="channel-row">
-      <span class="site-name">{{ siteName }}</span>
       <div class="channel-tabs">
         <button
           v-for="item in channels"
@@ -46,7 +45,6 @@
 
 <script setup lang="ts">
 defineProps<{
-  siteName: string
   channels: string[]
   channel: string
   subTabs: string[]
@@ -95,15 +93,6 @@ defineEmits<{
   align-items: center;
   gap: 8px;
   min-width: 0;
-  margin: 0 8px;
-}
-
-.site-name {
-  font-size: 13px;
-  font-weight: 800;
-  color: $primary-color-deep;
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
 .channel-item,
