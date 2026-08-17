@@ -76,18 +76,13 @@ const onTouchEnd = (e: TouchEvent) => {
 #app {
   width: 100%;
   height: 100%;
-  background: $background-dark;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: $background-page;
 }
 
 .app-container {
   width: 100%;
-  max-width: $phone-max-width;
   height: 100%;
   background: $background-page;
-  box-shadow: 0 0 50px rgba(58, 47, 53, 0.18);
   position: relative;
   overflow: hidden;
 }
@@ -115,14 +110,22 @@ const onTouchEnd = (e: TouchEvent) => {
   -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 414px) {
+@media (min-width: $desktop-preview-min) {
+  html,
+  body,
   #app {
-    background: $background-page;
+    background: $background-dark;
+  }
+
+  #app {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .app-container {
-    max-width: 100%;
-    box-shadow: none;
+    max-width: $phone-max-width;
+    box-shadow: 0 0 50px rgba(58, 47, 53, 0.18);
   }
 }
 

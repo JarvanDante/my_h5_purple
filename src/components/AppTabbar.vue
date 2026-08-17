@@ -73,10 +73,8 @@ const go = (path: string) => {
 .app-tabbar {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   width: 100%;
-  max-width: $phone-max-width;
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 4px 4px env(safe-area-inset-bottom, 0px);
   background: #fff;
@@ -133,11 +131,11 @@ const go = (path: string) => {
   font-weight: 500;
 }
 
-@media (max-width: 414px) {
+@media (min-width: $desktop-preview-min) {
   .app-tabbar {
-    left: 0;
-    transform: none;
-    max-width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: $phone-max-width;
   }
 }
 </style>
