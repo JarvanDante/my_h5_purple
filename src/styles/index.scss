@@ -2,7 +2,13 @@
 
 :root {
   --van-primary-color: #{$primary-color};
-  --van-danger-color: #{$primary-color};
+  --van-danger-color: #{$danger-color};
+  --color-primary: #{$primary-color};
+  --color-primary-deep: #{$primary-color-deep};
+  --color-secondary: #{$secondary-color};
+  --color-secondary-dark: #{$secondary-dark};
+  --color-bg: #{$background-page};
+  --color-danger: #{$danger-color};
 }
 
 * {

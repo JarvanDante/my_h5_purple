@@ -1,0 +1,10 @@
+@use './variables.scss' as *;
+
+@mixin media-tones {
+  .tone-0 { background: linear-gradient(160deg, $secondary-color, $primary-color); }
+  .tone-1 { background: linear-gradient(160deg, $background-page, $primary-color-deep); }
+  .tone-2 { background: linear-gradient(160deg, $secondary-color, $danger-color); }
+  .tone-3 { background: linear-gradient(160deg, $background-page, $primary-color); }
+  .tone-4 { background: linear-gradient(160deg, $secondary-color, $primary-color-deep); }
+  .tone-5 { background: linear-gradient(160deg, $background-page, $secondary-dark); }
+}

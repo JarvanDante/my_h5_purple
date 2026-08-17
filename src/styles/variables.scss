@@ -1,21 +1,22 @@
-// 樱粉少女（sakura）
-$primary-color: #ff4d88;
-$primary-color-deep: #e03a72;
-$secondary-color: #7b5be0;
-$danger-color: #ff4d88;
+// 主题色（设计稿取样）
+$primary-color: #f880ac;      // 主色
+$primary-color-deep: #f7659f; // 主色强调（更饱和粉）
+$secondary-color: #fab5d0;    // 辅助浅色
+$secondary-dark: #2f0b12;     // 辅助深色
+$danger-color: #c5303a;       // 警示提醒色
 $on-accent: #ffffff;
 
-$text-color: #3a2f35;
-$text-color-secondary: #6b5c64;
-$text-color-muted: #9a8892;
+$text-color: $secondary-dark;
+$text-color-secondary: #6a3a44;
+$text-color-muted: #9a6b76;
 $text-color-light: #ffffff;
 
 $background-color: #ffffff;
-$background-page: #fff5f8;
-$background-surface2: #ffeaf1;
-$background-dark: #3a2f35;
+$background-page: #fde2f0;    // 背景色
+$background-surface2: $secondary-color;
+$background-dark: $secondary-dark;
 
-$border-color: #f3d9e3;
+$border-color: #f4c6d8;
 $tabbar-height: 54px;
 // 仅桌面预览时限制内容宽度；真机一律铺满，避免宽屏手机两侧留白
 $phone-max-width: 480px;

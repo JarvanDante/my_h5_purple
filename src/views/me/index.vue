@@ -145,8 +145,8 @@ const promos = [
 
 const circles = [
   { title: '我的帖子', mark: '帖', bg: '#fff3e6', color: '#f08a24', path: '/planet' },
-  { title: '我的视频', mark: '▶', bg: '#ffe8ea', color: '#ee3a4a', path: '/video' },
-  { title: '粉丝关注', mark: '♡', bg: '#ffe8f2', color: '#e85a9a', path: '' },
+  { title: '我的视频', mark: '▶', bg: '#fde2f0', color: '#c5303a', path: '/video' },
+  { title: '粉丝关注', mark: '♡', bg: '#fde2f0', color: '#f7659f', path: '' },
   { title: 'AI定制', mark: 'AI', bg: '#e8f1ff', color: '#3b7cff', path: '/ai' },
 ]
 
@@ -257,6 +257,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/tones.scss' as *;
 
 .me-page {
   background: #fff;
@@ -284,7 +285,7 @@ onMounted(() => {
   height: 58px;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(160deg, #ffd6e6, #ff4d88);
+  background: linear-gradient(160deg, $secondary-color, $primary-color);
   flex-shrink: 0;
 }
 
@@ -357,11 +358,11 @@ onMounted(() => {
   }
 
   &.vip {
-    background: linear-gradient(120deg, #ff7aa6, #ff4d88);
+    background: linear-gradient(120deg, $primary-color-deep, $primary-color);
   }
 
   &.wallet {
-    background: linear-gradient(120deg, #9b7cff, #7b5be0);
+    background: linear-gradient(120deg, $secondary-color, $primary-color-deep);
   }
 }
 
@@ -433,12 +434,7 @@ onMounted(() => {
   border-radius: 8px;
 }
 
-.tone-0 { background: linear-gradient(180deg, #f3c9b8, #c47a6a); }
-.tone-1 { background: linear-gradient(180deg, #e8b7c8, #b86b86); }
-.tone-2 { background: linear-gradient(180deg, #d9c4b0, #a07858); }
-.tone-3 { background: linear-gradient(180deg, #c9b8d9, #7a6aa0); }
-.tone-4 { background: linear-gradient(180deg, #f0d0a8, #c4894a); }
-.tone-5 { background: linear-gradient(180deg, #c8d8e8, #6a8aaa); }
+@include media-tones;
 
 .circle-row {
   margin: 12px;

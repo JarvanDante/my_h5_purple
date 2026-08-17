@@ -68,7 +68,7 @@ onMounted(async () => {
   margin: 16px 12px;
   padding: 20px 16px;
   border-radius: 12px;
-  background: linear-gradient(135deg, $primary-color, $secondary-color);
+  background: linear-gradient(135deg, $primary-color, $primary-color-deep);
   color: #fff;
   text-align: center;
 

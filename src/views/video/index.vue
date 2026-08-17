@@ -193,6 +193,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/tones.scss' as *;
 
 .video-header {
   background: $primary-color;
@@ -223,7 +224,7 @@ onMounted(() => {
 .site-name {
   font-size: 13px;
   font-weight: 700;
-  color: $secondary-color;
+  color: $text-color-light;
   flex-shrink: 0;
 }
 
@@ -326,7 +327,7 @@ onMounted(() => {
 
   &.vip span,
   &.fav span {
-    color: $secondary-color;
+    color: $text-color-light;
   }
 }
 
@@ -486,10 +487,5 @@ onMounted(() => {
   border-radius: 3px;
 }
 
-.tone-0 { background: linear-gradient(160deg, #ffd0e0, #ff4d88); }
-.tone-1 { background: linear-gradient(160deg, #e4d4ff, #7b5be0); }
-.tone-2 { background: linear-gradient(160deg, #ffc2d4, #e85a9a); }
-.tone-3 { background: linear-gradient(160deg, #ffe0f0, #c45b9a); }
-.tone-4 { background: linear-gradient(160deg, #ffd9c8, #ff7a9a); }
-.tone-5 { background: linear-gradient(160deg, #dcc8ff, #8b6ad4); }
+@include media-tones;
 </style>
