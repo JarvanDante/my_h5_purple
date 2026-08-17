@@ -9,34 +9,28 @@
       @click="go(item.path)"
     >
       <span class="tab-icon" aria-hidden="true">
-        <svg v-if="item.key === 'comic'" viewBox="0 0 24 24" fill="none">
+        <svg v-if="item.key === 'comic'" viewBox="0 0 24 24">
           <path
+            class="shape"
             d="M5 7.5C5 5.6 6.6 4 8.5 4H15c2.2 0 4 1.8 4 4v8.2c0 1.3-1.5 2-2.5 1.2L14 15.2H8.5C6.6 15.2 5 13.6 5 11.7V7.5Z"
-            stroke="currentColor"
-            stroke-width="1.7"
           />
-          <text x="8.2" y="12.2" fill="currentColor" font-size="6.2" font-weight="700">hi</text>
+          <text class="mark" x="8.1" y="12.3" font-size="6.4" font-weight="800">hi</text>
         </svg>
-        <svg v-else-if="item.key === 'video'" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7" />
-          <path d="M10.2 9.2 16 12l-5.8 2.8V9.2Z" fill="currentColor" />
+        <svg v-else-if="item.key === 'video'" viewBox="0 0 24 24">
+          <rect class="shape" x="4.2" y="4.2" width="15.6" height="15.6" rx="4" />
+          <path class="mark-fill" d="M10.2 8.6 16.2 12l-6 3.4V8.6Z" />
         </svg>
-        <svg v-else-if="item.key === 'planet'" viewBox="0 0 24 24" fill="none">
-          <ellipse cx="12" cy="12" rx="8.2" ry="3.2" transform="rotate(-24 12 12)" stroke="currentColor" stroke-width="1.5" />
-          <circle cx="12" cy="12" r="5.4" stroke="currentColor" stroke-width="1.7" />
+        <svg v-else-if="item.key === 'planet'" viewBox="0 0 24 24">
+          <circle class="shape" cx="12" cy="12" r="5.6" />
+          <ellipse class="ring" cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-28 12 12)" />
         </svg>
-        <svg v-else-if="item.key === 'ai'" viewBox="0 0 24 24" fill="none">
-          <rect x="5" y="5" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.7" />
-          <text x="7.3" y="15.4" fill="currentColor" font-size="8" font-weight="700">AI</text>
+        <svg v-else-if="item.key === 'ai'" viewBox="0 0 24 24">
+          <rect class="shape" x="4.4" y="4.4" width="15.2" height="15.2" rx="4" />
+          <text class="mark" x="6.6" y="15.6" font-size="8.2" font-weight="800">AI</text>
         </svg>
-        <svg v-else viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="9" r="3.2" stroke="currentColor" stroke-width="1.7" />
-          <path
-            d="M6.2 18.4c.8-2.6 3-4 5.8-4s5 1.4 5.8 4"
-            stroke="currentColor"
-            stroke-width="1.7"
-            stroke-linecap="round"
-          />
+        <svg v-else viewBox="0 0 24 24">
+          <circle class="shape" cx="12" cy="8.6" r="3.4" />
+          <path class="shape" d="M5.6 19.8c.8-3.2 3.2-5.1 6.4-5.1s5.6 1.9 6.4 5.1H5.6Z" />
         </svg>
       </span>
       <span class="tab-label">{{ item.label }}</span>
@@ -76,7 +70,7 @@ const go = (path: string) => {
   left: 0;
   width: 100%;
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
-  padding: 4px 4px env(safe-area-inset-bottom, 0px);
+  padding: 2px 4px env(safe-area-inset-bottom, 0px);
   background: #fff;
   border-top: 1.6px solid $ink;
   display: flex;
@@ -87,34 +81,36 @@ const go = (path: string) => {
 
 .tab-item {
   flex: 1;
-  height: 46px;
+  height: 50px;
   border: 0;
   background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  color: $primary-color;
+  justify-content: flex-end;
+  gap: 1px;
+  padding-bottom: 4px;
+  color: $ink;
   cursor: pointer;
 
-  transition: transform 0.16s ease;
-
   &.active {
-    color: $primary-color-deep;
-    font-weight: 800;
-
     .tab-icon {
-      transform: scale(1.12);
+      width: 30px;
+      height: 30px;
+      transform: translateY(-2px);
     }
 
     .tab-label {
       font-weight: 800;
     }
+
+    .shape {
+      fill: $accent-yellow;
+    }
   }
 
   &:active {
-    transform: scale(0.9);
+    transform: scale(0.92);
   }
 }
 
@@ -122,12 +118,33 @@ const go = (path: string) => {
   width: 22px;
   height: 22px;
   display: flex;
-  transition: transform 0.16s ease;
+  color: $ink;
+  transition: width 0.16s ease, height 0.16s ease, transform 0.16s ease;
 
   svg {
-    width: 22px;
-    height: 22px;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
   }
+}
+
+.shape,
+.ring {
+  fill: none;
+  stroke: $ink;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.mark {
+  fill: $ink;
+  stroke: none;
+}
+
+.mark-fill {
+  fill: $ink;
+  stroke: none;
 }
 
 .tab-label {
