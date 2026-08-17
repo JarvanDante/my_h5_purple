@@ -4,10 +4,13 @@
       <div class="thumb" :class="`tone-${item.tone}`">
         <img v-if="item.cover" :src="item.cover" alt="" />
         <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
+        <p class="cover-title ellipsis">{{ item.title }}</p>
         <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
-      <p class="ellipsis">{{ item.title }}</p>
-      <span v-if="item.sub || item.views" class="meta ellipsis">{{ item.sub || item.views }}</span>
+      <p v-if="item.sub || item.views" class="foot">
+        <span v-if="item.sub" class="meta ellipsis">{{ item.sub }}</span>
+        <span v-if="item.views" class="chip">{{ item.views }}</span>
+      </p>
     </article>
   </div>
 </template>
@@ -31,7 +34,7 @@ defineEmits<{
 
 .media-grid {
   display: grid;
-  gap: 10px 8px;
+  gap: 12px 8px;
 
   &.cols-2 {
     grid-template-columns: repeat(2, 1fr);
@@ -45,58 +48,93 @@ defineEmits<{
 
 .thumb {
   position: relative;
-  border-radius: 8px;
-  height: 132px;
+  border-radius: $radius-thumb;
   overflow: hidden;
+  height: 132px;
+  border: 1.6px solid $ink;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 46%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.58));
+  }
 }
 
 .cols-2 .thumb {
-  height: 110px;
+  height: auto;
+  aspect-ratio: 3 / 4;
 }
 
 @include media-tones;
 
-.badge,
-.duration {
-  position: absolute;
-  color: #fff;
-  font-size: 10px;
-  border-radius: 3px;
-  padding: 1px 5px;
-}
-
 .badge {
+  position: absolute;
   top: 6px;
   left: 6px;
-  background: #3b82f6;
+  z-index: 1;
+  color: #fff;
+  font-size: 10px;
+  border-radius: 6px;
+  padding: 1px 6px;
+  background: $primary-color;
+  border: 1px solid $ink;
 
   &.vip {
     background: $primary-color-deep;
   }
 }
 
-.duration {
+.cover-title {
+  position: absolute;
+  left: 6px;
   right: 6px;
-  bottom: 6px;
-  background: rgba(0, 0, 0, 0.55);
+  bottom: 22px;
+  z-index: 1;
+  margin: 0;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
 }
 
-p {
+.duration {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 1;
+  color: #fff;
+  font-size: 10px;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 6px;
-  font-size: 12px;
-  color: #333;
+  min-width: 0;
 }
 
 .meta {
-  display: block;
-  margin-top: 2px;
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: $text-color-secondary;
+}
+
+.chip {
+  flex-shrink: 0;
+  background: $primary-color;
+  color: #fff;
   font-size: 10px;
-  color: #999;
+  border-radius: 8px;
+  padding: 1px 6px;
+  border: 1px solid $ink;
 }
 </style>

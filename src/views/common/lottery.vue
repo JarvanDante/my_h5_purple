@@ -8,7 +8,7 @@
       <button type="button" :disabled="busy" @click="draw">立即抽奖</button>
     </section>
     <p v-if="info?.notice" class="tip">{{ info.notice }}</p>
-    <section class="prizes">
+    <section class="soft-card prizes">
       <h3>奖品</h3>
       <p v-if="!info?.prizes?.length" class="empty">暂无活动，子后台「运营管理 → 抽奖」配置</p>
       <div v-for="p in info?.prizes || []" :key="p.id" class="prize">
@@ -67,10 +67,11 @@ onMounted(async () => {
 .hero {
   margin: 16px 12px;
   padding: 20px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, $primary-color, $primary-color-deep);
-  color: #fff;
+  border-radius: 16px;
+  background: $primary-color;
+  color: $ink;
   text-align: center;
+  border: 1.6px solid $ink;
 
   strong {
     display: block;
@@ -88,11 +89,11 @@ onMounted(async () => {
     margin-top: 14px;
     width: 160px;
     height: 40px;
-    border: 0;
+    border: 1.6px solid $ink;
     border-radius: 20px;
-    background: #fff;
-    color: $primary-color;
-    font-weight: 700;
+    background: $accent-yellow;
+    color: $ink;
+    font-weight: 800;
   }
 }
 
@@ -104,9 +105,6 @@ onMounted(async () => {
 }
 
 .prizes {
-  background: #fff;
-  padding: 12px 16px;
-
   h3 {
     font-size: 14px;
     margin-bottom: 10px;

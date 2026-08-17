@@ -5,17 +5,17 @@
       <input v-model="keyword" type="search" placeholder="搜索漫画 / 视频 / 小说" @keyup.enter="doSearch" />
       <button type="button" @click="doSearch">搜索</button>
     </div>
-    <section class="block">
-      <h3>热门搜索</h3>
+    <section class="soft-card">
+      <h3 class="section-title">热门搜索</h3>
       <div class="words">
         <button v-for="word in hotWords" :key="word" type="button" @click="keyword = word; doSearch()">
           {{ word }}
         </button>
       </div>
     </section>
-    <section v-if="results.length" class="block">
-      <h3>搜索结果</h3>
-      <MediaGrid :items="results" @select="open" />
+    <section v-if="results.length" class="soft-card">
+      <h3 class="section-title">搜索结果</h3>
+      <MediaGrid :items="results" cols="cols-2" @select="open" />
     </section>
   </div>
 </template>
@@ -48,37 +48,31 @@ const open = (item: CoverItem) => {
   display: flex;
   gap: 8px;
   padding: 12px;
-  background: #fff;
 
   input {
     flex: 1;
     height: 36px;
-    border: 0;
-    border-radius: 18px;
-    background: $background-surface2;
+    border: 1.6px solid $ink;
+    border-radius: $radius-pill;
+    background: #fff;
     padding: 0 14px;
     font-size: 14px;
     outline: none;
   }
 
   button {
-    border: 0;
-    background: $primary-color;
-    color: #fff;
-    border-radius: 18px;
+    border: 1.6px solid $ink;
+    background: $accent-yellow;
+    color: $ink;
+    border-radius: $radius-pill;
     padding: 0 14px;
     font-size: 13px;
+    font-weight: 800;
   }
 }
 
-.block {
-  background: #fff;
-  margin-top: 8px;
-  padding: 12px;
-}
-
-h3 {
-  font-size: 14px;
+.section-title {
+  display: inline-block;
   margin-bottom: 10px;
 }
 
@@ -88,12 +82,13 @@ h3 {
   gap: 8px;
 
   button {
-    border: 0;
+    border: 1.4px solid $ink;
     background: $background-surface2;
-    color: $primary-color;
-    border-radius: 14px;
+    color: $ink;
+    border-radius: $radius-pill;
     padding: 6px 12px;
     font-size: 12px;
+    font-weight: 600;
   }
 }
 </style>

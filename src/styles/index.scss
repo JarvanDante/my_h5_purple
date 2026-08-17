@@ -1,4 +1,5 @@
 @use './variables.scss' as *;
+@use './theme.scss';
 
 :root {
   --van-primary-color: #{$primary-color};
@@ -51,12 +52,6 @@ html {
   white-space: nowrap;
 }
 
-.page-shell {
-  min-height: 100%;
-  background: $background-page;
-  padding-bottom: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
-}
-
 .sub-page {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -70,11 +65,4 @@ html {
   color: $text-color-light;
   font-size: 16px;
   font-weight: 600;
-}
-
-.page-empty {
-  padding: 80px 24px 0;
-  text-align: center;
-  color: $text-color-muted;
-  font-size: 14px;
 }

@@ -1,24 +1,27 @@
 <template>
   <div class="page-shell">
-    <header class="head">
-      <h1>星球</h1>
-      <div class="tabs">
-        <button
-          v-for="item in tabs"
-          :key="item"
-          type="button"
-          :class="{ active: tab === item }"
-          @click="select(item)"
-        >
-          {{ item }}
-        </button>
+    <header class="home-header">
+      <div class="channel-row">
+        <h1 class="site-name">星球</h1>
+        <div class="channel-tabs">
+          <button
+            v-for="item in tabs"
+            :key="item"
+            type="button"
+            class="sub-item"
+            :class="{ active: tab === item }"
+            @click="select(item)"
+          >
+            {{ item }}
+          </button>
+        </div>
       </div>
     </header>
     <div class="inner-slide">
       <transition :name="name">
         <div :key="tab">
           <p v-if="!list.length" class="empty">暂无帖子，子后台「社区管理 → 帖子」审核通过后显示</p>
-          <article v-for="post in list" :key="post.id" class="post" @click="goPost(post.id)">
+          <article v-for="post in list" :key="post.id" class="post soft-card" @click="goPost(post.id)">
             <div class="avatar" :class="`tone-${post.id % 5}`" />
             <div class="main">
               <h3>{{ post.title }}</h3>
@@ -81,51 +84,18 @@ onMounted(load)
   min-height: 60vh;
 }
 
-.head {
-  background: $primary-color;
-  color: #fff;
-  padding: 10px 12px 0;
-
-  h1 {
-    font-size: 20px;
-  }
+.home-header .channel-row {
+  gap: 10px;
 }
 
-.tabs {
-  display: flex;
-  gap: 18px;
-  margin-top: 8px;
-
-  button {
-    border: 0;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.7);
-    height: 38px;
-    position: relative;
-
-    &.active {
-      color: #fff;
-      font-weight: 600;
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        height: 2px;
-        background: #fff;
-      }
-    }
-  }
+.home-header .site-name {
+  font-size: 18px;
 }
 
 .post {
   display: flex;
   gap: 10px;
-  padding: 14px 12px;
-  background: #fff;
-  border-bottom: 8px solid #f6f6f6;
+  margin-bottom: 0;
 }
 
 .avatar {

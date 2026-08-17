@@ -1,7 +1,7 @@
 <template>
   <div class="page-shell sub-page">
     <PageHeader :title="title" />
-    <div class="body">
+    <div class="soft-card body">
       <p v-if="loading" class="page-empty">加载中…</p>
       <p v-else-if="!items.length" class="page-empty">{{ emptyText }}</p>
       <MediaGrid v-else :items="items" cols="cols-2" @select="open" />
@@ -106,8 +106,6 @@ watch(() => [media.value, type.value], load, { immediate: true })
 
 <style scoped lang="scss">
 .body {
-  padding: 12px;
-  background: #fff;
   min-height: 50vh;
 }
 </style>

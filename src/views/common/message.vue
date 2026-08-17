@@ -1,7 +1,7 @@
 <template>
   <div class="page-shell sub-page">
     <PageHeader title="站内消息" />
-    <section class="box">
+    <section class="soft-card box">
       <div class="head">
         <span>未读 {{ unread }}</span>
         <button v-if="unread" type="button" @click="readAll">全部已读</button>
@@ -63,11 +63,6 @@ onMounted(async () => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.box {
-  background: #fff;
-  padding: 12px 16px;
-}
-
 .head {
   display: flex;
   justify-content: space-between;
@@ -77,7 +72,8 @@ onMounted(async () => {
   button {
     border: 0;
     background: none;
-    color: $primary-color;
+    color: $primary-color-deep;
+    font-weight: 700;
   }
 }
 
@@ -90,14 +86,14 @@ onMounted(async () => {
   display: block;
   width: 100%;
   text-align: left;
-  border: 0;
-  background: #fafafa;
+  border: 1.4px solid $ink;
+  background: #fff;
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;
 
   &.unread b {
-    color: $primary-color;
+    color: $primary-color-deep;
   }
 
   p {

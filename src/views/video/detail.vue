@@ -5,7 +5,7 @@
       <HlsPlayer v-if="item?.source_url" :src="item.source_url" :poster="item.cover_url" />
       <span v-else>暂无播放地址，请在媒资中心转码后回填</span>
     </div>
-    <section class="info">
+    <section class="soft-card info">
       <h2>{{ item?.title }}</h2>
       <p>{{ item?.description || item?.created_at }}</p>
     </section>
@@ -49,8 +49,7 @@ onMounted(() => {
 @include media-tones;
 
 .info {
-  background: #fff;
-  padding: 14px 12px;
+  padding: 14px 10px;
 }
 
 h2 {

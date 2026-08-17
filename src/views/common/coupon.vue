@@ -1,7 +1,7 @@
 <template>
   <div class="page-shell sub-page">
     <PageHeader title="优惠券" />
-    <section class="box">
+    <section class="soft-card box">
       <h3>可领取</h3>
       <p v-if="!tpls.length" class="empty">暂无可领券，子后台「资金管理 → 优惠券」配置</p>
       <button v-for="t in tpls" :key="t.id" type="button" :disabled="t.received || busy" @click="take(t)">
@@ -10,7 +10,7 @@
         <em>{{ t.received ? '已领取' : '领取' }}</em>
       </button>
     </section>
-    <section class="box">
+    <section class="soft-card box">
       <h3>我的券</h3>
       <p v-if="!mine.length" class="empty">还没有券</p>
       <div v-for="c in mine" :key="c.id" class="row">
@@ -72,10 +72,6 @@ onMounted(async () => {
 @use '@/styles/variables.scss' as *;
 
 .box {
-  background: #fff;
-  margin-top: 8px;
-  padding: 12px 16px;
-
   h3 {
     font-size: 14px;
     margin-bottom: 10px;
@@ -86,8 +82,8 @@ onMounted(async () => {
     align-items: center;
     width: 100%;
     text-align: left;
-    border: 1px solid #eee;
-    background: #fafafa;
+    border: 1.4px solid $ink;
+    background: #fff;
     border-radius: 8px;
     padding: 10px 12px;
     margin-bottom: 8px;
@@ -97,18 +93,20 @@ onMounted(async () => {
     }
 
     span {
-      color: $primary-color;
+      color: $primary-color-deep;
       margin-right: 8px;
       font-size: 12px;
     }
 
     em {
       font-style: normal;
-      color: #fff;
-      background: $primary-color;
+      color: $ink;
+      background: $accent-yellow;
+      border: 1.2px solid $ink;
       border-radius: 12px;
       padding: 2px 8px;
       font-size: 12px;
+      font-weight: 800;
     }
   }
 }

@@ -8,7 +8,7 @@
         {{ info?.today_checked ? '今日已签到' : '立即签到' }}
       </button>
     </section>
-    <section class="days">
+    <section class="soft-card days">
       <div
         v-for="item in rewards"
         :key="item.day_num"
@@ -76,10 +76,11 @@ onMounted(async () => {
 .hero {
   margin: 16px 12px;
   padding: 24px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, $primary-color, $primary-color-deep);
-  color: #fff;
+  border-radius: 16px;
+  background: $primary-color;
+  color: $ink;
   text-align: center;
+  border: 1.6px solid $ink;
 
   p {
     font-size: 13px;
@@ -95,11 +96,11 @@ onMounted(async () => {
   button {
     width: 160px;
     height: 40px;
-    border: 0;
+    border: 1.6px solid $ink;
     border-radius: 20px;
-    background: $on-accent;
-    color: $primary-color-deep;
-    font-weight: 700;
+    background: $accent-yellow;
+    color: $ink;
+    font-weight: 800;
 
     &:disabled {
       opacity: 0.7;
@@ -111,11 +112,11 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  padding: 0 12px;
 }
 
 .day {
   background: #fff;
+  border: 1.4px solid $ink;
   border-radius: 8px;
   padding: 10px 6px;
   text-align: center;
@@ -133,8 +134,9 @@ onMounted(async () => {
   }
 
   &.on {
-    outline: 1px solid $primary-color;
-    color: $primary-color;
+    background: $primary-color;
+    color: $ink;
+    font-weight: 700;
   }
 }
 

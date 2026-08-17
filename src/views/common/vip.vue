@@ -2,7 +2,7 @@
   <div class="page-shell sub-page">
     <PageHeader title="VIP 会员" />
     <p class="status">当前：{{ userStore.user?.group_name || '普通用户' }}</p>
-    <section v-if="list.length" class="plans">
+    <section v-if="list.length" class="soft-card plans">
       <button
         v-for="plan in list"
         :key="plan.id"
@@ -16,7 +16,7 @@
       </button>
     </section>
     <p v-else class="empty">暂无套餐，请在子后台「会员等级」配置</p>
-    <button type="button" class="pay" :disabled="!current || loading" @click="pay">
+    <button type="button" class="cta-btn" :disabled="!current || loading" @click="pay">
       {{ loading ? '开通中…' : '立即开通' }}
     </button>
   </div>
@@ -75,19 +75,18 @@ onMounted(() => {
 .plans {
   display: grid;
   gap: 10px;
-  padding: 16px 12px;
 }
 
 .plan {
   text-align: left;
-  border: 1px solid #eee;
+  border: 1.6px solid $ink;
   background: #fff;
   border-radius: 12px;
   padding: 14px;
 
   &.active {
-    border-color: $primary-color;
-    background: $background-surface2;
+    border-color: $ink;
+    background: $primary-color;
   }
 
   h3 {
@@ -107,20 +106,7 @@ onMounted(() => {
   }
 }
 
-.pay {
-  display: block;
-  width: calc(100% - 24px);
-  margin: 0 12px;
-  height: 44px;
-  border: 0;
-  border-radius: 22px;
-  background: $primary-color;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-
-  &:disabled {
-    opacity: 0.5;
-  }
+.cta-btn:disabled {
+  opacity: 0.5;
 }
 </style>

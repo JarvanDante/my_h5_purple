@@ -13,5 +13,6 @@ declare module 'vue' {
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SectionPanel: typeof import('./src/components/SectionPanel.vue')['default']
   }
 }

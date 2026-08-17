@@ -7,10 +7,10 @@
     </div>
     <div class="inner-slide">
       <transition :name="name">
-        <div :key="tab" class="body">
+        <div :key="tab" class="soft-card body">
           <MediaGrid
             :items="tab === 'comic' ? comics.slice(0, 6) : videos"
-            :cols="tab === 'video' ? 'cols-2' : 'cols-3'"
+            :cols="'cols-2'"
             @select="open"
           />
         </div>
@@ -47,30 +47,23 @@ const open = (item: CoverItem) => {
 
 .tabs {
   display: flex;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  gap: 8px;
+  padding: 10px 12px 0;
+  background: transparent;
 
   button {
     flex: 1;
-    height: 42px;
-    border: 0;
-    background: transparent;
-    color: #888;
-    position: relative;
+    height: 36px;
+    border: 1.6px solid $ink;
+    background: #fff;
+    color: $text-color-secondary;
+    border-radius: $radius-pill;
+    font-weight: 600;
 
     &.active {
-      color: $primary-color;
-      font-weight: 600;
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 28%;
-        right: 28%;
-        bottom: 0;
-        height: 2px;
-        background: $primary-color;
-      }
+      color: $ink;
+      background: $primary-color;
+      font-weight: 800;
     }
   }
 }
@@ -82,7 +75,6 @@ const open = (item: CoverItem) => {
 }
 
 .body {
-  padding: 12px;
-  background: #fff;
+  min-height: 40vh;
 }
 </style>

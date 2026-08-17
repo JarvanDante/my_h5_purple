@@ -1,11 +1,11 @@
 <template>
   <div class="page-shell sub-page">
     <PageHeader title="兑换码" />
-    <section class="box">
+    <section class="soft-card box">
       <input v-model="code" type="text" maxlength="32" placeholder="输入兑换码" />
       <button type="button" :disabled="busy" @click="submit">立即兑换</button>
     </section>
-    <section class="logs">
+    <section class="soft-card logs">
       <h3>兑换记录</h3>
       <p v-if="!logs.length" class="empty">暂无记录，子后台「运营管理 → 兑换码」可发码</p>
       <div v-for="item in logs" :key="item.code + (item.created_at || item.actived_at || '')" class="row">
@@ -71,35 +71,27 @@ onMounted(async () => {
 @use '@/styles/variables.scss' as *;
 
 .box {
-  margin: 16px 12px;
-  padding: 16px;
-  background: #fff;
-  border-radius: 12px;
-
   input {
     width: 100%;
     height: 40px;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 0 12px;
+    border: 1.6px solid $ink;
+    border-radius: $radius-pill;
+    padding: 0 14px;
   }
 
   button {
     width: 100%;
     height: 40px;
     margin-top: 12px;
-    border: 0;
-    border-radius: 20px;
-    background: $primary-color;
-    color: #fff;
-    font-weight: 700;
+    border: 1.6px solid $ink;
+    border-radius: $radius-pill;
+    background: $accent-yellow;
+    color: $ink;
+    font-weight: 800;
   }
 }
 
 .logs {
-  background: #fff;
-  padding: 12px 16px;
-
   h3 {
     font-size: 14px;
     margin-bottom: 10px;

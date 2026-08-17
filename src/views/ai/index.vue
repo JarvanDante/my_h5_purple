@@ -1,10 +1,12 @@
 <template>
   <div class="page-shell">
-    <header class="head">
-      <h1>AI</h1>
-      <p>创作工具演示页，后续接真实能力</p>
+    <header class="home-header">
+      <div class="channel-row">
+        <h1 class="site-name">AI</h1>
+      </div>
+      <p class="ai-desc">创作工具演示页，后续接真实能力</p>
     </header>
-    <section class="tools">
+    <section class="soft-card tools">
       <button v-for="tool in aiTools" :key="tool.key" type="button" class="tool" @click="open(tool.title)">
         <div class="icon">AI</div>
         <div>
@@ -13,9 +15,9 @@
         </div>
       </button>
     </section>
-    <section class="recent">
-      <h3>最近生成</h3>
-      <MediaGrid :items="comics.slice(0, 3)" @select="openItem" />
+    <section class="soft-card recent">
+      <h3 class="section-title">最近生成</h3>
+      <MediaGrid :items="comics.slice(0, 3)" cols="cols-3" @select="openItem" />
     </section>
   </div>
 </template>
@@ -42,26 +44,10 @@ const openItem = (item: CoverItem) => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.head {
-  background: $primary-color;
-  color: #fff;
-  padding: 14px 12px 18px;
-
-  h1 {
-    font-size: 20px;
-  }
-
-  p {
-    margin-top: 6px;
-    font-size: 12px;
-    opacity: 0.75;
-  }
-}
-
-.tools,
-.recent {
-  background: #fff;
-  padding: 12px;
+.ai-desc {
+  margin-top: 8px;
+  font-size: 12px;
+  color: $text-color-secondary;
 }
 
 .tool {
@@ -69,7 +55,7 @@ const openItem = (item: CoverItem) => {
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 0;
+  border: 1.6px solid $ink;
   background: $background-surface2;
   border-radius: 12px;
   padding: 12px;
@@ -78,13 +64,13 @@ const openItem = (item: CoverItem) => {
 
   h3 {
     font-size: 15px;
-    color: #333;
+    color: $ink;
   }
 
   p {
     margin-top: 4px;
     font-size: 12px;
-    color: #888;
+    color: $text-color-muted;
   }
 }
 
@@ -93,16 +79,17 @@ const openItem = (item: CoverItem) => {
   height: 44px;
   border-radius: 10px;
   background: $primary-color;
-  color: $on-accent;
+  color: $ink;
+  border: 1.6px solid $ink;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
-.recent h3 {
-  font-size: 14px;
+.recent .section-title {
+  display: inline-block;
   margin-bottom: 10px;
 }
 </style>

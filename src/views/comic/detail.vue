@@ -2,7 +2,7 @@
   <div class="page-shell sub-page">
     <PageHeader :title="item?.title || '作品详情'" />
     <div class="hero" :class="`tone-${tone}`" />
-    <section v-if="item" class="info">
+    <section v-if="item" class="soft-card info">
       <h2>{{ item.title }}</h2>
       <p>{{ item.author }} · {{ item.view_count }}阅读 · {{ item.chapter_count }}话</p>
       <div class="tags">
@@ -15,7 +15,7 @@
       <button v-if="item.need_pay" type="button" class="read-btn" @click="buy">购买整部</button>
       <button v-else type="button" class="read-btn" @click="startFirst">开始阅读</button>
     </section>
-    <section class="chapters">
+    <section class="soft-card chapters">
       <h3>目录</h3>
       <button
         v-for="ch in chapters"
@@ -96,8 +96,7 @@ onMounted(() => {
 
 .info,
 .chapters {
-  background: #fff;
-  padding: 16px;
+  padding: 16px 10px;
 }
 
 h2 {
@@ -126,11 +125,13 @@ h2 {
   margin: 10px 0;
 
   span {
-    background: $background-surface2;
-    color: $primary-color;
+    background: $primary-color;
+    color: $ink;
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 10px;
+    border: 1.2px solid $ink;
+    font-weight: 700;
   }
 }
 
@@ -138,16 +139,15 @@ h2 {
   width: 100%;
   height: 40px;
   margin-top: 14px;
-  border: 0;
+  border: 1.6px solid $ink;
   border-radius: 20px;
-  background: $primary-color;
-  color: #fff;
+  background: $accent-yellow;
+  color: $ink;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .chapters {
-  margin-top: 8px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
@@ -161,11 +161,12 @@ h2 {
 
 .chapter {
   height: 36px;
-  border: 1px solid #eee;
-  background: #fafafa;
-  border-radius: 6px;
+  border: 1.4px solid $ink;
+  background: #fff;
+  border-radius: 8px;
   font-size: 12px;
-  color: #333;
+  color: $ink;
+  font-weight: 600;
 
   &.lock {
     color: #bbb;

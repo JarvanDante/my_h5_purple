@@ -1,6 +1,6 @@
 <template>
   <div class="page-shell video-page">
-    <header class="video-header">
+    <header class="home-header">
       <div class="channel-row">
         <span class="site-name">{{ appName }}</span>
         <div class="channel-tabs">
@@ -16,7 +16,7 @@
           </button>
         </div>
         <button type="button" class="checkin-btn" @click="go('/checkin')">
-          <span class="gift">🎁</span>
+          <span>🎁</span>
           签到
         </button>
       </div>
@@ -35,17 +35,15 @@
       </div>
 
       <div class="search-row">
-        <div class="search-box" @click="go('/search')">
-          <span class="search-icon">⌕</span>
+        <div class="search-pill" @click="go('/search')">
+          <span>⌕</span>
           <span>搜索更多{{ channel }}</span>
         </div>
-        <button type="button" class="side-action vip" @click="go('/vip')">
+        <button type="button" class="round-action vip" @click="go('/vip')">
           <span>VIP</span>
-          充值
         </button>
-        <button type="button" class="side-action fav" @click="go('/favorite')">
+        <button type="button" class="round-action fav" @click="go('/favorite')">
           <span>★</span>
-          收藏
         </button>
       </div>
     </header>
@@ -53,41 +51,32 @@
     <div class="inner-slide">
       <transition :name="innerName">
         <div :key="channel + '-' + subTab" class="inner-pane">
-          <section class="banner-row">
-            <div v-for="item in ads.slice(0, 4)" :key="item.id" class="banner-card" @click="open(item)">
-              <div class="banner-cover" :class="`tone-${item.tone}`">
-                <img v-if="item.cover" :src="item.cover" alt="" />
-              </div>
-              <p class="ellipsis">{{ item.title }}</p>
-              <span class="ad-tag">广告</span>
+          <section v-if="ads[0]" class="hero-banner" @click="open(ads[0])">
+            <div class="hero-cover" :class="`tone-${ads[0].tone}`">
+              <img v-if="ads[0].cover" :src="ads[0].cover" alt="" />
             </div>
           </section>
 
-          <section class="quick-grid">
-            <button v-for="item in quicks" :key="item.label" type="button" @click="onQuick(item)">
-              <span class="q-icon" :style="{ background: item.bg }">{{ item.icon }}</span>
-              <span>{{ item.label }}</span>
+          <section class="quick-strip">
+            <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
+              <span class="quick-icon">{{ item.icon }}</span>
+              <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
 
-          <section class="block">
-            <div class="block-head">
-              <h3>日更限定//特别放送//🎬🎬🎬</h3>
-              <button type="button" @click="go('/list?media=video&type=daily')">更多 ›</button>
-            </div>
+          <SectionPanel title="日更限定" more @more="go('/list?media=video&type=daily')">
             <p v-if="!covers.length" class="page-empty">暂无视频，子后台「视频管理」上架后显示</p>
             <div v-else class="video-grid">
               <article v-for="item in covers" :key="item.id" @click="open(item)">
                 <div class="thumb" :class="`tone-${item.tone}`">
                   <img v-if="item.cover" :src="item.cover" alt="" />
-                  <span class="badge">{{ item.tag || 'Free' }}</span>
+                  <span class="meta-left">{{ item.views || '热播' }}</span>
                   <span v-if="item.duration" class="duration">{{ item.duration }}</span>
                 </div>
                 <p class="title">{{ item.title }}</p>
-                <span v-if="item.views" class="hot">人气·{{ item.views }}</span>
               </article>
             </div>
-          </section>
+          </SectionPanel>
         </div>
       </transition>
     </div>
@@ -101,6 +90,7 @@ import { showToast } from 'vant'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useConfigStore } from '@/stores/config'
+import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
 
@@ -195,296 +185,67 @@ onMounted(() => {
 @use '@/styles/variables.scss' as *;
 @use '@/styles/tones.scss' as *;
 
-.video-header {
-  background: $primary-color;
-  color: #fff;
-  padding: 8px 12px 12px;
-}
-
-.channel-row,
-.sub-row,
-.search-row {
-  display: flex;
-  align-items: center;
-}
-
-.channel-row {
-  gap: 10px;
-}
-
-.channel-tabs {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  overflow-x: auto;
-  min-width: 0;
-}
-
-.site-name {
-  font-size: 13px;
-  font-weight: 700;
-  color: $text-color-light;
-  flex-shrink: 0;
-}
-
-.channel-item {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 18px;
-  font-weight: 600;
-  padding: 4px 0;
-
-  &.active {
-    color: #fff;
-  }
-}
-
-.checkin-btn {
-  margin-left: 0;
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: #fff;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.sub-row {
-  margin-top: 8px;
-  gap: 14px;
-  overflow-x: auto;
-}
-
-.sub-item {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 13px;
-  padding: 6px 0;
-  position: relative;
-
-  &.active {
-    color: #fff;
-    font-weight: 600;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 2px;
-      right: 2px;
-      bottom: 0;
-      height: 2px;
-      background: #fff;
-      border-radius: 2px;
-    }
-  }
-}
-
-.search-row {
-  margin-top: 10px;
-  gap: 8px;
-}
-
-.search-box {
-  flex: 1;
-  height: 34px;
-  border-radius: 17px;
-  background: rgba(0, 0, 0, 0.22);
-  color: rgba(255, 255, 255, 0.72);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 12px;
-  font-size: 13px;
-}
-
-.search-icon {
-  font-size: 16px;
-}
-
-.side-action {
-  width: 40px;
-  border: 0;
-  background: transparent;
-  color: #fff;
-  font-size: 10px;
-  line-height: 1.15;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-
-  span {
-    font-size: 12px;
-    font-weight: 700;
-  }
-
-  &.vip span,
-  &.fav span {
-    color: $text-color-light;
-  }
-}
-
-.banner-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  background: #fff;
-  padding: 12px;
-}
-
-.banner-cover {
-  height: 92px;
-  border-radius: 6px;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.banner-card p {
-  margin-top: 6px;
-  font-size: 11px;
-  color: #333;
-}
-
-.ad-tag {
-  display: inline-block;
-  margin-top: 2px;
-  font-size: 10px;
-  color: #bbb;
-}
-
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 50vh;
 }
 
-.inner-pane {
-  background: #fff;
-}
-
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px 4px;
-  padding: 14px 8px 8px;
-
-  button {
-    border: 0;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: #333;
-  }
-}
-
-.q-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-.block {
-  padding: 8px 12px 16px;
-}
-
-.block-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-
-  h3 {
-    font-size: 13px;
-    font-weight: 700;
-  }
-
-  button {
-    border: 0;
-    background: transparent;
-    color: #999;
-    font-size: 12px;
-  }
-}
-
 .video-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 8px;
+  gap: 12px 8px;
 }
 
 .thumb {
   position: relative;
   aspect-ratio: 16 / 10;
-  border-radius: 8px;
+  border-radius: $radius-thumb;
   overflow: hidden;
+  border: 1.6px solid $ink;
 
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 42%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
+  }
 }
 
-.badge {
+.meta-left,
+.duration {
   position: absolute;
-  top: 0;
-  left: 0;
-  background: #3b82f6;
+  bottom: 6px;
+  z-index: 1;
   color: #fff;
   font-size: 10px;
-  padding: 2px 8px 3px;
-  border-radius: 8px 0 8px 0;
+}
+
+.meta-left {
+  left: 6px;
 }
 
 .duration {
-  position: absolute;
-  left: 6px;
-  bottom: 6px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
-  font-size: 10px;
-  padding: 1px 5px;
-  border-radius: 3px;
+  right: 6px;
 }
 
 .title {
   margin-top: 6px;
   font-size: 13px;
-  color: #222;
+  color: $ink;
+  font-weight: 600;
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.hot {
-  display: inline-block;
-  margin-top: 4px;
-  background: #ffe8d6;
-  color: #e24b2a;
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 3px;
 }
 
 @include media-tones;

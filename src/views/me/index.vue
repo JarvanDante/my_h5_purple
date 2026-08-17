@@ -1,18 +1,22 @@
 <template>
   <div class="page-shell me-page">
-    <header class="me-title">我的</header>
+    <header class="home-header">
+      <div class="channel-row">
+        <h1 class="site-name">我的</h1>
+        <button type="button" class="checkin-btn" @click="go('/checkin')">
+          <span>🎁</span>
+          签到
+        </button>
+      </div>
+    </header>
 
-    <section class="profile">
+    <section class="soft-card profile">
       <img v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
       <div v-else class="avatar" />
       <div class="meta">
         <h1>{{ user?.nickname || '未登录' }}</h1>
         <button type="button" class="uid-box" @click="copyUid">编号: {{ uid }}</button>
       </div>
-      <button type="button" class="checkin" @click="go('/checkin')">
-        <span class="gift">🎁</span>
-        签到
-      </button>
     </section>
 
     <section class="hero-cards">
@@ -32,28 +36,28 @@
       </button>
     </section>
 
-    <section class="quick">
+    <section class="soft-card quick">
       <button v-for="item in quicks" :key="item.title" type="button" @click="onQuick(item)">
         <span class="q-icon" v-html="item.icon" />
         <span>{{ item.title }}</span>
       </button>
     </section>
 
-    <section class="promo-grid">
+    <section class="soft-card promo-grid">
       <button v-for="item in promos" :key="item.title" type="button" class="promo" @click="soon(item.title)">
         <div class="thumb" :class="`tone-${item.tone}`" />
         <span>{{ item.title }}</span>
       </button>
     </section>
 
-    <section class="circle-row">
+    <section class="soft-card circle-row">
       <button v-for="item in circles" :key="item.title" type="button" @click="onCircle(item)">
         <span class="c-icon" :style="{ background: item.bg, color: item.color }">{{ item.mark }}</span>
         <span>{{ item.title }}</span>
       </button>
     </section>
 
-    <section class="tools">
+    <section class="soft-card tools">
       <button v-for="item in tools" :key="item.title" type="button" @click="onTool(item)">
         <span class="t-icon" v-html="item.icon" />
         <span>{{ item.title }}</span>
@@ -260,23 +264,20 @@ onMounted(() => {
 @use '@/styles/tones.scss' as *;
 
 .me-page {
-  background: #fff;
   position: relative;
 }
 
-.me-title {
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 17px;
-  font-weight: 600;
+.home-header .channel-row {
+  justify-content: space-between;
+}
+
+.home-header .site-name {
+  font-size: 18px;
 }
 
 .profile {
   display: flex;
   align-items: center;
-  padding: 4px 16px 14px;
   gap: 12px;
 }
 
@@ -287,6 +288,7 @@ onMounted(() => {
   object-fit: cover;
   background: linear-gradient(160deg, $secondary-color, $primary-color);
   flex-shrink: 0;
+  border: 1.6px solid $ink;
 }
 
 .meta {
@@ -296,7 +298,7 @@ onMounted(() => {
   h1 {
     font-size: 18px;
     font-weight: 700;
-    color: #222;
+    color: $ink;
   }
 }
 
@@ -304,29 +306,13 @@ onMounted(() => {
   margin-top: 6px;
   height: 22px;
   padding: 0 8px;
-  border: 1px solid $primary-color;
-  border-radius: 4px;
-  background: #fff;
-  color: $primary-color;
+  border: 1.4px solid $ink;
+  border-radius: $radius-pill;
+  background: $primary-color;
+  color: $ink;
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.3px;
-}
-
-.checkin {
-  border: 0;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-size: 12px;
-  color: #333;
-  flex-shrink: 0;
-
-  .gift {
-    font-size: 22px;
-    line-height: 1;
-  }
 }
 
 .hero-cards {
@@ -338,11 +324,11 @@ onMounted(() => {
 
 .hero {
   height: 76px;
-  border: 0;
+  border: 1.6px solid $ink;
   border-radius: 12px;
   padding: 12px 12px 10px;
   text-align: left;
-  color: #fff;
+  color: $ink;
   position: relative;
   overflow: hidden;
 
@@ -358,11 +344,11 @@ onMounted(() => {
   }
 
   &.vip {
-    background: linear-gradient(120deg, $primary-color-deep, $primary-color);
+    background: $primary-color;
   }
 
   &.wallet {
-    background: linear-gradient(120deg, $secondary-color, $primary-color-deep);
+    background: $accent-yellow;
   }
 }
 
@@ -379,7 +365,6 @@ onMounted(() => {
 .quick {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 16px 8px 8px;
 
   button {
     border: 0;
@@ -410,7 +395,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px 6px;
-  padding: 8px 10px 4px;
 }
 
 .promo {
@@ -437,10 +421,6 @@ onMounted(() => {
 @include media-tones;
 
 .circle-row {
-  margin: 12px;
-  padding: 12px 4px;
-  border-radius: 14px;
-  background: $background-surface2;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
 
@@ -470,7 +450,6 @@ onMounted(() => {
 .tools {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  padding: 4px 8px 24px;
   row-gap: 16px;
 
   button {
@@ -492,8 +471,8 @@ onMounted(() => {
   width: 92px;
   padding: 8px 8px 10px;
   border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  border: 1.6px solid $ink;
+  box-shadow: 3px 3px 0 $ink;
   z-index: 8;
   text-align: center;
 
@@ -528,8 +507,10 @@ onMounted(() => {
   height: 26px;
   border: 0;
   border-radius: 13px;
-  background: $primary-color;
-  color: #fff;
+  background: $accent-yellow;
+  color: $ink;
+  border: 1.4px solid $ink;
+  font-weight: 800;
   font-size: 11px;
 }
 
@@ -548,8 +529,9 @@ onMounted(() => {
   width: 100%;
   max-width: 300px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 18px 16px 12px;
+  border: 1.6px solid $ink;
 
   h3 {
     text-align: center;
@@ -588,8 +570,8 @@ onMounted(() => {
   }
 
   .ok {
-    color: $primary-color;
-    font-weight: 600;
+    color: $ink;
+    font-weight: 800;
     border-left: 1px solid #f2f2f2;
   }
 }

@@ -78,7 +78,7 @@ const go = (path: string) => {
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 4px 4px env(safe-area-inset-bottom, 0px);
   background: #fff;
-  border-top: 1px solid $border-color;
+  border-top: 1.6px solid $ink;
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -95,16 +95,21 @@ const go = (path: string) => {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: $text-color;
+  color: $primary-color;
   cursor: pointer;
 
   transition: transform 0.16s ease;
 
   &.active {
-    color: $primary-color;
+    color: $primary-color-deep;
+    font-weight: 800;
 
     .tab-icon {
-      transform: scale(1.08);
+      transform: scale(1.12);
+    }
+
+    .tab-label {
+      font-weight: 800;
     }
   }
 

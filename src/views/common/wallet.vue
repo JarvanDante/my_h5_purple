@@ -6,7 +6,7 @@
       <strong>{{ wallet?.balance ?? userStore.user?.balance ?? 0 }}</strong>
       <span>累计入账 {{ wallet?.total_in ?? 0 }} · 支出 {{ wallet?.total_out ?? 0 }}</span>
     </section>
-    <section v-if="packs.length" class="packs">
+    <section v-if="packs.length" class="soft-card packs">
       <h3>充值套餐</h3>
       <button
         v-for="p in packs"
@@ -18,7 +18,7 @@
         {{ p.name }} · {{ p.coin }}+{{ p.bonus }} 金币 / {{ p.amount }}
       </button>
     </section>
-    <section class="waters">
+    <section class="soft-card waters">
       <h3>流水</h3>
       <p v-if="!waters.length" class="empty">暂无流水，点套餐 mock 支付后会出现</p>
       <div v-for="w in waters" :key="w.id" class="row">
@@ -86,9 +86,10 @@ onMounted(async () => {
 .hero {
   margin: 16px 12px;
   padding: 20px 16px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, $primary-color, $primary-color-deep);
-  color: #fff;
+  border-radius: 16px;
+  background: $primary-color;
+  color: $ink;
+  border: 1.6px solid $ink;
 
   p {
     font-size: 13px;
@@ -109,10 +110,6 @@ onMounted(async () => {
 
 .packs,
 .waters {
-  background: #fff;
-  margin-top: 8px;
-  padding: 12px 16px;
-
   h3 {
     font-size: 14px;
     margin-bottom: 10px;
@@ -123,8 +120,8 @@ onMounted(async () => {
   display: block;
   width: 100%;
   text-align: left;
-  border: 1px solid #eee;
-  background: #fafafa;
+  border: 1.4px solid $ink;
+  background: #fff;
   border-radius: 8px;
   padding: 10px 12px;
   margin-bottom: 8px;

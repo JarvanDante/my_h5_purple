@@ -1,7 +1,7 @@
 <template>
   <div class="page-shell sub-page">
     <PageHeader :title="post?.title || '帖子详情'" />
-    <article v-if="post" class="post">
+    <article v-if="post" class="soft-card post">
       <h2>{{ post.title }}</h2>
       <p>{{ post.content }}</p>
       <img v-for="(pic, i) in post.pics || []" :key="i" :src="mediaUrl(pic)" alt="" />
@@ -34,17 +34,16 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.post {
-  background: #fff;
-  padding: 16px 12px;
+@use '@/styles/variables.scss' as *;
 
+.post {
   h2 {
     font-size: 18px;
   }
 
   p {
     margin: 10px 0;
-    color: #444;
+    color: $text-color-secondary;
     line-height: 1.6;
   }
 
@@ -52,6 +51,7 @@ onMounted(() => {
     width: 100%;
     border-radius: 8px;
     margin-bottom: 8px;
+    border: 1.4px solid $ink;
   }
 }
 
