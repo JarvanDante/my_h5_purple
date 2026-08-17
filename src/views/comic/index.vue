@@ -1,52 +1,18 @@
 <template>
   <div class="page-shell comic-page">
-    <header class="home-header">
-      <div class="channel-row">
-        <span class="site-name">{{ appName }}</span>
-        <div class="channel-tabs">
-          <button
-            v-for="item in channels"
-            :key="item"
-            type="button"
-            class="channel-item"
-            :class="{ active: channel === item }"
-            @click="selectChannel(item)"
-          >
-            {{ item }}
-          </button>
-        </div>
-        <button type="button" class="checkin-btn" @click="go('/checkin')">
-          <span>🎁</span>
-          签到
-        </button>
-      </div>
-
-      <div class="sub-row">
-        <button
-          v-for="item in subTabs"
-          :key="item"
-          type="button"
-          class="sub-item"
-          :class="{ active: subTab === item }"
-          @click="selectSub(item)"
-        >
-          {{ item }}
-        </button>
-      </div>
-
-      <div class="search-row">
-        <div class="search-pill" @click="go('/search')">
-          <span>⌕</span>
-          <span>搜索更多{{ channel }}</span>
-        </div>
-        <button type="button" class="round-action vip" @click="go('/vip')">
-          <span>VIP</span>
-        </button>
-        <button type="button" class="round-action fav" @click="go('/favorite')">
-          <span>★</span>
-        </button>
-      </div>
-    </header>
+    <HomeHeader
+      :site-name="appName"
+      :channels="channels"
+      :channel="channel"
+      :sub-tabs="subTabs"
+      :sub-tab="subTab"
+      @select-channel="selectChannel"
+      @select-sub="selectSub"
+      @checkin="go('/checkin')"
+      @search="go('/search')"
+      @vip="go('/vip')"
+      @favorite="go('/favorite')"
+    />
 
     <div class="inner-slide">
       <transition :name="innerName">
@@ -77,6 +43,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import HomeHeader from '@/components/HomeHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { fetchComicsList, type ComicsItem } from '@/api/comics'
@@ -146,12 +113,33 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 @use '@/styles/tones.scss' as *;
 
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
+}
+
+.hero-banner {
+  margin: 10px 12px 0;
+  border-radius: $radius-card;
+  overflow: hidden;
+  border: 1.6px solid $ink;
+  background: #fff;
+}
+
+.hero-cover {
+  height: 148px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 }
 
 @include media-tones;

@@ -18,7 +18,10 @@
 .home-header .sub-row,
 .home-header .search-row {
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
+  width: 100%;
+  min-width: 0;
 }
 
 .home-header .channel-tabs {
@@ -133,20 +136,20 @@
   gap: 0;
   flex-shrink: 0;
   font-weight: 700;
+}
 
-  span {
-    font-size: 11px;
-    line-height: 1;
-  }
+.round-action span {
+  font-size: 11px;
+  line-height: 1;
+}
 
-  &.vip {
-    background: $primary-color;
-    color: #fff;
-  }
+.round-action.vip {
+  background: $primary-color;
+  color: #fff;
+}
 
-  &.fav {
-    background: $accent-yellow;
-  }
+.round-action.fav {
+  background: $accent-yellow;
 }
 
 .hero-banner {
@@ -155,17 +158,18 @@
   overflow: hidden;
   border: 1.6px solid $ink;
   background: #fff;
+}
 
-  .hero-cover {
-    height: 148px;
-    overflow: hidden;
+.hero-banner .hero-cover {
+  height: 148px;
+  overflow: hidden;
+}
 
-    img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  }
+.hero-banner .hero-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .quick-strip {
