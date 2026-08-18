@@ -1,12 +1,13 @@
 <template>
-  <div class="media-grid" :class="cols">
+  <div class="media-grid" :class="[cols, { wide }]">
     <article v-for="item in items" :key="item.id" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
         <img v-if="item.cover" :src="item.cover" alt="" />
         <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
-        <p class="cover-title ellipsis">{{ item.title }}</p>
+        <p v-if="!wide" class="cover-title ellipsis">{{ item.title }}</p>
         <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
+      <p v-if="wide" class="card-title ellipsis">{{ item.title }}</p>
       <p v-if="item.sub || item.views" class="foot">
         <span v-if="item.sub" class="meta ellipsis">{{ item.sub }}</span>
         <span v-if="item.views" class="chip">{{ item.views }}</span>
@@ -21,6 +22,7 @@ import type { CoverItem } from '@/data/mock'
 defineProps<{
   items: CoverItem[]
   cols?: 'cols-2' | 'cols-3'
+  wide?: boolean
 }>()
 
 defineEmits<{
@@ -73,6 +75,17 @@ defineEmits<{
   aspect-ratio: 3 / 4;
 }
 
+.wide.cols-2 .thumb {
+  aspect-ratio: 16 / 9;
+}
+
+.card-title {
+  margin-top: 6px;
+  font-size: 13px;
+  color: $ink;
+  font-weight: 600;
+}
+
 @include media-tones;
 
 .badge {
@@ -111,6 +124,11 @@ defineEmits<{
   z-index: 1;
   color: #fff;
   font-size: 10px;
+}
+
+.wide .duration {
+  left: 6px;
+  right: auto;
 }
 
 .foot {

@@ -35,7 +35,7 @@
               <article v-for="item in covers" :key="item.id" @click="open(item)">
                 <div class="thumb" :class="`tone-${item.tone}`">
                   <img v-if="item.cover" :src="item.cover" alt="" />
-                  <span class="meta-left">{{ item.views || '热播' }}</span>
+                  <span v-if="item.tag" class="badge">{{ item.tag }}</span>
                   <span v-if="item.duration" class="duration">{{ item.duration }}</span>
                 </div>
                 <p class="title">{{ item.title }}</p>
@@ -137,9 +137,9 @@ const onQuick = (item: { label: string; path: string }) => {
 }
 
 onMounted(() => {
-  fetchVideoList(1, 20)
+  fetchVideoList(1, 6, '', 1)
     .then((data) => {
-      list.value = data.list || []
+      list.value = (data.list || []).slice(0, 6)
     })
     .catch(toastError)
 })
@@ -183,7 +183,7 @@ onMounted(() => {
 
 .thumb {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 16 / 9;
   border-radius: $radius-thumb;
   overflow: hidden;
   border: 1.6px solid $ink;
@@ -203,21 +203,26 @@ onMounted(() => {
   }
 }
 
-.meta-left,
+.badge,
 .duration {
   position: absolute;
-  bottom: 6px;
   z-index: 1;
   color: #fff;
   font-size: 10px;
 }
 
-.meta-left {
+.badge {
+  top: 6px;
   left: 6px;
+  background: $primary-color;
+  border: 1px solid $ink;
+  border-radius: 6px;
+  padding: 1px 6px;
 }
 
 .duration {
-  right: 6px;
+  left: 6px;
+  bottom: 6px;
 }
 
 .title {
@@ -226,10 +231,9 @@ onMounted(() => {
   color: $ink;
   font-weight: 600;
   line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @include media-tones;

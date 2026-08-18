@@ -4,7 +4,7 @@
     <div class="soft-card body">
       <p v-if="loading" class="page-empty">加载中…</p>
       <p v-else-if="!items.length" class="page-empty">{{ emptyText }}</p>
-      <MediaGrid v-else :items="items" cols="cols-2" @select="open" />
+      <MediaGrid v-else :items="items" cols="cols-2" :wide="media === 'video'" @select="open" />
     </div>
   </div>
 </template>
@@ -64,11 +64,7 @@ const toVideoCover = (v: VideoItem): CoverItem => ({
   tone: v.id % 6,
 })
 
-const videoSort = () => {
-  if (type.value === 'daily') return 1
-  if (type.value === 'rank' || type.value === 'hot') return 0
-  return 0
-}
+const videoSort = () => 1
 
 const open = (item: CoverItem) => {
   if (media.value === 'video') {
