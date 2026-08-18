@@ -72,7 +72,7 @@ const go = (path: string) => {
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 2px 4px env(safe-area-inset-bottom, 0px);
   background: #fff;
-  border-top: 1.6px solid $ink;
+  border-top: 1px solid $line;
   display: flex;
   align-items: flex-start;
   justify-content: space-around;

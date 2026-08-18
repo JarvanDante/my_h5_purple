@@ -174,7 +174,7 @@ watch(() => route.params.id, load, { immediate: true })
 
 .line-btn {
   margin-left: auto;
-  border: 1.4px solid $ink;
+  border: 1px solid $line;
   background: #fff;
   color: $ink;
   font-size: 12px;
@@ -214,8 +214,7 @@ watch(() => route.params.id, load, { immediate: true })
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  border: 1.6px solid $ink;
-  background: $accent-yellow;
+  background: $primary-soft;
   display: flex;
   align-items: center;
   justify-content: center;

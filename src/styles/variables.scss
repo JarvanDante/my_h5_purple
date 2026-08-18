@@ -1,27 +1,29 @@
-// 主题色（设计稿取样）
-$primary-color: #f880ac;      // 主色
-$primary-color-deep: #f7659f; // 主色强调（更饱和粉）
-$secondary-color: #fab5d0;    // 辅助浅色
-$secondary-dark: #2f0b12;     // 辅助深色
-$danger-color: #c5303a;       // 警示提醒色
+// Sakura cream：保留二次元粉，但把高饱和和大面积装饰收掉
+$primary-color: #e86a96;      // 主色：只用于选中、标签、强调
+$primary-color-deep: #d44d7e;
+$primary-soft: #ffe6ef;       // 选中底、浅标签
+$secondary-color: #ffd4e3;
+$secondary-dark: #2c1b22;
+$danger-color: #c5303a;
 $on-accent: #ffffff;
 
 $text-color: $secondary-dark;
-$text-color-secondary: #6a3a44;
-$text-color-muted: #9a6b76;
+$text-color-secondary: #8a6570;
+$text-color-muted: #b08a94;
 $text-color-light: #ffffff;
 
 $background-color: #ffffff;
-$background-page: #fde2f0;    // 背景色
-$background-surface2: $secondary-color;
+$background-page: #fff6f8;    // 近白的奶油粉，不再用大面积糖果粉
+$background-surface2: $primary-soft;
 $background-dark: $secondary-dark;
 
-$accent-yellow: #ffd54a;      // 更多按钮 / 快捷入口底
-$ink: #1c1214;                // 描边、主文字
-$radius-card: 16px;
-$radius-thumb: 12px;
+$accent-yellow: #f2c14b;      // 只给 CTA / 底栏选中，不做整块底
+$ink: #2c1b22;
+$line: #f0d7df;               // 浅描边，替代粗黑框
+$shadow-card: 0 10px 28px rgba(232, 106, 150, 0.08);
+$radius-card: 14px;
+$radius-thumb: 10px;
 $radius-pill: 999px;
 $tabbar-height: 56px;
-// 仅桌面预览时限制内容宽度；真机一律铺满，避免宽屏手机两侧留白
 $phone-max-width: 480px;
 $desktop-preview-min: 960px;

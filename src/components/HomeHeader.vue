@@ -67,7 +67,7 @@ defineEmits<{
 .home-header {
   background: #fff;
   padding: 8px 12px 12px;
-  border-bottom: 1.6px solid $ink;
+  box-shadow: 0 1px 0 $line;
 }
 
 .channel-row,
@@ -107,7 +107,7 @@ defineEmits<{
 
 .channel-item,
 .sub-item {
-  border: 1.6px solid transparent;
+  border: 0;
   background: transparent;
   color: $text-color-secondary;
   font-weight: 600;
@@ -120,9 +120,9 @@ defineEmits<{
   padding: 4px 10px;
 
   &.active {
-    color: $ink;
-    background: $primary-color;
-    border-color: $ink;
+    color: $primary-color-deep;
+    background: $primary-soft;
+    font-weight: 800;
   }
 }
 
@@ -147,10 +147,9 @@ defineEmits<{
   padding: 4px 10px;
 
   &.active {
-    color: $ink;
-    background: $primary-color;
-    font-weight: 800;
-    border-color: $ink;
+    color: $primary-color-deep;
+    background: $primary-soft;
+    font-weight: 700;
   }
 }
 
@@ -164,8 +163,8 @@ defineEmits<{
   min-width: 0;
   height: 36px;
   border-radius: $radius-pill;
-  background: #fff;
-  border: 1.6px solid $ink;
+  background: $background-page;
+  border: 1px solid $line;
   color: $text-color-muted;
   display: flex;
   align-items: center;
@@ -177,12 +176,12 @@ defineEmits<{
 }
 
 .round-action {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  border: 1.6px solid $ink;
-  background: #fff;
-  color: $ink;
+  border: 0;
+  background: $primary-soft;
+  color: $primary-color-deep;
   font-size: 11px;
   font-weight: 800;
   line-height: 1;
@@ -197,7 +196,8 @@ defineEmits<{
   }
 
   &.fav {
-    background: $accent-yellow;
+    background: #fff4d4;
+    color: #c48a12;
   }
 }
 </style>

@@ -53,7 +53,7 @@ defineEmits<{
   border-radius: $radius-thumb;
   overflow: hidden;
   height: 132px;
-  border: 1.6px solid $ink;
+  border: 0;
 
   img {
     width: 100%;
@@ -98,7 +98,7 @@ defineEmits<{
   border-radius: 6px;
   padding: 1px 6px;
   background: $primary-color;
-  border: 1px solid $ink;
+  border: 0;
 
   &.vip {
     background: $primary-color-deep;
@@ -153,6 +153,5 @@ defineEmits<{
   font-size: 10px;
   border-radius: 8px;
   padding: 1px 6px;
-  border: 1px solid $ink;
 }
 </style>

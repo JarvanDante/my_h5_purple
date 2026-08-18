@@ -119,14 +119,6 @@ onMounted(() => {
   min-height: 60vh;
 }
 
-.hero-banner {
-  margin: 10px 12px 0;
-  border-radius: $radius-card;
-  overflow: hidden;
-  border: 1.6px solid $ink;
-  background: #fff;
-}
-
 .hero-cover {
   height: 148px;
   overflow: hidden;

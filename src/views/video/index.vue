@@ -155,14 +155,6 @@ onMounted(() => {
   min-height: 50vh;
 }
 
-.hero-banner {
-  margin: 10px 12px 0;
-  border-radius: $radius-card;
-  overflow: hidden;
-  border: 1.6px solid $ink;
-  background: #fff;
-}
-
 .hero-cover {
   height: 148px;
   overflow: hidden;
@@ -186,7 +178,6 @@ onMounted(() => {
   aspect-ratio: 16 / 9;
   border-radius: $radius-thumb;
   overflow: hidden;
-  border: 1.6px solid $ink;
 
   img {
     width: 100%;
@@ -215,7 +206,7 @@ onMounted(() => {
   top: 6px;
   left: 6px;
   background: $primary-color;
-  border: 1px solid $ink;
+  border: 0;
   border-radius: 6px;
   padding: 1px 6px;
 }
