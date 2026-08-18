@@ -103,6 +103,7 @@ export type PostItem = {
   pics: string[]
   like_count: number
   comment_count: number
+  view_count?: number
   created_at: string
 }
 
@@ -112,6 +113,13 @@ export function fetchPostList(sort = 'new', page = 1, size = 20) {
 
 export function fetchPostDetail(id: number) {
   return request<{ post: PostItem }>(`/post/detail?id=${id}`)
+}
+
+export function createPost(title: string, content: string, pics: string[] = []) {
+  return request<{ id: number }>('/post/create', {
+    method: 'POST',
+    body: JSON.stringify({ title, content, pics }),
+  })
 }
 
 export type MessageItem = {
