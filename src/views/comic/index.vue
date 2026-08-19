@@ -115,7 +115,7 @@ const sectionTitle = computed(() => {
 
 const emptyText = computed(() => {
   const kind = currentKind.value
-  if (kind === 2 || subTab.value === '推荐') return '暂无推荐，子后台勾选「H5 推荐」后显示'
+  if (kind === 2 || subTab.value === '推荐') return '暂无推荐，子后台勾选「推荐」后显示'
   if (kind === 3 || subTab.value === '漫画榜') return '暂无榜单，有观看数据后显示'
   if (kind === 0) return `暂无「${subTab.value}」漫画，上架并选择该分类后显示`
   return '暂无漫画，子后台「漫画管理」上架后显示'
