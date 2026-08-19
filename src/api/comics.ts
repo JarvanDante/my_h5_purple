@@ -36,10 +36,22 @@ export type ChapterItem = {
   playable: boolean
 }
 
-export function fetchComicsList(page = 1, size = 20, keyword = '') {
+export function fetchComicsList(
+  page = 1,
+  size = 20,
+  keyword = '',
+  category = '',
+  sort?: number,
+) {
   const q = new URLSearchParams({ page: String(page), size: String(size) })
   if (keyword) q.set('keyword', keyword)
+  if (category) q.set('category', category)
+  if (sort !== undefined) q.set('sort', String(sort))
   return request<{ list: ComicsItem[]; total: number }>(`/comics/list?${q}`)
+}
+
+export function fetchComicsCategories() {
+  return request<{ list: { id: number; name: string; kind: number }[] }>('/comics/categories')
 }
 
 export function fetchComicsDetail(id: number) {

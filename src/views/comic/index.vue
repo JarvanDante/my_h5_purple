@@ -40,23 +40,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import HomeHeader from '@/components/HomeHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
-import { fetchComicsList, type ComicsItem } from '@/api/comics'
+import { fetchComicsCategories, fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Comic' })
 
+const fallbackTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
 const router = useRouter()
 const channels = ['漫画', '动漫', '小说', '短剧']
-const subTabs = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
+const subTabs = ref([...fallbackTabs])
+const cateKind = ref<Record<string, number>>({})
 const channelSlide = useTabSlide(channels)
-const subSlide = useTabSlide(subTabs)
+const subSlide = useTabSlide(subTabs.value, fallbackTabs[0])
 const channel = computed(() => channelSlide.current.value)
 const subTab = computed(() => subSlide.current.value)
 const innerName = ref('tab-left')
@@ -100,13 +102,54 @@ const open = (item: CoverItem) => {
   router.push(`/comic/${item.id}`)
 }
 
-onMounted(() => {
-  fetchComicsList(1, 21)
+const loadList = () => {
+  const kind = cateKind.value[subTab.value]
+  let category = ''
+  let sort = 2
+  if (kind === 1) {
+    sort = 2
+  } else if (kind === 2) {
+    sort = 0
+  } else if (kind === 3) {
+    sort = 1
+  } else if (kind === 0 || kind === undefined) {
+    const name = subTab.value
+    if (name === '新更') sort = 2
+    else if (name === '推荐') sort = 0
+    else if (name === '漫画榜') sort = 1
+    else {
+      category = name
+      sort = 2
+    }
+  }
+  fetchComicsList(1, 21, '', category, sort)
     .then((data) => {
       list.value = data.list || []
     })
     .catch(toastError)
+}
+
+onMounted(() => {
+  fetchComicsCategories()
+    .then((data) => {
+      const rows = data.list || []
+      if (!rows.length) return
+      const names = rows.map((r) => r.name)
+      const kinds: Record<string, number> = {}
+      rows.forEach((r) => {
+        kinds[r.name] = r.kind
+      })
+      cateKind.value = kinds
+      subTabs.value = names
+      if (!names.includes(subTab.value)) {
+        subSlide.select(names[0])
+      }
+    })
+    .catch(() => undefined)
+    .finally(loadList)
 })
+
+watch(subTab, loadList)
 </script>
 
 <style scoped lang="scss">
