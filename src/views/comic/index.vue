@@ -45,7 +45,7 @@ import { useRouter } from 'vue-router'
 import HomeHeader from '@/components/HomeHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
-import { fetchComicsCategories, fetchComicsList, type ComicsItem } from '@/api/comics'
+import { fetchComicsCategories, fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -90,6 +90,7 @@ const covers = computed<CoverItem[]>(() =>
     tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
     views: String(c.view_count),
     cover: mediaUrl(c.cover),
+    labels: comicCategories(c),
     tone: c.id % 6,
   })),
 )

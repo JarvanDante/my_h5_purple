@@ -6,6 +6,7 @@
       <h2>{{ item.title }}</h2>
       <p>{{ item.author }} · {{ item.view_count }}阅读 · {{ item.chapter_count }}话</p>
       <div class="tags">
+        <span v-for="cate in comicCategories(item)" :key="'c-' + cate">{{ cate }}</span>
         <span v-if="item.is_vip">VIP</span>
         <span v-if="item.price">{{ item.price }}金币</span>
         <span v-for="tag in item.tags" :key="tag">{{ tag }}</span>
@@ -36,7 +37,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
-import { buyComics, fetchComicsChapters, fetchComicsDetail, type ChapterItem, type ComicsDetail } from '@/api/comics'
+import { buyComics, fetchComicsChapters, fetchComicsDetail, comicCategories, type ChapterItem, type ComicsDetail } from '@/api/comics'
 import { useUserStore } from '@/stores/user'
 import { toastError } from '@/utils/request'
 

@@ -6,6 +6,7 @@ export type CoverItem = {
   duration?: string
   views?: string
   cover?: string
+  labels?: string[]
   tone: number
 }
 

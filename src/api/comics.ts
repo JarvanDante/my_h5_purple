@@ -7,6 +7,7 @@ export type ComicsItem = {
   cover: string
   intro: string
   category: string
+  categories?: string[]
   tags: string[]
   is_vip: number
   price: number
@@ -34,6 +35,15 @@ export type ChapterItem = {
   pic_count: number
   is_free: boolean
   playable: boolean
+}
+
+export function comicCategories(c: { category?: string; categories?: string[] }) {
+  if (c.categories?.length) return c.categories
+  if (!c.category) return []
+  return c.category
+    .split(/[,，]/)
+    .map((s) => s.trim())
+    .filter(Boolean)
 }
 
 export function fetchComicsList(

@@ -7,6 +7,9 @@
         <p v-if="!wide" class="cover-title ellipsis">{{ item.title }}</p>
         <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
+      <p v-if="item.labels?.length" class="labels">
+        <span v-for="lb in item.labels" :key="lb">{{ lb }}</span>
+      </p>
       <p v-if="wide" class="card-title ellipsis">{{ item.title }}</p>
       <p v-if="item.sub || item.views" class="foot">
         <span v-if="item.sub" class="meta ellipsis">{{ item.sub }}</span>
@@ -153,5 +156,22 @@ defineEmits<{
   font-size: 10px;
   border-radius: 8px;
   padding: 1px 6px;
+}
+
+.labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+
+  span {
+    font-size: 10px;
+    line-height: 1.4;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: $primary-soft;
+    color: $ink;
+    border: 1px solid rgba($ink, 0.12);
+  }
 }
 </style>

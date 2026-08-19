@@ -14,7 +14,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
-import { fetchComicsList } from '@/api/comics'
+import { fetchComicsList, comicCategories } from '@/api/comics'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -89,6 +89,7 @@ const load = () => {
             tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
             views: String(c.view_count),
             cover: mediaUrl(c.cover),
+            labels: comicCategories(c),
             tone: c.id % 6,
           }))
         })
