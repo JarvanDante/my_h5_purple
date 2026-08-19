@@ -1,17 +1,20 @@
 <template>
-  <div class="media-grid" :class="[cols, { wide }]">
+  <div class="media-grid" :class="[cols, { wide, mosaic: mosaicMode }]">
     <article v-for="item in items" :key="item.id" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
-        <img v-if="item.cover" :src="item.cover" alt="" />
+        <CoverMosaic v-if="item.mosaic" :src="item.cover" />
+        <img v-else-if="item.cover" :src="item.cover" alt="" />
         <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
-        <p v-if="!wide" class="cover-title ellipsis">{{ item.title }}</p>
+        <p v-if="!wide && !item.mosaic" class="cover-title ellipsis">{{ item.title }}</p>
         <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
-      <p v-if="item.labels?.length" class="labels">
+      <p v-if="item.mosaic" class="card-title ellipsis">{{ item.title }}</p>
+      <p v-if="item.badge" class="foot-badge">{{ item.badge }}</p>
+      <p v-else-if="item.labels?.length" class="labels">
         <span v-for="lb in item.labels" :key="lb">{{ lb }}</span>
       </p>
       <p v-if="wide" class="card-title ellipsis">{{ item.title }}</p>
-      <p v-if="item.sub || item.views" class="foot">
+      <p v-if="!item.mosaic && (item.sub || item.views)" class="foot">
         <span v-if="item.sub" class="meta ellipsis">{{ item.sub }}</span>
         <span v-if="item.views" class="chip">{{ item.views }}</span>
       </p>
@@ -20,13 +23,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import CoverMosaic from '@/components/CoverMosaic.vue'
 import type { CoverItem } from '@/data/mock'
 
-defineProps<{
+const props = defineProps<{
   items: CoverItem[]
   cols?: 'cols-2' | 'cols-3'
   wide?: boolean
 }>()
+
+const mosaicMode = computed(() => props.items.some((item) => item.mosaic))
 
 defineEmits<{
   select: [item: CoverItem]
@@ -64,6 +71,11 @@ defineEmits<{
     object-fit: cover;
   }
 
+  :deep(.cover-mosaic) {
+    position: absolute;
+    inset: 0;
+  }
+
   &::after {
     content: '';
     position: absolute;
@@ -95,7 +107,7 @@ defineEmits<{
   position: absolute;
   top: 6px;
   left: 6px;
-  z-index: 1;
+  z-index: 2;
   color: #fff;
   font-size: 10px;
   border-radius: 6px;
@@ -156,6 +168,22 @@ defineEmits<{
   font-size: 10px;
   border-radius: 8px;
   padding: 1px 6px;
+}
+
+.foot-badge {
+  margin-top: 4px;
+  display: inline-block;
+  max-width: 100%;
+  font-size: 10px;
+  line-height: 1.4;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: #fde8d8;
+  color: #c56a2d;
+}
+
+.mosaic .thumb::after {
+  display: none;
 }
 
 .labels {

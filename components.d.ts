@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
+    CoverMosaic: typeof import('./src/components/CoverMosaic.vue')['default']
     HlsPlayer: typeof import('./src/components/HlsPlayer.vue')['default']
     HomeHeader: typeof import('./src/components/HomeHeader.vue')['default']
     MediaGrid: typeof import('./src/components/MediaGrid.vue')['default']

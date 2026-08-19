@@ -90,16 +90,18 @@ const load = () => {
             recommend = 1
           }
           return fetchComicsList(1, 40, '', '', sort, recommend).then((data) => {
-            items.value = (data.list || []).map((c) => ({
-              id: String(c.id),
-              title: c.title,
-              sub: c.author || `${c.chapter_count}话`,
-              tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
-              views: String(c.view_count),
-              cover: mediaUrl(c.cover),
-              labels: comicCategories(c),
-              tone: c.id % 6,
-            }))
+            items.value = (data.list || []).map((c) => {
+              const cate = comicCategories(c)[0] || ''
+              return {
+                id: String(c.id),
+                title: c.title,
+                tag: c.is_vip ? 'VIP' : 'Free',
+                cover: mediaUrl(c.cover),
+                badge: `共${c.chapter_count || 0}话${cate ? `·${cate}` : ''}`,
+                mosaic: true,
+                tone: c.id % 6,
+              }
+            })
           })
         })()
   task.catch(toastError).finally(() => {

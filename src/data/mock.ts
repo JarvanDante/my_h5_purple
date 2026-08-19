@@ -7,6 +7,8 @@ export type CoverItem = {
   views?: string
   cover?: string
   labels?: string[]
+  badge?: string
+  mosaic?: boolean
   tone: number
 }
 
