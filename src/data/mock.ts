@@ -50,8 +50,9 @@ export const hotWords = ['星河旅人', '夜色书店', '今日上新', '韩漫
 export const listTitles: Record<string, string> = {
   topic: '专题',
   hot: '热门',
-  daily: '每日更新',
+  daily: '今日上新',
   rank: '漫画榜',
+  recommend: '精选推荐',
   category: '分类',
   ad: '精选推荐',
 }

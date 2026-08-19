@@ -81,18 +81,27 @@ const load = () => {
       ? fetchVideoList(1, 40, '', videoSort()).then((data) => {
           items.value = (data.list || []).map(toVideoCover)
         })
-      : fetchComicsList(1, 40).then((data) => {
-          items.value = (data.list || []).map((c) => ({
-            id: String(c.id),
-            title: c.title,
-            sub: c.author || `${c.chapter_count}话`,
-            tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
-            views: String(c.view_count),
-            cover: mediaUrl(c.cover),
-            labels: comicCategories(c),
-            tone: c.id % 6,
-          }))
-        })
+      : (() => {
+          let sort = 2
+          let recommend = 0
+          if (type.value === 'rank' || type.value === 'hot') sort = 1
+          else if (type.value === 'recommend') {
+            sort = 0
+            recommend = 1
+          }
+          return fetchComicsList(1, 40, '', '', sort, recommend).then((data) => {
+            items.value = (data.list || []).map((c) => ({
+              id: String(c.id),
+              title: c.title,
+              sub: c.author || `${c.chapter_count}话`,
+              tag: c.is_vip ? 'VIP' : c.price > 0 ? '金币' : 'Free',
+              views: String(c.view_count),
+              cover: mediaUrl(c.cover),
+              labels: comicCategories(c),
+              tone: c.id % 6,
+            }))
+          })
+        })()
   task.catch(toastError).finally(() => {
     loading.value = false
   })

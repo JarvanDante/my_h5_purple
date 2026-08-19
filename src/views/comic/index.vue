@@ -29,8 +29,8 @@
             </button>
           </section>
 
-          <SectionPanel title="今日上新" more @more="go('/list?media=comic&type=daily')">
-            <p v-if="!covers.length" class="page-empty">暂无漫画，子后台「漫画管理」上架后显示</p>
+          <SectionPanel :title="sectionTitle" more @more="go(morePath)">
+            <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
             <MediaGrid v-else :items="covers" cols="cols-2" @select="open" />
           </SectionPanel>
         </div>
@@ -103,27 +103,56 @@ const open = (item: CoverItem) => {
   router.push(`/comic/${item.id}`)
 }
 
+const currentKind = computed(() => cateKind.value[subTab.value])
+
+const sectionTitle = computed(() => {
+  const kind = currentKind.value
+  if (kind === 2 || subTab.value === '推荐') return '精选推荐'
+  if (kind === 3 || subTab.value === '漫画榜') return '漫画榜'
+  if (kind === 0) return subTab.value || '今日上新'
+  return '今日上新'
+})
+
+const emptyText = computed(() => {
+  const kind = currentKind.value
+  if (kind === 2 || subTab.value === '推荐') return '暂无推荐，子后台勾选「H5 推荐」后显示'
+  if (kind === 3 || subTab.value === '漫画榜') return '暂无榜单，有观看数据后显示'
+  if (kind === 0) return `暂无「${subTab.value}」漫画，上架并选择该分类后显示`
+  return '暂无漫画，子后台「漫画管理」上架后显示'
+})
+
+const morePath = computed(() => {
+  const kind = currentKind.value
+  if (kind === 3 || subTab.value === '漫画榜') return '/list?media=comic&type=rank'
+  if (kind === 2 || subTab.value === '推荐') return '/list?media=comic&type=recommend'
+  return '/list?media=comic&type=daily'
+})
+
 const loadList = () => {
   const kind = cateKind.value[subTab.value]
   let category = ''
   let sort = 2
+  let recommend = 0
   if (kind === 1) {
     sort = 2
   } else if (kind === 2) {
     sort = 0
+    recommend = 1
   } else if (kind === 3) {
     sort = 1
   } else if (kind === 0 || kind === undefined) {
     const name = subTab.value
-    if (name === '新更') sort = 2
-    else if (name === '推荐') sort = 0
-    else if (name === '漫画榜') sort = 1
+    if (name === '新更' || name === '最新') sort = 2
+    else if (name === '推荐') {
+      sort = 0
+      recommend = 1
+    } else if (name === '漫画榜') sort = 1
     else {
       category = name
       sort = 2
     }
   }
-  fetchComicsList(1, 21, '', category, sort)
+  fetchComicsList(1, 21, '', category, sort, recommend)
     .then((data) => {
       list.value = data.list || []
     })
