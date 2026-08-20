@@ -6,15 +6,15 @@
   background-color: $background-page;
 }
 
-.home-header {
+.home-header:not(.home-header--pack) {
   background: #fff;
   padding: 8px 12px 12px;
   box-shadow: 0 1px 0 $line;
 }
 
-.home-header .channel-row,
-.home-header .sub-row,
-.home-header .search-row {
+.home-header:not(.home-header--pack) .channel-row,
+.home-header:not(.home-header--pack) .sub-row,
+.home-header:not(.home-header--pack) .search-row {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -22,7 +22,7 @@
   min-width: 0;
 }
 
-.home-header .channel-tabs {
+.home-header:not(.home-header--pack) .channel-tabs {
   flex: 1;
   display: flex;
   align-items: center;
@@ -31,8 +31,8 @@
   min-width: 0;
 }
 
-.home-header .channel-item,
-.home-header .sub-item {
+.home-header:not(.home-header--pack) .channel-item,
+.home-header:not(.home-header--pack) .sub-item {
   flex-shrink: 0;
   background: transparent;
   color: $text-color-secondary;
@@ -41,7 +41,7 @@
   padding: 4px 2px;
 }
 
-.home-header .channel-item {
+.home-header:not(.home-header--pack) .channel-item {
   font-size: 16px;
   padding: 5px 12px;
   border-radius: $radius-pill;
@@ -54,7 +54,7 @@
   }
 }
 
-.home-header .checkin-btn {
+.home-header:not(.home-header--pack) .checkin-btn {
   margin-left: auto;
   border: 0;
   background: transparent;
@@ -66,13 +66,13 @@
   flex-shrink: 0;
 }
 
-.home-header .sub-row {
+.home-header:not(.home-header--pack) .sub-row {
   margin-top: 6px;
   gap: 4px;
   overflow-x: auto;
 }
 
-.home-header .sub-item {
+.home-header:not(.home-header--pack) .sub-item {
   font-size: 13px;
   padding: 4px 10px;
   border-radius: $radius-pill;
@@ -85,7 +85,7 @@
   }
 }
 
-.home-header .search-row {
+.home-header:not(.home-header--pack) .search-row {
   margin-top: 10px;
   gap: 8px;
 }
@@ -136,6 +136,11 @@
   overflow: hidden;
   background: #fff;
   box-shadow: $shadow-card;
+}
+
+.home-header--pack .hero-banner {
+  margin: 0;
+  box-shadow: none;
 }
 
 .hero-banner .hero-cover {

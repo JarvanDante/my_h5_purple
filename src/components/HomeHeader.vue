@@ -1,5 +1,7 @@
 <template>
-  <header class="home-header">
+  <header class="home-header home-header--pack">
+    <div class="pack-glow" aria-hidden="true" />
+
     <div class="channel-row">
       <div class="channel-tabs">
         <button
@@ -34,11 +36,23 @@
 
     <div class="search-row">
       <div class="search-pill" @click="$emit('search')">
-        <span>⌕</span>
+        <span class="search-ico">⌕</span>
         <span>搜索更多{{ channel }}</span>
       </div>
-      <button type="button" class="round-action vip" @click="$emit('vip')">VIP</button>
-      <button type="button" class="round-action fav" @click="$emit('favorite')">★</button>
+      <div class="action-stack">
+        <button type="button" class="pack-action vip" @click="$emit('vip')">
+          <span class="pack-ico">👑</span>
+          <span>VIP充值</span>
+        </button>
+        <button type="button" class="pack-action fav" @click="$emit('favorite')">
+          <span class="pack-ico">★</span>
+          <span>收藏</span>
+        </button>
+      </div>
+    </div>
+
+    <div v-if="$slots.banner" class="pack-banner">
+      <slot name="banner" />
     </div>
   </header>
 </template>
@@ -64,15 +78,30 @@ defineEmits<{
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.home-header {
-  background: #fff;
-  padding: 8px 12px 12px;
-  box-shadow: 0 1px 0 $line;
+.home-header--pack {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, #fff7fa 58%, #ffe8f0 100%);
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 16px;
+  border-radius: 0 0 24px 24px;
+  box-shadow: 0 16px 32px rgba(232, 106, 150, 0.12);
+}
+
+.pack-glow {
+  position: absolute;
+  top: -48px;
+  right: -36px;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(232, 106, 150, 0.2), transparent 68%);
+  pointer-events: none;
 }
 
 .channel-row,
 .sub-row,
 .search-row {
+  position: relative;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -91,14 +120,14 @@ defineEmits<{
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .channel-item,
 .sub-item,
 .checkin-btn,
-.round-action {
+.pack-action {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
@@ -116,8 +145,8 @@ defineEmits<{
 }
 
 .channel-item {
-  font-size: 15px;
-  padding: 4px 10px;
+  font-size: 16px;
+  padding: 5px 12px;
 
   &.active {
     color: $primary-color-deep;
@@ -127,19 +156,24 @@ defineEmits<{
 }
 
 .checkin-btn {
+  margin-left: 8px;
   border: 0;
-  background: transparent;
-  color: $ink;
+  background: linear-gradient(180deg, #fff 0%, $primary-soft 100%);
+  color: $primary-color-deep;
   font-size: 12px;
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 2px;
   white-space: nowrap;
+  border-radius: $radius-pill;
+  padding: 5px 10px;
+  box-shadow: inset 0 0 0 1px rgba(232, 106, 150, 0.16);
 }
 
 .sub-row {
   margin-top: 8px;
-  gap: 8px;
+  gap: 6px;
 }
 
 .sub-item {
@@ -154,50 +188,92 @@ defineEmits<{
 }
 
 .search-row {
-  margin-top: 10px;
+  margin-top: 12px;
+  align-items: stretch;
   gap: 8px;
 }
 
 .search-pill {
   flex: 1;
   min-width: 0;
-  height: 36px;
+  min-height: 52px;
   border-radius: $radius-pill;
-  background: $background-page;
-  border: 1px solid $line;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(232, 106, 150, 0.14);
   color: $text-color-muted;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 12px;
+  gap: 8px;
+  padding: 0 16px;
   font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.round-action {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+.search-ico {
+  font-size: 16px;
+  color: $primary-color;
+}
+
+.action-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pack-action {
   border: 0;
-  background: $primary-soft;
-  color: $primary-color-deep;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
+  background: transparent;
+  padding: 0;
+  min-width: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  color: $ink;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.pack-ico {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  font-size: 12px;
+}
 
-  &.vip {
-    background: $primary-color;
-    color: #fff;
-  }
+.pack-action.vip .pack-ico {
+  background: linear-gradient(180deg, #ffe08a, #f2c14b);
+  color: #8a5a00;
+}
 
-  &.fav {
-    background: #fff4d4;
-    color: #c48a12;
-  }
+.pack-action.fav .pack-ico {
+  background: linear-gradient(180deg, #ffd0e0, #e86a96);
+  color: #fff;
+}
+
+.pack-banner {
+  position: relative;
+  margin-top: 12px;
+  border-radius: $radius-card;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(44, 27, 34, 0.1);
+}
+
+.pack-banner :deep(.hero-banner) {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.pack-banner :deep(.hero-cover) {
+  height: 148px;
 }
 </style>

@@ -11,17 +11,19 @@
       @search="go('/search')"
       @vip="go('/vip')"
       @favorite="go('/favorite')"
-    />
+    >
+      <template v-if="ads[0]" #banner>
+        <section class="hero-banner" @click="open(ads[0])">
+          <div class="hero-cover" :class="`tone-${ads[0].tone}`">
+            <img v-if="ads[0].cover" :src="ads[0].cover" alt="" />
+          </div>
+        </section>
+      </template>
+    </HomeHeader>
 
     <div class="inner-slide">
       <transition :name="innerName">
         <div :key="channel + '-' + subTab" class="inner-pane">
-          <section v-if="ads[0]" class="hero-banner" @click="open(ads[0])">
-            <div class="hero-cover" :class="`tone-${ads[0].tone}`">
-              <img v-if="ads[0].cover" :src="ads[0].cover" alt="" />
-            </div>
-          </section>
-
           <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
               <span class="quick-icon">{{ item.icon }}</span>
