@@ -233,7 +233,7 @@ onMounted(() => {
     height: 230%;
     max-width: none;
     transform: translate(-50%, -50%);
-    filter: blur(16px);
+    filter: blur(2px);
   }
 }
 
