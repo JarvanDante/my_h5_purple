@@ -1,15 +1,16 @@
 <template>
   <div class="media-grid" :class="[cols, { wide, mosaic: mosaicMode }]">
-    <article v-for="item in items" :key="item.id" class="card" @click="$emit('select', item)">
+    <article v-for="item in items" :key="`${item.isAd ? 'ad' : 'm'}-${item.id}`" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
-        <CoverMosaic v-if="item.mosaic" :src="item.cover" />
-        <img v-else-if="item.cover" :src="item.cover" alt="" />
-        <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
-        <p v-if="!wide && !item.mosaic" class="cover-title ellipsis">{{ item.title }}</p>
-        <span v-if="item.duration" class="duration">{{ item.duration }}</span>
+        <CoverMosaic v-if="item.mosaic && item.cover && !item.isAd" :src="item.cover" />
+        <img v-else-if="item.cover && !item.isAd" :src="item.cover" alt="" />
+        <span v-if="item.isAd" class="ad-mark">广告</span>
+        <span v-else-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
+        <p v-if="!wide && !item.mosaic && !item.isAd" class="cover-title ellipsis">{{ item.title }}</p>
+        <span v-if="item.duration && !item.isAd" class="duration">{{ item.duration }}</span>
       </div>
-      <p v-if="item.mosaic" class="card-title ellipsis">{{ item.title }}</p>
-      <p v-if="item.badge" class="foot-badge">{{ item.badge }}</p>
+      <p v-if="item.mosaic || item.isAd" class="card-title ellipsis">{{ item.title }}</p>
+      <p v-if="item.badge && !item.isAd" class="foot-badge">{{ item.badge }}</p>
       <p v-else-if="item.labels?.length" class="labels">
         <span v-for="lb in item.labels" :key="lb">{{ lb }}</span>
       </p>
@@ -50,25 +51,35 @@ defineEmits<{
   padding-bottom: 12px;
 
   &.cols-2 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   &.cols-3,
   &:not([class*='cols-']) {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 4px;
+    justify-items: stretch;
   }
+}
+
+.card {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .thumb {
   position: relative;
+  width: 100%;
   border-radius: $radius-thumb;
   overflow: hidden;
   height: 132px;
   border: 0;
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
+    max-width: 100%;
     object-fit: cover;
   }
 
@@ -91,6 +102,25 @@ defineEmits<{
   aspect-ratio: 3 / 4;
 }
 
+.cols-3 .card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.cols-3 .thumb {
+  width: 100%;
+  max-width: 100%;
+  height: 150px;
+}
+
+.cols-3 .card-title {
+  margin-top: 4px;
+}
+
+.cols-3 .foot-badge {
+  margin-top: 1px;
+}
+
 .wide.cols-2 .thumb {
   aspect-ratio: 16 / 9;
 }
@@ -103,6 +133,20 @@ defineEmits<{
 }
 
 @include media-tones;
+
+.ad-mark {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 3px 5px;
+}
 
 .badge {
   position: absolute;
