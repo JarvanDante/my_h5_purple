@@ -102,8 +102,20 @@ defineEmits<{
   }
 
   .sub-row {
-    margin-top: 0;
-    padding: 2px 0 8px;
+    margin-top: 2px;
+    padding: 8px 0 10px;
+    gap: 20px;
+  }
+
+  .sub-item {
+    font-size: 13.5px;
+    line-height: 22px;
+    padding: 2px 2px;
+    letter-spacing: 0.02em;
+
+    &.active {
+      font-weight: 700;
+    }
   }
 }
 
@@ -122,6 +134,11 @@ defineEmits<{
 .sub-row {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .channel-tabs {
