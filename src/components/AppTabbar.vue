@@ -9,28 +9,24 @@
       @click="go(item.path)"
     >
       <span class="tab-icon" aria-hidden="true">
-        <svg v-if="item.key === 'comic'" viewBox="0 0 24 24">
-          <path
-            class="shape"
-            d="M5 7.5C5 5.6 6.6 4 8.5 4H15c2.2 0 4 1.8 4 4v8.2c0 1.3-1.5 2-2.5 1.2L14 15.2H8.5C6.6 15.2 5 13.6 5 11.7V7.5Z"
-          />
-          <text class="mark" x="8.1" y="12.3" font-size="6.4" font-weight="800">hi</text>
+        <svg v-if="item.key === 'comic'" viewBox="0 0 24 24" fill="none">
+          <path class="shape" d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z" />
+          <path class="shape" d="M8.5 9.5h.01M15.5 9.5h.01M8.5 15c1 1.2 5 1.2 7 0" />
         </svg>
-        <svg v-else-if="item.key === 'video'" viewBox="0 0 24 24">
-          <rect class="shape" x="4.2" y="4.2" width="15.6" height="15.6" rx="4" />
-          <path class="mark-fill" d="M10.2 8.6 16.2 12l-6 3.4V8.6Z" />
+        <svg v-else-if="item.key === 'video'" viewBox="0 0 24 24" fill="none">
+          <rect class="shape" x="3" y="5.5" width="18" height="13" rx="2.5" />
+          <path class="shape" d="M10.5 9.8l4.5 2.7-4.5 2.7z" />
         </svg>
-        <svg v-else-if="item.key === 'planet'" viewBox="0 0 24 24">
-          <circle class="shape" cx="12" cy="12" r="5.6" />
-          <ellipse class="ring" cx="12" cy="12" rx="9" ry="3.2" transform="rotate(-28 12 12)" />
+        <svg v-else-if="item.key === 'planet'" viewBox="0 0 24 24" fill="none">
+          <circle class="shape" cx="12" cy="12" r="4.2" />
+          <ellipse class="ring" cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-22 12 12)" />
         </svg>
-        <svg v-else-if="item.key === 'ai'" viewBox="0 0 24 24">
-          <rect class="shape" x="4.4" y="4.4" width="15.2" height="15.2" rx="4" />
-          <text class="mark" x="6.6" y="15.6" font-size="8.2" font-weight="800">AI</text>
+        <svg v-else-if="item.key === 'ai'" viewBox="0 0 24 24" fill="none">
+          <path class="shape" d="M12 3.5l2.2 5 5 .5-3.8 3.4 1.1 5.1L12 15l-4.5 2.5 1.1-5.1L4.8 9l5-.5z" />
         </svg>
-        <svg v-else viewBox="0 0 24 24">
-          <circle class="shape" cx="12" cy="8.6" r="3.4" />
-          <path class="shape" d="M5.6 19.8c.8-3.2 3.2-5.1 6.4-5.1s5.6 1.9 6.4 5.1H5.6Z" />
+        <svg v-else viewBox="0 0 24 24" fill="none">
+          <circle class="shape" cx="12" cy="8.5" r="3.8" />
+          <path class="shape" d="M4.8 20c1-3.6 3.8-5.5 7.2-5.5S18.2 16.4 19.2 20" />
         </svg>
       </span>
       <span class="tab-label">{{ item.label }}</span>

@@ -13,10 +13,7 @@
           {{ item }}
         </button>
       </div>
-      <button type="button" class="checkin-btn" @click="$emit('checkin')">
-        <LineIcon name="gift" />
-        签到
-      </button>
+      <button type="button" class="checkin-btn" @click="$emit('checkin')">签到</button>
     </div>
 
     <div class="sub-row">
@@ -37,14 +34,8 @@
         <span class="search-ico"><LineIcon name="search" /></span>
         <span>搜索更多{{ channel }}</span>
       </div>
-      <button type="button" class="pack-action vip" @click="$emit('vip')">
-        <span class="cta-ico">会员</span>
-        <span>VIP充值</span>
-      </button>
-      <button type="button" class="pack-action fav" @click="$emit('favorite')">
-        <span class="pack-img"><LineIcon name="fav" /></span>
-        <span>收藏</span>
-      </button>
+      <button type="button" class="qbtn" @click="$emit('vip')">VIP</button>
+      <button type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
     </div>
 
     <div v-if="$slots.banner" class="pack-banner">
@@ -80,7 +71,6 @@ defineEmits<{
   position: relative;
   background: #fff;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 12px;
-  box-shadow: 0 1px 0 $line;
 }
 
 .channel-row,
@@ -105,83 +95,85 @@ defineEmits<{
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 6px;
+  gap: 16px;
   min-width: 0;
 }
 
 .channel-item,
 .sub-item,
 .checkin-btn,
-.pack-action {
+.qbtn {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
   flex-shrink: 0;
 }
 
-.channel-item,
-.sub-item {
+.channel-item {
   border: 0;
   background: transparent;
   color: $text-color-secondary;
-  font-weight: 600;
-  white-space: nowrap;
-  border-radius: $radius-pill;
-}
-
-.channel-item {
   font-size: 15px;
-  padding: 4px 8px;
-  color: $text-color-secondary;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0 0 5px;
+  position: relative;
 
   &.active {
     color: $ink;
-    background: transparent;
-    font-size: 18px;
-    font-weight: 800;
+    font-size: 17px;
+    font-weight: 700;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 16px;
+      height: 3px;
+      border-radius: 2px;
+      background: $primary-color;
+      transform: translateX(-50%);
+    }
   }
 }
 
 .checkin-btn {
-  margin-left: 8px;
+  margin-left: auto;
   border: 0;
-  background: transparent;
-  color: $text-color-secondary;
-  font-size: 12px;
+  background: $primary-color;
+  color: #fff;
+  font-size: 11.5px;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-  padding: 4px 2px;
-
-  :deep(.line-icon) {
-    width: 16px;
-    height: 16px;
-  }
+  border-radius: $radius-pill;
+  padding: 5px 12px;
 }
 
 .sub-row {
-  margin-top: 8px;
-  gap: 6px;
+  margin-top: 6px;
+  gap: 15px;
 }
 
 .sub-item {
+  border: 0;
+  background: transparent;
+  color: $text-color-secondary;
   font-size: 13px;
-  padding: 4px 8px 6px;
-  border-radius: 0;
+  font-weight: 400;
+  white-space: nowrap;
+  padding: 3px 0;
 
   &.active {
     color: $primary-color;
-    background: transparent;
-    font-weight: 700;
-    box-shadow: inset 0 -2px 0 $primary-color;
+    background: $primary-soft;
+    font-weight: 650;
+    padding: 3px 10px;
+    border-radius: $radius-pill;
   }
 }
 
 .search-row {
   margin-top: 8px;
-  align-items: center;
   gap: 8px;
 }
 
@@ -191,20 +183,20 @@ defineEmits<{
   height: 34px;
   border-radius: $radius-pill;
   background: $background-surface2;
-  border: 1px solid $line;
+  border: 0;
   color: $text-color-secondary;
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 0 12px;
-  font-size: 13px;
+  font-size: 12.5px;
   white-space: nowrap;
   overflow: hidden;
 }
 
 .search-ico {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: $text-color-secondary;
   display: flex;
 
@@ -214,53 +206,22 @@ defineEmits<{
   }
 }
 
-.pack-action {
+.qbtn {
+  width: 36px;
+  height: 34px;
   border: 0;
+  border-radius: 9px;
   background: transparent;
-  padding: 0;
-  min-width: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
   color: $text-color-secondary;
-  font-size: 9px;
-  font-weight: 600;
-  line-height: 1.1;
-}
-
-.pack-img {
-  width: 22px;
-  height: 22px;
-  color: $text-color;
-  display: flex;
-
-  :deep(.line-icon) {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-.cta-ico {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: $primary-color;
-  color: #fff;
   font-size: 8px;
-  font-weight: 800;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: -0.04em;
-}
-
-.pack-action.vip {
-  color: $text-color-secondary;
 }
 
 .pack-banner {
   position: relative;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 </style>

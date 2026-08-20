@@ -95,7 +95,7 @@
   height: 36px;
   border-radius: $radius-pill;
   background: $background-surface2;
-  border: 1px solid $line;
+  border: 0;
   color: $text-color-secondary;
   display: flex;
   align-items: center;
@@ -179,29 +179,28 @@
 }
 
 .quick-strip .quick-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: $background-surface2;
-  color: $ink;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: $primary-soft;
+  color: $primary-color;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
 
   .line-icon,
   svg {
-    width: 22px;
-    height: 22px;
+    width: 21px;
+    height: 21px;
   }
 }
 
 .quick-strip .quick-label {
-  color: $text-color-secondary;
+  color: $text-color;
   background: transparent;
   border: 0;
   padding: 0;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .section-panel {
@@ -236,7 +235,7 @@
     width: 3px;
     height: 14px;
     border-radius: 2px;
-    background: $ink;
+    background: $primary-color;
   }
 }
 
@@ -244,8 +243,8 @@
   border: 0;
   background: transparent;
   color: $text-color-secondary;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 500;
   border-radius: 0;
   padding: 4px 0;
   line-height: 1.2;

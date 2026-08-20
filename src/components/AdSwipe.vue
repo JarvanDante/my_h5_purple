@@ -26,6 +26,7 @@
           <span class="ad-tag">广告</span>
         </div>
         <p class="ad-title">{{ item.title }}</p>
+        <span class="ad-label">广告</span>
       </button>
     </div>
   </div>
@@ -171,12 +172,19 @@ watch(
 .ad-title {
   margin: 6px 0 0;
   color: $ink;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 500;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.ad-label {
+  display: block;
+  margin-top: 2px;
+  color: $text-color-secondary;
+  font-size: 9.5px;
 }
 
 .ad-tag {

@@ -14,19 +14,20 @@
     <g v-else-if="name === 'fav'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
       <path d="M7 4.6h10a1.4 1.4 0 0 1 1.4 1.4v13.2L12 15.6 5.6 19.2V6A1.4 1.4 0 0 1 7 4.6Z" />
     </g>
-    <g v-else-if="name === 'topic'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
-      <path d="M9.2 4.4 7.4 19.6M16.6 4.4 14.8 19.6M5 9.4h14.4M4.4 14.6H18.8" />
+    <g v-else-if="name === 'topic'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H10l2 2.5h6.5A1.5 1.5 0 0 1 20 8v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18z" />
     </g>
-    <g v-else-if="name === 'hot'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-      <path d="M12 3.8s3.4 3.2 3.4 6.6a3.4 3.4 0 0 1-6.2 1.9C8.4 10.8 10 8.8 12 3.8Z" />
-      <path d="M8.6 14.6A4.6 4.6 0 0 0 12 20.2a4.6 4.6 0 0 0 3.4-7.8" />
+    <g v-else-if="name === 'hot'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3s4.5 3.8 4.5 8a4.5 4.5 0 0 1-9 0c0-1.4.5-2.6 1.2-3.6" />
+      <path d="M12 21a5 5 0 0 0 5-5c0-1.5-.7-2.8-1.6-3.8" />
+      <path d="M12 21a5 5 0 0 1-5-5" />
     </g>
-    <g v-else-if="name === 'daily'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-      <rect x="4.4" y="5.6" width="15.2" height="14" rx="2" />
-      <path d="M8 3.8v3.4M16 3.8v3.4M4.4 10.2h15.2" stroke-linecap="round" />
+    <g v-else-if="name === 'daily'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+      <rect x="3.5" y="5" width="17" height="15" rx="2.5" />
+      <path d="M3.5 9.5h17M8 3.5v3M16 3.5v3" />
     </g>
-    <g v-else-if="name === 'rank'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
-      <path d="M7.2 16.6h9.6v3.2H7.2zM8.4 10.2h7.2v6.4H8.4zM10.2 5.4h3.6v4.8h-3.6z" />
+    <g v-else-if="name === 'rank'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 20h14M9 20v-6M15 20V9M12 20V4" />
     </g>
     <g v-else-if="name === 'play'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
       <rect x="4.2" y="4.2" width="15.6" height="15.6" rx="4" />

@@ -112,7 +112,7 @@ defineEmits<{
   font-size: 10px;
   border-radius: 6px;
   padding: 1px 6px;
-  background: rgba(26, 26, 31, 0.55);
+  background: $primary-color;
   border: 0;
 
   &.vip {
