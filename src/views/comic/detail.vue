@@ -213,8 +213,8 @@ onMounted(() => {
 .hero {
   position: relative;
   flex-shrink: 0;
-  min-height: 292px;
-  padding: 0 14px 32px;
+  height: 239px;
+  padding: 0 14px 16px;
   overflow: hidden;
   color: #fff;
   background: #1a1618;
@@ -233,6 +233,7 @@ onMounted(() => {
     height: 230%;
     max-width: none;
     transform: translate(-50%, -50%);
+    filter: blur(16px);
   }
 }
 
@@ -275,7 +276,7 @@ onMounted(() => {
 .hero-main {
   display: flex;
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 8px;
 }
 
 .poster {
