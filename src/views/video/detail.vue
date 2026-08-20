@@ -6,19 +6,6 @@
           <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
       </button>
-      <button
-        type="button"
-        class="fs-btn"
-        :aria-label="isFs ? '退出全屏' : '全屏'"
-        @click="isFs ? exitFs() : enterFs()"
-      >
-        <svg v-if="!isFs" viewBox="0 0 24 24" fill="none">
-          <path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-        <svg v-else viewBox="0 0 24 24" fill="none">
-          <path d="M9 4v5H4M15 4v5h5M4 15h5v5M20 15h-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        </svg>
-      </button>
       <HlsPlayer
         v-if="item?.source_url"
         ref="playerRef"
@@ -26,7 +13,7 @@
         :poster="poster"
         @user-pause="onUserPause"
         @play="onPlayerPlay"
-        @native-fullscreen="enterFs"
+        @native-fullscreen="toggleFs"
       />
       <span v-else class="no-src">暂无播放地址，请在媒资中心转码后回填</span>
       <div v-if="showAd" class="ad-cover">
@@ -188,6 +175,11 @@ const exitFs = () => {
   if (document.fullscreenElement) {
     document.exitFullscreen?.().catch(() => undefined)
   }
+}
+
+const toggleFs = () => {
+  if (isFs.value) exitFs()
+  else enterFs()
 }
 
 const onPlayerPlay = () => {
@@ -434,27 +426,6 @@ onBeforeUnmount(() => {
   color: #fff;
   font-size: 20px;
   line-height: 1;
-}
-
-.fs-btn {
-  position: absolute;
-  top: calc(8px + env(safe-area-inset-top, 0px));
-  right: 8px;
-  z-index: 4;
-  width: 32px;
-  height: 32px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.35);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
 }
 
 .back-btn {

@@ -5,7 +5,7 @@
     controls
     playsinline
     webkit-playsinline
-    controlslist="nofullscreen nodownload"
+    controlslist="nodownload"
     disablepictureinpicture
     crossorigin="anonymous"
     :poster="poster || undefined"
