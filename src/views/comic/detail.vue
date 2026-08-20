@@ -216,7 +216,10 @@ onMounted(() => {
 .hero {
   position: relative;
   flex-shrink: 0;
-  height: auto;
+  width: 375px;
+  max-width: 100%;
+  height: 239px;
+  box-sizing: border-box;
   padding: 0 16px 10px;
   overflow: hidden;
   color: #fff;
@@ -259,8 +262,7 @@ onMounted(() => {
 .nav {
   display: flex;
   justify-content: space-between;
-  height: calc(40px + env(safe-area-inset-top, 0px));
-  padding-top: env(safe-area-inset-top, 0px);
+  height: 40px;
   align-items: center;
 }
 
