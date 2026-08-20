@@ -22,7 +22,7 @@
         <div :key="channel + '-' + subTab" class="inner-pane">
           <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
-              <span class="quick-icon"><LineIcon :name="item.icon" /></span>
+              <span class="quick-icon">{{ item.emoji }}</span>
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -42,7 +42,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import LineIcon from '@/components/LineIcon.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { fetchComicsCategories, fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
@@ -74,10 +73,10 @@ const selectSub = (item: string) => {
 }
 
 const quicks = [
-  { icon: 'topic', label: '专题', path: '/list?media=comic&type=topic' },
-  { icon: 'hot', label: '热门', path: '/list?media=comic&type=hot' },
-  { icon: 'daily', label: '每日', path: '/list?media=comic&type=daily' },
-  { icon: 'rank', label: '榜单', path: '/list?media=comic&type=rank' },
+  { emoji: '📍', label: '专题', path: '/list?media=comic&type=topic' },
+  { emoji: '🔥', label: '热门', path: '/list?media=comic&type=hot' },
+  { emoji: '📅', label: '每日', path: '/list?media=comic&type=daily' },
+  { emoji: '🏆', label: '榜单', path: '/list?media=comic&type=rank' },
 ]
 
 const list = ref<ComicsItem[]>([])

@@ -67,8 +67,8 @@ const go = (path: string) => {
   width: 100%;
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 2px 4px env(safe-area-inset-bottom, 0px);
-  background: #fff;
-  border-top: 1px solid $line;
+  background: $background-tabbar;
+  border-top: 1px solid #ffdde9;
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -86,7 +86,7 @@ const go = (path: string) => {
   justify-content: flex-end;
   gap: 1px;
   padding-bottom: 4px;
-  color: $text-color-secondary;
+  color: $tab-idle;
   cursor: pointer;
 
   &.active {
@@ -120,7 +120,7 @@ const go = (path: string) => {
   width: 22px;
   height: 22px;
   display: flex;
-  color: $text-color-secondary;
+  color: $tab-idle;
 
   svg {
     width: 100%;

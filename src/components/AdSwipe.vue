@@ -181,10 +181,13 @@ watch(
 }
 
 .ad-label {
-  display: block;
+  display: inline-block;
   margin-top: 2px;
   color: $text-color-secondary;
   font-size: 9.5px;
+  background: $background-surface2;
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
 .ad-tag {

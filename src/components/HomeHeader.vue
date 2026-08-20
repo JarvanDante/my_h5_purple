@@ -13,7 +13,7 @@
           {{ item }}
         </button>
       </div>
-      <button type="button" class="checkin-btn" @click="$emit('checkin')">签到</button>
+      <button type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
     </div>
 
     <div class="sub-row">
@@ -65,8 +65,8 @@ defineEmits<{
 
 .home-header--pack {
   position: relative;
-  background: #fff;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 12px;
+  background: $background-topbar;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 12px;
 }
 
 .channel-row,
@@ -112,25 +112,12 @@ defineEmits<{
   font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
-  padding: 0 0 5px;
-  position: relative;
+  padding: 0 0 3px;
 
   &.active {
-    color: $ink;
+    color: $primary-color;
     font-size: 17px;
     font-weight: 700;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      width: 16px;
-      height: 3px;
-      border-radius: 2px;
-      background: $primary-color;
-      transform: translateX(-50%);
-    }
   }
 }
 
@@ -143,10 +130,14 @@ defineEmits<{
   font-weight: 600;
   border-radius: $radius-pill;
   padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .sub-row {
   margin-top: 6px;
+  padding: 6px 0 10px;
   gap: 15px;
 }
 
@@ -157,19 +148,16 @@ defineEmits<{
   font-size: 13px;
   font-weight: 400;
   white-space: nowrap;
-  padding: 3px 0;
+  padding: 0;
 
   &.active {
     color: $primary-color;
-    background: $primary-soft;
     font-weight: 650;
-    padding: 3px 10px;
-    border-radius: $radius-pill;
   }
 }
 
 .search-row {
-  margin-top: 8px;
+  margin-top: 0;
   gap: 8px;
 }
 
@@ -178,9 +166,9 @@ defineEmits<{
   min-width: 0;
   height: 34px;
   border-radius: $radius-pill;
-  background: $background-surface2;
-  border: 0;
-  color: $text-color-secondary;
+  background: transparent;
+  border: 1px solid $search-border;
+  color: $search-text;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -193,7 +181,7 @@ defineEmits<{
 .search-ico {
   width: 14px;
   height: 14px;
-  color: $text-color-secondary;
+  color: $search-text;
   display: flex;
 
   :deep(.line-icon) {
@@ -207,10 +195,10 @@ defineEmits<{
   height: 34px;
   border: 0;
   border-radius: 9px;
-  background: transparent;
-  color: $text-color-secondary;
+  background: $primary-color;
+  color: #fff;
   font-size: 8px;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;

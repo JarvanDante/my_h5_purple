@@ -22,7 +22,7 @@
         <div :key="channel + '-' + subTab" class="inner-pane">
           <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
-              <span class="quick-icon"><LineIcon :name="item.icon" /></span>
+              <span class="quick-icon">{{ item.emoji }}</span>
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -52,7 +52,6 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import LineIcon from '@/components/LineIcon.vue'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
@@ -107,10 +106,10 @@ const ads = computed<CoverItem[]>(() => {
 })
 
 const quicks = [
-  { icon: 'vip', label: '抢先看', path: '/vip' },
-  { icon: 'play', label: '直播', path: '' },
-  { icon: 'topic', label: '专题', path: '/list?media=video&type=topic' },
-  { icon: 'wallet', label: '金币专区', path: '/wallet' },
+  { emoji: '👑', label: '抢先看', path: '/vip' },
+  { emoji: '▶️', label: '直播', path: '' },
+  { emoji: '📍', label: '专题', path: '/list?media=video&type=topic' },
+  { emoji: '💰', label: '金币专区', path: '/wallet' },
 ]
 
 const go = (path: string) => router.push(path)

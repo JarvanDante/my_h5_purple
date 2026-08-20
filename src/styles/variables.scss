@@ -1,26 +1,31 @@
-// 近白灰底 + 稀缺粉：主色只给选中态和主 CTA
-$primary-color: #ff3d71;
-$primary-color-deep: #e31c5f;
-$primary-soft: #ffe8ef;
-$secondary-color: #efeef2;
-$secondary-dark: #1a1a1f;
+// 全粉铺底：对齐对比稿当前方案
+$primary-color: #ff5c93;
+$primary-color-deep: #f0568f;
+$primary-soft: #ffd9e5;
+$secondary-color: #ffe4ee;
+$secondary-dark: #f0568f;
 $danger-color: #e31c5f;
 $on-accent: #ffffff;
 
-$text-color: #1a1a1f;
-$text-color-secondary: #8e8e93;
-$text-color-muted: #aeaeb2;
+$text-color: #f0568f;
+$text-color-secondary: #d28ca6;
+$text-color-muted: #e0a8bc;
 $text-color-light: #ffffff;
 
 $background-color: #ffffff;
-$background-page: #fafafa;
-$background-surface2: #f1f1f4;
+$background-page: #fff0f4;
+$background-surface2: #ffe4ee;
 $background-dark: #141418;
+$background-topbar: #ffe9f0;
+$background-tabbar: #fff6f9;
 
-$accent-yellow: #ff3d71;
-$ink: #1a1a1f;
-$line: #efeff2;
-$shadow-card: 0 1px 3px rgba(20, 20, 30, 0.06);
+$accent-yellow: #ff5c93;
+$ink: #f0568f;
+$line: #ffe0ea;
+$tab-idle: #f090b4;
+$search-border: #ffb8d0;
+$search-text: #f58ab0;
+$shadow-card: 0 1px 0 rgba(0, 0, 0, 0.02);
 $radius-card: 14px;
 $radius-thumb: 10px;
 $radius-pill: 999px;
