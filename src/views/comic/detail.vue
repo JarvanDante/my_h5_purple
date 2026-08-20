@@ -24,41 +24,48 @@
           <CoverMosaic :src="cover" />
         </div>
         <div class="meta">
-          <div class="title-row">
-            <h1 class="ellipsis">{{ item.title }}</h1>
-            <span v-if="category" class="cate">{{ category }}</span>
-          </div>
-          <p class="line">共{{ item.chapter_count || 0 }}话</p>
-          <p class="line">{{ formatCount(item.view_count) }}人气 · {{ formatCount(item.like_count) }}人收藏</p>
-          <button type="button" class="fav-btn" @click="onFav">+收藏</button>
+          <h1 class="ellipsis">{{ item.title }}</h1>
+          <p class="sub">
+            <span v-for="name in categories" :key="name" class="cate">{{ name }}</span>
+            <span class="chap-num">共{{ item.chapter_count || 0 }}话</span>
+          </p>
+          <p class="stats">{{ formatCount(item.view_count) }}人气 | {{ formatCount(favCount) }}人收藏</p>
+          <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
+            {{ collected ? '已收藏' : '+收藏' }}
+          </button>
         </div>
       </div>
     </header>
 
-    <div v-if="tags.length" class="tag-row">
-      <span v-for="tag in tags" :key="tag">{{ tag }}</span>
-    </div>
-
-    <section v-if="item?.intro" class="intro-card">{{ item.intro }}</section>
-    <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
-
-    <section class="catalog">
-      <div class="catalog-head">
-        <h3>目录</h3>
-        <span>共{{ chapters.length }}话</span>
+    <div class="scroll-body">
+      <div v-if="tags.length" class="tag-row">
+        <span v-for="tag in tags" :key="tag">{{ tag }}</span>
       </div>
-      <button
-        v-for="ch in chapters"
-        :key="ch.id"
-        type="button"
-        class="chapter"
-        :class="{ lock: !ch.playable }"
-        @click="openChapter(ch)"
-      >
-        <span class="ch-name">第{{ ch.seq }}话</span>
-        <span v-if="!ch.playable" class="ch-lock">锁</span>
-      </button>
-    </section>
+      <p v-if="item?.intro" class="intro">{{ item.intro }}</p>
+      <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
+
+      <section class="catalog">
+        <div class="catalog-head">
+          <h3>目录</h3>
+          <span>共{{ chapters.length }}话 ›</span>
+        </div>
+        <button
+          v-for="ch in chapters"
+          :key="ch.id"
+          type="button"
+          class="chapter"
+          :class="{ lock: !ch.playable }"
+          @click="openChapter(ch)"
+        >
+          <span class="ch-thumb">
+            <img v-if="cover" :src="cover" alt="" />
+          </span>
+          <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
+          <span v-if="ch.playable" class="watch">观看</span>
+          <span v-else class="ch-lock">锁</span>
+        </button>
+      </section>
+    </div>
 
     <div class="bottom-bar">
       <button v-if="item?.need_pay" type="button" class="read-btn" @click="buy">购买整部</button>
@@ -72,6 +79,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import CoverMosaic from '@/components/CoverMosaic.vue'
+import { fetchCollectList, MEDIA_COMICS, operateCollect } from '@/api/collect'
 import {
   buyComics,
   fetchComicsChapters,
@@ -88,15 +96,28 @@ const router = useRouter()
 const userStore = useUserStore()
 const item = ref<ComicsDetail | null>(null)
 const chapters = ref<ChapterItem[]>([])
+const collected = ref(false)
 
 const cover = computed(() => mediaUrl(item.value?.cover))
-const category = computed(() => comicCategories(item.value || {})[0] || '')
+const categories = computed(() => comicCategories(item.value || {}))
 const tags = computed(() => (item.value?.tags || []).filter(Boolean))
+const favCount = computed(() => Number(item.value?.like_count || 0))
 
 const formatCount = (n?: number) => {
   const v = Number(n || 0)
   if (v >= 10000) return `${(v / 10000).toFixed(1).replace(/\.0$/, '')}w`
+  if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, '')}k`
   return String(v)
+}
+
+const loadFav = async () => {
+  if (!getToken() || !item.value) return
+  try {
+    const data = await fetchCollectList(1, MEDIA_COMICS, 1, 100)
+    collected.value = (data.list || []).some((row) => row.content_id === item.value?.id)
+  } catch {
+    collected.value = false
+  }
 }
 
 const load = async () => {
@@ -104,6 +125,7 @@ const load = async () => {
   const [d, c] = await Promise.all([fetchComicsDetail(id), fetchComicsChapters(id)])
   item.value = d
   chapters.value = c.list || []
+  await loadFav()
 }
 
 const buy = async () => {
@@ -148,12 +170,25 @@ const share = async () => {
   }
 }
 
-const onFav = () => {
+const onFav = async () => {
+  if (!item.value) return
   if (!getToken()) {
-    showToast('请先登录')
-    return
+    try {
+      await userStore.ensureLogin()
+    } catch {
+      showToast('请先登录')
+      return
+    }
   }
-  showToast('漫画收藏即将开放')
+  const next = !collected.value
+  try {
+    await operateCollect(item.value.id, MEDIA_COMICS, next)
+    collected.value = next
+    item.value.like_count = Math.max(0, Number(item.value.like_count || 0) + (next ? 1 : -1))
+    showToast(next ? '已收藏' : '已取消收藏')
+  } catch (err) {
+    toastError(err)
+  }
 }
 
 onMounted(() => {
@@ -166,18 +201,20 @@ onMounted(() => {
 
 .comic-detail {
   padding-bottom: 0;
+  height: 100%;
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  background: $background-page;
+  overflow: hidden;
+  background: #fff;
 }
 
 .hero {
   position: relative;
-  padding: 0 14px 18px;
+  flex-shrink: 0;
+  padding: 0 14px 16px;
   overflow: hidden;
   color: #fff;
-  min-height: 228px;
 }
 
 .hero-tile,
@@ -217,7 +254,8 @@ onMounted(() => {
 .nav {
   display: flex;
   justify-content: space-between;
-  height: 46px;
+  height: calc(46px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   align-items: center;
 }
 
@@ -240,7 +278,7 @@ onMounted(() => {
 .hero-main {
   display: flex;
   gap: 12px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .poster {
@@ -250,6 +288,7 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+  outline: 2px solid rgba(255, 255, 255, 0.55);
 }
 
 .meta {
@@ -257,78 +296,92 @@ onMounted(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 2px 0 0;
 }
 
-.title-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-}
-
 h1 {
-  flex: 1;
-  min-width: 0;
   font-size: 18px;
   font-weight: 800;
   line-height: 1.3;
 }
 
+.sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 .cate {
   flex-shrink: 0;
-  margin-top: 2px;
-  background: $primary-color;
+  background: #7b6cff;
   color: #fff;
   font-size: 10px;
   line-height: 1;
-  padding: 4px 6px;
-  border-radius: 3px;
+  padding: 3px 7px;
+  border-radius: 999px;
   font-weight: 700;
 }
 
-.line {
-  margin-top: 6px;
+.chap-num,
+.stats {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.stats {
+  margin-top: 8px;
 }
 
 .fav-btn {
   align-self: flex-start;
   margin-top: 10px;
   height: 28px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: 0;
   border-radius: 14px;
-  background: $accent-yellow;
-  color: $ink;
+  background: #ffd84d;
+  color: #1a1a1f;
   font-size: 12px;
   font-weight: 800;
+
+  &.on {
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  }
+}
+
+.scroll-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #fff;
 }
 
 .tag-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 14px 4px;
+  padding: 12px 14px 0;
   background: #fff;
 
   span {
     font-size: 12px;
     color: #e07a2f;
-    background: #f4f4f4;
-    border-radius: 12px;
+    background: #fff1e4;
+    border-radius: 999px;
     padding: 4px 10px;
   }
 }
 
-.intro-card {
+.intro {
   margin: 10px 14px 0;
-  padding: 12px;
-  background: #fff;
-  border-radius: 12px;
   font-size: 13px;
-  color: #666;
+  color: #1a1a1f;
   line-height: 1.6;
 }
 
@@ -339,26 +392,25 @@ h1 {
 }
 
 .catalog {
-  flex: 1;
-  margin: 12px 14px 12px;
-  padding: 12px;
-  background: #fff;
-  border-radius: 12px;
+  margin-top: 14px;
 }
 
 .catalog-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  padding: 8px 14px;
+  background: #fff1e4;
 
   h3 {
-    font-size: 15px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #e07a2f;
   }
 
   span {
     font-size: 12px;
-    color: $text-color-secondary;
+    color: #e07a2f;
   }
 }
 
@@ -366,29 +418,62 @@ h1 {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 44px;
+  gap: 10px;
+  height: 64px;
+  padding: 0 14px;
   border: 0;
-  border-top: 1px solid #f5eef1;
+  border-bottom: 1px solid #f4f0f2;
   background: #fff;
-  font-size: 14px;
-  color: $ink;
   text-align: left;
+}
 
-  &.lock {
-    color: #bbb;
+.ch-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f4f4f6;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
 }
 
+.ch-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  color: #1a1a1f;
+  font-weight: 500;
+}
+
+.chapter.lock .ch-name {
+  color: #bbb;
+}
+
+.watch {
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  border: 1px solid #e07a2f;
+  color: #e07a2f;
+  font-size: 12px;
+  line-height: 24px;
+}
+
 .ch-lock {
+  flex-shrink: 0;
   font-size: 11px;
   color: #c4a4ad;
 }
 
 .bottom-bar {
-  position: sticky;
-  bottom: 0;
-  margin-top: auto;
+  flex-shrink: 0;
   padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
   background: #fff;
   box-shadow: 0 -4px 16px rgba(44, 27, 34, 0.06);
@@ -399,8 +484,8 @@ h1 {
   height: 44px;
   border: 0;
   border-radius: 22px;
-  background: $accent-yellow;
-  color: $ink;
+  background: #ffd84d;
+  color: #1a1a1f;
   font-size: 16px;
   font-weight: 800;
 }
