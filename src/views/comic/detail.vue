@@ -42,34 +42,48 @@
       </div>
     </header>
 
-    <div class="scroll-body">
-      <div v-if="tags.length" class="tag-row">
-        <span v-for="tag in tags" :key="tag">{{ tag }}</span>
-      </div>
-      <p v-if="item?.intro" class="intro">{{ item.intro }}</p>
-      <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
-
-      <section class="catalog">
-        <div class="catalog-head">
-          <h3>目录</h3>
-          <span>共{{ chapters.length }}话 ›</span>
-        </div>
-        <button
-          v-for="ch in chapters"
-          :key="ch.id"
-          type="button"
-          class="chapter"
-          :class="{ lock: !ch.playable }"
-          @click="openChapter(ch)"
-        >
-          <span class="ch-thumb">
-            <img v-if="cover" :src="cover" alt="" />
-          </span>
-          <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
-          <span v-if="ch.playable" class="watch">观看</span>
-          <span v-else class="ch-lock">锁</span>
+    <div class="panel">
+      <div class="tab-row">
+        <button type="button" class="tab" :class="{ active: tab === 'detail' }" @click="tab = 'detail'">
+          漫画详情
         </button>
-      </section>
+        <button type="button" class="tab" :class="{ active: tab === 'comment' }" @click="tab = 'comment'">
+          评论({{ commentCount }})
+        </button>
+      </div>
+
+      <div class="scroll-body">
+        <template v-if="tab === 'detail'">
+          <div v-if="tags.length" class="tag-row">
+            <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+          </div>
+          <p v-if="item?.intro" class="intro"><b>故事：</b>{{ item.intro }}</p>
+          <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
+
+          <section class="catalog">
+            <div class="catalog-head">
+              <h3>目录</h3>
+              <span>共{{ chapters.length }}话 ›</span>
+            </div>
+            <button
+              v-for="ch in chapters"
+              :key="ch.id"
+              type="button"
+              class="chapter"
+              :class="{ lock: !ch.playable }"
+              @click="openChapter(ch)"
+            >
+              <span class="ch-thumb">
+                <img v-if="cover" :src="cover" alt="" />
+              </span>
+              <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
+              <span v-if="ch.playable" class="watch">观看</span>
+              <span v-else class="ch-lock">锁</span>
+            </button>
+          </section>
+        </template>
+        <div v-else class="comment-hold">评论即将开放</div>
+      </div>
     </div>
 
     <div class="bottom-bar">
@@ -101,6 +115,8 @@ const userStore = useUserStore()
 const item = ref<ComicsDetail | null>(null)
 const chapters = ref<ChapterItem[]>([])
 const collected = ref(false)
+const tab = ref<'detail' | 'comment'>('detail')
+const commentCount = computed(() => 0)
 
 const cover = computed(() => mediaUrl(item.value?.cover))
 const categories = computed(() => comicCategories(item.value || {}))
@@ -210,7 +226,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: #f4f0f2;
 }
 
 .hero {
@@ -391,12 +407,65 @@ h1 {
   }
 }
 
+.panel {
+  flex: 1;
+  min-height: 0;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+}
+
+.tab-row {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-shrink: 0;
+  padding: 10px 16px 0;
+  border-bottom: 1px solid #f4f0f2;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: #9a8a90;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 6px 0 10px;
+  position: relative;
+
+  &.active {
+    color: #1a1a1f;
+    font-weight: 800;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 22px;
+      height: 3px;
+      border-radius: 2px;
+      background: #ffd84d;
+      transform: translateX(-50%);
+    }
+  }
+}
+
 .scroll-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: #fff;
+}
+
+.comment-hold {
+  padding: 48px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #c4a4ad;
 }
 
 .tag-row {
