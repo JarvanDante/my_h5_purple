@@ -84,14 +84,14 @@ defineEmits<{
 }
 
 .home-header--single {
-  padding-bottom: 12px;
+  padding-bottom: 6px;
 
   .channel-item {
     padding: 0;
   }
 
   .search-row {
-    margin-top: 8px;
+    margin-top: 0;
   }
 }
 
