@@ -4,8 +4,13 @@
     class="media"
     controls
     playsinline
+    webkit-playsinline
+    controlslist="nofullscreen nodownload"
+    disablepictureinpicture
     crossorigin="anonymous"
     :poster="poster || undefined"
+    @play="onPlay"
+    @pause="onPause"
   />
 </template>
 
@@ -14,12 +19,19 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { showToast } from 'vant'
 
 const props = defineProps<{ src: string; poster?: string }>()
+const emit = defineEmits<{
+  play: []
+  'user-pause': []
+  'native-fullscreen': []
+}>()
 const el = ref<HTMLVideoElement | null>(null)
 let hls: { destroy: () => void } | null = null
+let ignorePause = false
 
 const attach = async (url: string) => {
   const video = el.value
   if (!video || !url) return
+  ignorePause = true
   hls?.destroy()
   hls = null
   video.removeAttribute('src')
@@ -41,22 +53,61 @@ const attach = async (url: string) => {
       inst.loadSource(url)
       inst.attachMedia(video)
       hls = inst
-      return
-    }
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    } else {
       video.src = url
-      return
     }
+  } else {
+    video.src = url
   }
-  video.src = url
+  window.setTimeout(() => {
+    ignorePause = false
+  }, 0)
 }
 
-onMounted(() => attach(props.src))
+const onPause = () => {
+  if (ignorePause) return
+  const video = el.value
+  if (!video || video.ended) return
+  emit('user-pause')
+}
+
+const onPlay = () => {
+  ignorePause = false
+  emit('play')
+}
+
+const stealNativeFullscreen = () => {
+  const video = el.value as (HTMLVideoElement & { webkitExitFullscreen?: () => void }) | null
+  if (!video) return
+  if (document.fullscreenElement === video) {
+    document.exitFullscreen?.().catch(() => undefined)
+  }
+  video.webkitExitFullscreen?.()
+  emit('native-fullscreen')
+}
+
+const onDocFullscreen = () => {
+  if (document.fullscreenElement === el.value) stealNativeFullscreen()
+}
+
+const play = () => el.value?.play()
+const pause = () => el.value?.pause()
+
+onMounted(() => {
+  attach(props.src)
+  const video = el.value
+  video?.addEventListener('webkitbeginfullscreen', stealNativeFullscreen)
+  document.addEventListener('fullscreenchange', onDocFullscreen)
+})
 watch(() => props.src, (url) => attach(url))
 onBeforeUnmount(() => {
+  el.value?.removeEventListener('webkitbeginfullscreen', stealNativeFullscreen)
+  document.removeEventListener('fullscreenchange', onDocFullscreen)
   hls?.destroy()
   hls = null
 })
+
+defineExpose({ play, pause })
 </script>
 
 <style scoped>

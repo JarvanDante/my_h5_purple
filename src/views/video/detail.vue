@@ -1,9 +1,47 @@
 <template>
-  <div class="page-shell sub-page">
-    <PageHeader :title="item?.title || '视频详情'" />
-    <div class="player" :class="`tone-${tone}`">
-      <HlsPlayer v-if="item?.source_url" :src="item.source_url" :poster="item.cover_url" />
-      <span v-else>暂无播放地址，请在媒资中心转码后回填</span>
+  <div class="page-shell sub-page video-play">
+    <div class="player" :class="[`tone-${tone}`, { 'is-fs': isFs }]">
+      <button type="button" class="back-btn" aria-label="返回" @click="back">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="fs-btn"
+        :aria-label="isFs ? '退出全屏' : '全屏'"
+        @click="isFs ? exitFs() : enterFs()"
+      >
+        <svg v-if="!isFs" viewBox="0 0 24 24" fill="none">
+          <path d="M8 4H4v4M16 4h4v4M4 16v4h4M20 16v4h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <svg v-else viewBox="0 0 24 24" fill="none">
+          <path d="M9 4v5H4M15 4v5h5M4 15h5v5M20 15h-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      <HlsPlayer
+        v-if="item?.source_url"
+        ref="playerRef"
+        :src="item.source_url"
+        :poster="poster"
+        @user-pause="onUserPause"
+        @play="onPlayerPlay"
+        @native-fullscreen="enterFs"
+      />
+      <span v-else class="no-src">暂无播放地址，请在媒资中心转码后回填</span>
+      <div v-if="showAd" class="ad-cover">
+        <span class="ad-placeholder">广告</span>
+        <button type="button" class="ad-skip" @click="onAdAction">
+          {{ adLeft > 0 ? `开通会员跳过广告：${adLeft}秒` : '开始播放' }}
+        </button>
+      </div>
+      <div v-else-if="showPauseAd" class="pause-ad">
+        <div class="pause-ad-box">
+          <button type="button" class="pause-ad-close" aria-label="关闭" @click="closePauseAd">×</button>
+          <span>广告</span>
+          <button type="button" class="pause-ad-vip" @click="goVip">VIP去广告</button>
+        </div>
+      </div>
     </div>
 
     <div class="tab-row">
@@ -13,16 +51,48 @@
     </div>
 
     <template v-if="tab === 'intro'">
-      <section class="soft-card info">
+      <section class="intro">
         <h2>{{ item?.title }}</h2>
-        <p>{{ item?.description || item?.created_at }}</p>
+        <div v-if="tags.length" class="tags">
+          <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+        </div>
+        <p v-if="item?.created_at" class="meta">{{ item.created_at }}</p>
       </section>
 
-      <section class="soft-card ad-row">
-        <button v-for="ad in ads" :key="ad.label" type="button" class="ad-item" @click="onAd(ad)">
-          <span class="ad-icon">{{ ad.icon }}</span>
-          <span class="ad-label">{{ ad.label }}</span>
+      <section class="actions">
+        <button type="button" :class="{ on: liked }" @click="toggle('like')">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 20s-7-4.4-7-9.2A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.8C19 15.6 12 20 12 20Z" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+          <span>{{ liked ? '已赞' : '点赞' }}</span>
         </button>
+        <button type="button" :class="{ on: collected }" @click="toggle('fav')">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 17.2 6.2 20l1.1-6.4L2.8 9.2l6.5-.9L12 2.8l2.7 5.5 6.5.9-4.5 4.4L17.8 20 12 17.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          </svg>
+          <span>{{ collected ? '已收藏' : '收藏' }}</span>
+        </button>
+        <button type="button" @click="share">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="18" cy="5.5" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <circle cx="6" cy="12" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <circle cx="18" cy="18.5" r="2.2" stroke="currentColor" stroke-width="1.6" />
+            <path d="M8 12.7 16 17.8M16 6.2 8 11.3" stroke="currentColor" stroke-width="1.6" />
+          </svg>
+          <span>分享</span>
+        </button>
+        <button type="button" @click="soon('反馈')">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M5 6.5h14v9.2H9.2L5 19.4V6.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          </svg>
+          <span>反馈</span>
+        </button>
+      </section>
+
+      <section class="ad-row">
+        <div v-for="n in 5" :key="n" class="ad-slot">
+          <span>广告</span>
+        </div>
       </section>
 
       <SectionPanel title="精彩推荐">
@@ -31,37 +101,108 @@
       </SectionPanel>
     </template>
 
-    <section v-else class="soft-card comment-box">
+    <section v-else class="comment-box">
       <p class="page-empty">暂无评论</p>
     </section>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import PageHeader from '@/components/PageHeader.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
+import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
 import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
+import { useUserStore } from '@/stores/user'
 import type { CoverItem } from '@/data/mock'
-import { mediaUrl, toastError } from '@/utils/request'
+import { decodeId, videoPath } from '@/utils/idcrypt'
+import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const item = ref<VideoItem | null>(null)
 const recommends = ref<CoverItem[]>([])
 const tab = ref<'intro' | 'comment'>('intro')
-const tone = computed(() => (item.value?.id || 0) % 6)
+const liked = ref(false)
+const collected = ref(false)
+const playerRef = ref<{ play: () => void } | null>(null)
+const showAd = ref(true)
+const showPauseAd = ref(false)
+const isFs = ref(false)
+const adLeft = ref(5)
+let adTimer = 0
 
-const ads = [
-  { icon: '👑', label: '开通VIP', path: '/vip' },
-  { icon: '🪙', label: '金币商城', path: '/wallet' },
-  { icon: '🎁', label: '福利中心', path: '/checkin' },
-  { icon: '🌸', label: '精选活动', path: '' },
-]
+const clearAdTimer = () => {
+  window.clearInterval(adTimer)
+  adTimer = 0
+}
+
+const startAdTimer = () => {
+  clearAdTimer()
+  showAd.value = true
+  adLeft.value = 5
+  adTimer = window.setInterval(() => {
+    adLeft.value -= 1
+    if (adLeft.value <= 0) {
+      adLeft.value = 0
+      clearAdTimer()
+    }
+  }, 1000)
+}
+
+const onAdAction = () => {
+  if (adLeft.value > 0) {
+    router.push('/vip')
+    return
+  }
+  showAd.value = false
+  showPauseAd.value = false
+  playerRef.value?.play()
+}
+
+const onUserPause = () => {
+  if (showAd.value) return
+  showPauseAd.value = true
+}
+
+const closePauseAd = () => {
+  showPauseAd.value = false
+}
+
+const goVip = () => {
+  router.push('/vip')
+}
+
+const enterFs = () => {
+  isFs.value = true
+  document.documentElement.classList.add('video-fs')
+}
+
+const exitFs = () => {
+  isFs.value = false
+  document.documentElement.classList.remove('video-fs')
+  if (document.fullscreenElement) {
+    document.exitFullscreen?.().catch(() => undefined)
+  }
+}
+
+const onPlayerPlay = () => {
+  showPauseAd.value = false
+}
+const tone = computed(() => (item.value?.id || 0) % 6)
+const poster = computed(() => mediaUrl(item.value?.cover_url))
+
+const tags = computed(() => {
+  const raw = (item.value?.description || '').trim()
+  if (!raw) return []
+  const parts = raw.split(/[,，|／/]/).map((s) => s.trim()).filter(Boolean)
+  if (parts.length >= 2 && parts.every((s) => s.length <= 10)) return parts.slice(0, 8)
+  return []
+})
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const formatDuration = (sec: number) => {
@@ -83,25 +224,84 @@ const toCover = (v: VideoItem): CoverItem => ({
 
 const soon = (name: string) => showToast(`${name} 稍后接入`)
 
-const onAd = (ad: { label: string; path: string }) => {
-  if (ad.path) {
-    router.push(ad.path)
-    return
-  }
-  soon(ad.label)
+const open = (row: CoverItem) => {
+  router.push(videoPath(row.id))
 }
 
-const open = (row: CoverItem) => {
-  router.push(`/video/${row.id}`)
+const back = () => {
+  if (isFs.value) {
+    exitFs()
+    return
+  }
+  if (window.history.state?.back) {
+    router.back()
+    return
+  }
+  router.replace('/video')
+}
+
+const share = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href)
+    showToast('链接已复制')
+  } catch {
+    showToast('复制失败')
+  }
+}
+
+const ensureAuth = async () => {
+  if (getToken()) return true
+  try {
+    await userStore.ensureLogin()
+    return true
+  } catch {
+    showToast('请先登录')
+    return false
+  }
+}
+
+const loadMarks = async () => {
+  if (!getToken() || !item.value) return
+  const id = item.value.id
+  try {
+    const [fav, like] = await Promise.all([
+      fetchCollectList(COLLECT_FAV, MEDIA_VIDEO, 1, 100),
+      fetchCollectList(COLLECT_LIKE, MEDIA_VIDEO, 1, 100),
+    ])
+    collected.value = (fav.list || []).some((row) => row.content_id === id)
+    liked.value = (like.list || []).some((row) => row.content_id === id)
+  } catch {
+    collected.value = false
+    liked.value = false
+  }
+}
+
+const toggle = async (kind: 'like' | 'fav') => {
+  if (!item.value || !(await ensureAuth())) return
+  const isLike = kind === 'like'
+  const next = isLike ? !liked.value : !collected.value
+  try {
+    await operateCollect(item.value.id, MEDIA_VIDEO, next, isLike ? COLLECT_LIKE : COLLECT_FAV)
+    if (isLike) liked.value = next
+    else collected.value = next
+    showToast(next ? (isLike ? '已点赞' : '已收藏') : isLike ? '已取消点赞' : '已取消收藏')
+  } catch (err) {
+    toastError(err)
+  }
 }
 
 const load = () => {
-  const id = Number(route.params.id)
+  const id = decodeId(route.params.id)
   if (!id) return
   tab.value = 'intro'
+  liked.value = false
+  collected.value = false
+  showPauseAd.value = false
+  startAdTimer()
   fetchVideoDetail(id)
     .then((data) => {
       item.value = data
+      return loadMarks()
     })
     .catch(toastError)
   fetchVideoList(1, 8, '', 1)
@@ -115,13 +315,23 @@ const load = () => {
 }
 
 watch(() => route.params.id, load, { immediate: true })
+onBeforeUnmount(() => {
+  clearAdTimer()
+  exitFs()
+})
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 @use '@/styles/tones.scss' as *;
 
+.video-play {
+  padding-bottom: 16px;
+  background: #fff;
+}
+
 .player {
+  position: relative;
   min-height: 210px;
   display: flex;
   align-items: center;
@@ -131,10 +341,160 @@ watch(() => route.params.id, load, { immediate: true })
   background: #000;
 }
 
+.player.is-fs {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  min-height: 100%;
+  height: 100%;
+}
+
+.ad-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #2a2a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-placeholder {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 14px;
+}
+
+.ad-skip {
+  position: absolute;
+  right: 10px;
+  bottom: 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+}
+
+.pause-ad {
+  position: absolute;
+  inset: 0 0 48px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pause-ad-box {
+  position: relative;
+  width: 58%;
+  max-width: 220px;
+  aspect-ratio: 16 / 10;
+  background: #3a3a40;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 13px;
+  pointer-events: auto;
+}
+
+.player.is-fs .pause-ad {
+  inset: 0 0 56px;
+}
+
+.player.is-fs .pause-ad-box {
+  width: 72%;
+  max-width: 280px;
+}
+
+.pause-ad-vip {
+  border: 0;
+  border-radius: 999px;
+  background: #ffd84d;
+  color: #1a1a1f;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+}
+
+.pause-ad-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.fs-btn {
+  position: absolute;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  right: 8px;
+  z-index: 4;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.back-btn {
+  position: absolute;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: 8px;
+  z-index: 4;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .player :deep(.media) {
   max-height: none;
   aspect-ratio: 16 / 9;
   height: auto;
+}
+
+.player.is-fs :deep(.media) {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+}
+
+.no-src {
+  padding: 24px 16px;
+  text-align: center;
 }
 
 @include media-tones;
@@ -142,8 +502,9 @@ watch(() => route.params.id, load, { immediate: true })
 .tab-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 10px 12px 0;
+  gap: 18px;
+  padding: 12px 14px 0;
+  background: #fff;
 }
 
 .tab {
@@ -152,86 +513,129 @@ watch(() => route.params.id, load, { immediate: true })
   color: $text-color-secondary;
   font-size: 15px;
   font-weight: 600;
-  padding: 6px 0;
+  padding: 6px 0 8px;
   position: relative;
 
   &.active {
-    color: $ink;
+    color: #1a1a1f;
     font-weight: 800;
 
     &::after {
       content: '';
       position: absolute;
-      left: 0;
-      right: 0;
+      left: 50%;
       bottom: 0;
+      width: 18px;
       height: 3px;
       border-radius: 2px;
-      background: $accent-yellow;
+      background: #ffd84d;
+      transform: translateX(-50%);
     }
   }
 }
 
 .line-btn {
   margin-left: auto;
-  border: 1px solid $line;
-  background: #fff;
-  color: $ink;
-  font-size: 12px;
+  border: 0;
+  background: #1a1a1f;
+  color: #fff;
+  font-size: 11px;
   font-weight: 700;
   border-radius: $radius-pill;
-  padding: 4px 10px;
+  padding: 5px 10px;
 }
 
-.info {
+.intro {
+  padding: 14px 14px 4px;
+  background: #fff;
+
   h2 {
     font-size: 16px;
+    font-weight: 800;
+    color: #1a1a1f;
+    line-height: 1.45;
   }
+}
 
-  p {
-    margin-top: 6px;
-    color: $text-color-muted;
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+
+  span {
     font-size: 12px;
+    color: #e07a2f;
+    background: #fff1e4;
+    border-radius: 999px;
+    padding: 4px 10px;
+  }
+}
+
+.meta {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #8e8e93;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 8px 8px;
+  background: #fff;
+
+  button {
+    border: 0;
+    background: transparent;
+    color: #1a1a1f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 56px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    span {
+      font-size: 11px;
+    }
+
+    &.on {
+      color: $primary-color;
+    }
   }
 }
 
 .ad-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
+  padding: 8px 14px 12px;
+  background: #fff;
 }
 
-.ad-item {
-  border: 0;
-  background: transparent;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.ad-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: $primary-soft;
+.ad-slot {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  background: #f1f1f4;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-}
 
-.ad-label {
-  font-size: 11px;
-  color: $ink;
-  font-weight: 600;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  span {
+    font-size: 10px;
+    color: #8e8e93;
+  }
 }
 
 .comment-box {
   min-height: 160px;
+  margin: 12px 14px;
+  padding: 12px;
+  background: #fff;
+  border-radius: 12px;
 }
 </style>
