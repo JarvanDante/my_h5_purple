@@ -42,14 +42,15 @@
           </div>
         </div>
       </div>
-      <div class="hero-extra">
-        <div v-if="tags.length" class="tag-row">
-          <span v-for="tag in tags" :key="tag">{{ tag }}</span>
-        </div>
-        <p v-if="item?.intro" class="intro"><b>故事：</b>{{ item.intro }}</p>
-        <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
-      </div>
     </header>
+
+    <div class="hero-extra">
+      <div v-if="tags.length" class="tag-row">
+        <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+      </div>
+      <p v-if="item?.intro" class="intro"><b>故事：</b>{{ item.intro }}</p>
+      <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
+    </div>
 
     <div class="panel">
       <div class="tab-row">
@@ -237,7 +238,8 @@ onMounted(() => {
   flex-shrink: 0;
   width: 375px;
   max-width: 100%;
-  height: auto;
+  height: 198px;
+  box-sizing: border-box;
   overflow: hidden;
   color: #fff;
   background: #1a1618;
@@ -246,7 +248,7 @@ onMounted(() => {
 .hero-visual {
   position: relative;
   z-index: 1;
-  height: 198px;
+  height: 100%;
   box-sizing: border-box;
   padding: 0 16px 10px;
 }
@@ -279,9 +281,11 @@ onMounted(() => {
 }
 
 .hero-extra {
-  position: relative;
-  z-index: 1;
-  padding: 4px 16px 14px;
+  flex-shrink: 0;
+  width: 375px;
+  max-width: 100%;
+  padding: 12px 16px 14px;
+  background: #fff;
 }
 
 .nav,
@@ -492,8 +496,8 @@ h1 {
 
   span {
     font-size: 12px;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.2);
+    color: #e07a2f;
+    background: #fff1e4;
     border-radius: 999px;
     padding: 4px 10px;
   }
@@ -502,7 +506,7 @@ h1 {
 .intro {
   margin: 10px 0 0;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.92);
+  color: #1a1a1f;
   line-height: 1.55;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -513,7 +517,7 @@ h1 {
 .reason {
   margin: 8px 0 0;
   font-size: 12px;
-  color: #ffd2a8;
+  color: #c2410c;
 }
 
 .catalog {
