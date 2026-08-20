@@ -22,15 +22,19 @@
       </div>
       <div v-if="item" class="hero-main">
         <div class="poster">
-          <CoverMosaic :src="cover" />
+          <img v-if="cover" :src="cover" alt="" />
         </div>
         <div class="meta">
-          <h1 class="ellipsis">{{ item.title }}</h1>
+          <h1>{{ item.title }}</h1>
           <p class="sub">
             <span v-for="name in categories" :key="name" class="cate">{{ name }}</span>
             <span class="chap-num">共{{ item.chapter_count || 0 }}话</span>
           </p>
-          <p class="stats">{{ formatCount(item.view_count) }}人气 | {{ formatCount(favCount) }}人收藏</p>
+          <p class="stats">
+            <em>{{ formatCount(item.view_count) }}人气</em>
+            <i />
+            <em>{{ formatCount(favCount) }}人收藏</em>
+          </p>
           <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
             {{ collected ? '已收藏' : '+收藏' }}
           </button>
@@ -79,7 +83,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import CoverMosaic from '@/components/CoverMosaic.vue'
 import { fetchCollectList, MEDIA_COMICS, operateCollect } from '@/api/collect'
 import {
   buyComics,
@@ -214,7 +217,7 @@ onMounted(() => {
   position: relative;
   flex-shrink: 0;
   height: 239px;
-  padding: 0 14px 16px;
+  padding: 0 16px 16px;
   overflow: hidden;
   color: #fff;
   background: #1a1618;
@@ -240,7 +243,12 @@ onMounted(() => {
 .hero-mask {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.16) 0%,
+    rgba(0, 0, 0, 0.3) 55%,
+    rgba(0, 0, 0, 0.42) 100%
+  );
 }
 
 .nav,
@@ -258,35 +266,45 @@ onMounted(() => {
 }
 
 .nav-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 0;
-  background: transparent;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.22);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
   }
 }
 
 .hero-main {
   display: flex;
-  gap: 12px;
-  margin-top: 8px;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
+  padding-left: 22px;
 }
 
 .poster {
-  width: 92px;
-  height: 128px;
+  width: 86px;
+  height: 118px;
   flex-shrink: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
-  outline: 2px solid #fff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
+  outline: 1.5px solid rgba(255, 255, 255, 0.95);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .meta {
@@ -294,14 +312,18 @@ onMounted(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  padding: 2px 0 0;
+  justify-content: center;
 }
 
 h1 {
-  font-size: 18px;
-  font-weight: 800;
-  line-height: 1.3;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .sub {
@@ -314,39 +336,54 @@ h1 {
 
 .cate {
   flex-shrink: 0;
-  background: #7b6cff;
+  background: #6d5cff;
   color: #fff;
   font-size: 10px;
   line-height: 1;
   padding: 3px 7px;
-  border-radius: 999px;
+  border-radius: 4px;
   font-weight: 700;
 }
 
-.chap-num,
-.stats {
+.chap-num {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.86);
 }
 
 .stats {
-  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.78);
+
+  em {
+    font-style: normal;
+  }
+
+  i {
+    width: 1px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.35);
+  }
 }
 
 .fav-btn {
   align-self: flex-start;
   margin-top: 10px;
-  height: 28px;
-  padding: 0 16px;
+  height: 30px;
+  padding: 0 18px;
   border: 0;
-  border-radius: 14px;
+  border-radius: 15px;
   background: #ffd84d;
   color: #1a1a1f;
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(255, 196, 0, 0.28);
 
   &.on {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.2);
     color: #fff;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
   }
