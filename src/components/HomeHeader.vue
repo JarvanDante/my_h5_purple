@@ -74,34 +74,32 @@ defineEmits<{
   padding: env(safe-area-inset-top, 0px) 12px 12px;
 }
 
+.home-header--pack .channel-row {
+  height: 48px;
+  min-height: 48px;
+}
+
+.home-header--pack .channel-tabs {
+  gap: 20px;
+}
+
 .home-header--pack .channel-item {
   padding: 0;
+  line-height: 22px;
+  letter-spacing: 0.02em;
 }
 
 .home-header--single {
-  padding-bottom: 6px;
-
-  .channel-row {
-    height: 48px;
-    min-height: 48px;
-  }
-
-  .channel-item {
-    padding: 0;
-  }
+  padding-bottom: 8px;
 
   .search-row {
-    margin-top: 0;
+    margin-top: 6px;
   }
 }
 
 .home-header--pack:not(.home-header--single) {
   padding-top: calc(10px + env(safe-area-inset-top, 0px));
 
-  .channel-row {
-    height: auto;
-    min-height: 36px;
-  }
 
   .sub-row {
     margin-top: 2px;
