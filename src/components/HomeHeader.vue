@@ -64,7 +64,9 @@ defineEmits<{
 @use '@/styles/variables.scss' as *;
 
 .home-header--pack {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   background: $background-topbar;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 12px;
 }
