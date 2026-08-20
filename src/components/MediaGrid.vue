@@ -3,7 +3,7 @@
     <article v-for="item in items" :key="`${item.isAd ? 'ad' : 'm'}-${item.id}`" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
         <CoverMosaic v-if="item.mosaic && item.cover && !item.isAd" :src="item.cover" />
-        <img v-else-if="item.cover && !item.isAd" :src="item.cover" alt="" />
+        <EncryptedImage v-else-if="item.cover && !item.isAd" :src="item.cover" alt="" />
         <span v-if="item.isAd" class="ad-mark">广告</span>
         <span v-else-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
         <p v-if="!wide && !poster && !item.mosaic && !item.isAd" class="cover-title ellipsis">{{ item.title }}</p>
@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import CoverMosaic from '@/components/CoverMosaic.vue'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import type { CoverItem } from '@/data/mock'
 
 const props = defineProps<{
@@ -76,7 +77,8 @@ defineEmits<{
   height: 132px;
   border: 0;
 
-  img {
+  img,
+  :deep(img) {
     display: block;
     width: 100%;
     height: 100%;

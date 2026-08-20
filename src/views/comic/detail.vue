@@ -2,7 +2,7 @@
   <div class="page-shell sub-page comic-detail">
     <header class="hero">
       <div v-if="cover" class="hero-bg">
-        <img :src="cover" alt="" />
+        <EncryptedImage :src="cover" alt="" />
       </div>
       <div class="hero-mask" />
       <div class="hero-visual">
@@ -23,7 +23,7 @@
         </div>
         <div v-if="item" class="hero-main">
           <div class="poster">
-            <img v-if="cover" :src="cover" alt="" />
+            <EncryptedImage v-if="cover" :src="cover" alt="" />
           </div>
           <div class="meta">
             <h1>{{ item.title }}</h1>
@@ -78,7 +78,7 @@
               @click="openChapter(ch)"
             >
               <span class="ch-thumb">
-                <img v-if="cover" :src="cover" alt="" />
+                <EncryptedImage v-if="cover" :src="cover" alt="" />
               </span>
               <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
               <span v-if="ch.playable" class="watch">观看</span>
@@ -111,6 +111,7 @@ import {
   type ComicsDetail,
 } from '@/api/comics'
 import { useUserStore } from '@/stores/user'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -258,7 +259,7 @@ onMounted(() => {
   inset: 0;
   overflow: hidden;
 
-  img {
+  :deep(img) {
     display: block;
     width: 100%;
     height: 100%;
@@ -336,7 +337,7 @@ onMounted(() => {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
   outline: 1.5px solid rgba(255, 255, 255, 0.95);
 
-  img {
+  :deep(img) {
     display: block;
     width: 100%;
     height: 100%;
@@ -564,7 +565,7 @@ h1 {
   background: #f4f4f6;
   flex-shrink: 0;
 
-  img {
+  :deep(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;

@@ -18,7 +18,7 @@
     <div ref="rootRef" class="scroll" @click="toggleChrome">
       <p v-if="!pics.length" class="empty">{{ empty }}</p>
       <template v-for="(pic, i) in pics" :key="pic.url + i">
-        <img :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
+        <EncryptedImage :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
         <div v-if="i === midAdIndex" class="page-ad">
           <span>广告</span>
         </div>
@@ -91,7 +91,7 @@
             @click="openChapter(ch)"
           >
             <span class="thumb">
-              <img v-if="cover" :src="cover" alt="" />
+              <EncryptedImage v-if="cover" :src="cover" alt="" />
             </span>
             <span class="name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
             <span class="go" :class="{ last: ch.id === chapterId }">
@@ -114,6 +114,7 @@ import {
   readChapter,
   type ChapterItem,
 } from '@/api/comics'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -337,9 +338,12 @@ h1 {
   color: #9aa;
 }
 
-.pic {
+.pic,
+:deep(.pic) {
   display: block;
   width: 100%;
+  height: auto;
+  object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
   background: #111;

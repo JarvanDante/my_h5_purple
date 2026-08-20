@@ -10,7 +10,7 @@
         v-if="item?.source_url"
         ref="playerRef"
         :src="item.source_url"
-        :poster="poster"
+        :poster="posterSrc"
         @user-pause="onUserPause"
         @play="onPlayerPlay"
         @native-fullscreen="toggleFs"
@@ -106,6 +106,7 @@ import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
 import { useUserStore } from '@/stores/user'
 import type { CoverItem } from '@/data/mock'
 import { decodeId, videoPath } from '@/utils/idcrypt'
+import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -187,6 +188,7 @@ const onPlayerPlay = () => {
 }
 const tone = computed(() => (item.value?.id || 0) % 6)
 const poster = computed(() => mediaUrl(item.value?.cover_url))
+const posterSrc = useEncryptedSrc(poster)
 
 const tags = computed(() => {
   const raw = (item.value?.description || '').trim()

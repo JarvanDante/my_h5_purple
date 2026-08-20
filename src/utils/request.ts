@@ -58,6 +58,22 @@ export function toastError(err: unknown) {
 /** 相对路径走同域 /static（开发由 Vite 代理到 my_service）。 */
 export function mediaUrl(path?: string) {
   if (!path) return ''
-  if (/^(https?:)?\/\//i.test(path) || path.startsWith('data:')) return path
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path
   return path.startsWith('/') ? path : `/${path}`
+}
+
+/** H5 用户上传明文图, 服务端加密为 .bnc。 */
+export async function uploadMedia(file: File, purpose: 'image' | 'avatar' = 'image') {
+  const headers = new Headers()
+  const token = getToken()
+  if (token) headers.set('Authorization', token)
+  const body = new FormData()
+  body.append('file', file)
+  body.append('purpose', purpose)
+  const res = await fetch(`${BASE}/media/upload`, { method: 'POST', headers, body })
+  const json = (await res.json()) as Envelope<{ url: string; object_key: string }>
+  if (json.code !== 0) {
+    throw new ApiError(json.code, json.message || '上传失败')
+  }
+  return json.data
 }

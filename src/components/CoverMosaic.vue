@@ -1,13 +1,17 @@
 <template>
   <div class="cover-mosaic">
-    <div v-if="src" class="tile" :style="{ backgroundImage: `url(${src})` }" />
-    <img v-if="src" :src="src" alt="" />
+    <div v-if="displaySrc" class="tile" :style="{ backgroundImage: `url(${displaySrc})` }" />
+    <EncryptedImage v-if="src" :src="src" alt="" />
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps<{ src?: string }>()
+import EncryptedImage from '@/components/EncryptedImage.vue'
+import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
+
+const props = defineProps<{ src?: string }>()
+const displaySrc = useEncryptedSrc(() => props.src)
 </script>
 
 <style scoped lang="scss">
@@ -28,7 +32,8 @@ defineProps<{ src?: string }>()
   filter: saturate(0.85);
 }
 
-img {
+img,
+:deep(img) {
   position: relative;
   z-index: 1;
   display: block;

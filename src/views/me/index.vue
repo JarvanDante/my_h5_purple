@@ -11,7 +11,7 @@
     </header>
 
     <section class="soft-card profile">
-      <img v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
+      <EncryptedImage v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
       <div v-else class="avatar" />
       <div class="meta">
         <h1>{{ user?.nickname || '未登录' }}</h1>
@@ -91,6 +91,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { bindInviteCode } from '@/api/user'
 import { useUserStore } from '@/stores/user'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 import { publicUid } from '@/utils/userid'
 
@@ -281,7 +282,8 @@ onMounted(() => {
   gap: 12px;
 }
 
-.avatar {
+.avatar,
+:deep(.avatar) {
   width: 58px;
   height: 58px;
   border-radius: 50%;

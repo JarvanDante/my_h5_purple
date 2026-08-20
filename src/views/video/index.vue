@@ -31,7 +31,7 @@
             <div v-else class="video-grid">
               <article v-for="item in covers" :key="item.id" @click="open(item)">
                 <div class="thumb" :class="`tone-${item.tone}`">
-                  <img v-if="item.cover" :src="item.cover" alt="" />
+                  <EncryptedImage v-if="item.cover" :src="item.cover" alt="" />
                   <span v-if="item.tag" class="badge">{{ item.tag }}</span>
                   <span v-if="item.duration" class="duration">{{ item.duration }}</span>
                 </div>
@@ -56,6 +56,7 @@ import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
 import { videoPath } from '@/utils/idcrypt'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Video' })
@@ -224,7 +225,7 @@ watch(channel, loadList)
   border-radius: $radius-thumb;
   overflow: hidden;
 
-  img {
+  :deep(img) {
     display: block;
     width: 100%;
     height: 100%;

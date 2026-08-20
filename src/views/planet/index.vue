@@ -21,7 +21,7 @@
     <section v-if="ads.length" class="ad-strip">
       <article v-for="ad in ads" :key="ad.id" class="ad-card" @click="openVideo(ad.id)">
         <div class="ad-cover" :class="`tone-${ad.tone}`">
-          <img v-if="ad.cover" :src="ad.cover" alt="" />
+          <EncryptedImage v-if="ad.cover" :src="ad.cover" alt="" />
         </div>
         <p class="ad-title ellipsis">{{ ad.title }}</p>
         <span class="ad-tag">广告</span>
@@ -48,7 +48,7 @@
             </div>
             <h3>{{ post.title }}</h3>
             <p class="content">{{ post.content }}</p>
-            <img v-if="post.pics?.[0]" class="pic" :src="mediaUrl(post.pics[0])" alt="" />
+            <EncryptedImage v-if="post.pics?.[0]" class="pic" :src="mediaUrl(post.pics[0])" alt="" />
             <div v-else-if="!post.content" class="pic" :class="`tone-${post.id % 6}`" />
             <div class="topics">
               <span>广场</span>
@@ -87,6 +87,8 @@ import { useTabSlide } from '@/composables/useTabSlide'
 import { createPost, fetchPostList, type PostItem } from '@/api/ops'
 import { fetchVideoList } from '@/api/video'
 import { useUserStore } from '@/stores/user'
+import { videoPath } from '@/utils/idcrypt'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
@@ -113,7 +115,7 @@ const hint = computed(() => {
 const select = (item: string) => slide.select(item)
 const go = (path: string) => router.push(path)
 const goPost = (id: number) => router.push(`/planet/${id}`)
-const openVideo = (id: string) => router.push(`/video/${id}`)
+const openVideo = (id: string) => router.push(videoPath(id))
 const soon = (name: string) => showToast(`${name} 稍后接入`)
 
 const formatTime = (raw: string) => {
@@ -217,7 +219,7 @@ onMounted(() => {
   border-radius: 10px;
   overflow: hidden;
 
-  img {
+  :deep(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -342,7 +344,8 @@ h3 {
   overflow: hidden;
 }
 
-.pic {
+.pic,
+:deep(.pic) {
   width: 100%;
   max-height: 220px;
   object-fit: cover;

@@ -4,7 +4,7 @@
     <article v-if="post" class="soft-card post">
       <h2>{{ post.title }}</h2>
       <p>{{ post.content }}</p>
-      <img v-for="(pic, i) in post.pics || []" :key="i" :src="mediaUrl(pic)" alt="" />
+      <EncryptedImage v-for="(pic, i) in post.pics || []" :key="i" :src="mediaUrl(pic)" alt="" />
       <div class="bar">
         <span>♡ {{ post.like_count }}</span>
         <span>💬 {{ post.comment_count }}</span>
@@ -19,6 +19,7 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import { fetchPostDetail, type PostItem } from '@/api/ops'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -47,7 +48,7 @@ onMounted(() => {
     line-height: 1.6;
   }
 
-  img {
+  :deep(img) {
     width: 100%;
     border-radius: 8px;
     margin-bottom: 8px;
