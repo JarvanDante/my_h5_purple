@@ -75,16 +75,16 @@ defineEmits<{
 }
 
 .home-header--single {
-  padding-top: calc(22px + env(safe-area-inset-top, 0px));
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
   padding-bottom: 14px;
 
   .channel-row {
-    min-height: 36px;
+    min-height: 32px;
     padding-bottom: 12px;
   }
 
   .channel-item {
-    padding: 6px 0 4px;
+    padding: 2px 0 4px;
   }
 
   .search-row {
