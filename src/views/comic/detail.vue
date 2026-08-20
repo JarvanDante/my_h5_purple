@@ -5,40 +5,49 @@
         <img :src="cover" alt="" />
       </div>
       <div class="hero-mask" />
-      <div class="nav">
-        <button type="button" class="nav-btn" aria-label="返回" @click="back">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </button>
-        <button type="button" class="nav-btn" aria-label="分享" @click="share">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="18" cy="5" r="2.2" stroke="currentColor" stroke-width="1.6" />
-            <circle cx="6" cy="12" r="2.2" stroke="currentColor" stroke-width="1.6" />
-            <circle cx="18" cy="19" r="2.2" stroke="currentColor" stroke-width="1.6" />
-            <path d="M8 12.8 16 18.2M16 5.8 8 11.2" stroke="currentColor" stroke-width="1.6" />
-          </svg>
-        </button>
-      </div>
-      <div v-if="item" class="hero-main">
-        <div class="poster">
-          <img v-if="cover" :src="cover" alt="" />
-        </div>
-        <div class="meta">
-          <h1>{{ item.title }}</h1>
-          <p class="sub">
-            <span v-for="name in categories" :key="name" class="cate">{{ name }}</span>
-            <span class="chap-num">共{{ item.chapter_count || 0 }}话</span>
-          </p>
-          <p class="stats">
-            <em>{{ formatCount(item.view_count) }}人气</em>
-            <i />
-            <em>{{ formatCount(favCount) }}人收藏</em>
-          </p>
-          <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
-            {{ collected ? '已收藏' : '+收藏' }}
+      <div class="hero-visual">
+        <div class="nav">
+          <button type="button" class="nav-btn" aria-label="返回" @click="back">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          <button type="button" class="nav-btn" aria-label="分享" @click="share">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="18" cy="5" r="2.2" stroke="currentColor" stroke-width="1.6" />
+              <circle cx="6" cy="12" r="2.2" stroke="currentColor" stroke-width="1.6" />
+              <circle cx="18" cy="19" r="2.2" stroke="currentColor" stroke-width="1.6" />
+              <path d="M8 12.8 16 18.2M16 5.8 8 11.2" stroke="currentColor" stroke-width="1.6" />
+            </svg>
           </button>
         </div>
+        <div v-if="item" class="hero-main">
+          <div class="poster">
+            <img v-if="cover" :src="cover" alt="" />
+          </div>
+          <div class="meta">
+            <h1>{{ item.title }}</h1>
+            <p class="sub">
+              <span v-for="name in categories" :key="name" class="cate">{{ name }}</span>
+              <span class="chap-num">共{{ item.chapter_count || 0 }}话</span>
+            </p>
+            <p class="stats">
+              <em>{{ formatCount(item.view_count) }}人气</em>
+              <i />
+              <em>{{ formatCount(favCount) }}人收藏</em>
+            </p>
+            <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
+              {{ collected ? '已收藏' : '+收藏' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-extra">
+        <div v-if="tags.length" class="tag-row">
+          <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+        </div>
+        <p v-if="item?.intro" class="intro"><b>故事：</b>{{ item.intro }}</p>
+        <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
       </div>
     </header>
 
@@ -54,12 +63,6 @@
 
       <div class="scroll-body">
         <template v-if="tab === 'detail'">
-          <div v-if="tags.length" class="tag-row">
-            <span v-for="tag in tags" :key="tag">{{ tag }}</span>
-          </div>
-          <p v-if="item?.intro" class="intro"><b>故事：</b>{{ item.intro }}</p>
-          <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
-
           <section class="catalog">
             <div class="catalog-head">
               <h3>目录</h3>
@@ -234,12 +237,18 @@ onMounted(() => {
   flex-shrink: 0;
   width: 375px;
   max-width: 100%;
-  height: 198px;
-  box-sizing: border-box;
-  padding: 0 16px 10px;
+  height: auto;
   overflow: hidden;
   color: #fff;
   background: #1a1618;
+}
+
+.hero-visual {
+  position: relative;
+  z-index: 1;
+  height: 198px;
+  box-sizing: border-box;
+  padding: 0 16px 10px;
 }
 
 .hero-bg {
@@ -264,9 +273,15 @@ onMounted(() => {
   background: linear-gradient(
     180deg,
     rgba(0, 0, 0, 0.12) 0%,
-    rgba(0, 0, 0, 0.28) 60%,
-    rgba(0, 0, 0, 0.4) 100%
+    rgba(0, 0, 0, 0.32) 48%,
+    rgba(0, 0, 0, 0.55) 100%
   );
+}
+
+.hero-extra {
+  position: relative;
+  z-index: 1;
+  padding: 4px 16px 14px;
 }
 
 .nav,
@@ -472,33 +487,37 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 14px 0;
-  background: #fff;
+  padding: 0;
+  background: transparent;
 
   span {
     font-size: 12px;
-    color: #e07a2f;
-    background: #fff1e4;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 999px;
     padding: 4px 10px;
   }
 }
 
 .intro {
-  margin: 10px 14px 0;
+  margin: 10px 0 0;
   font-size: 13px;
-  color: #1a1a1f;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .reason {
-  margin: 8px 14px 0;
+  margin: 8px 0 0;
   font-size: 12px;
-  color: #c2410c;
+  color: #ffd2a8;
 }
 
 .catalog {
-  margin-top: 14px;
+  margin-top: 0;
 }
 
 .catalog-head {
