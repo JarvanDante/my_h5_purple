@@ -16,7 +16,7 @@
       <button type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
     </div>
 
-    <div class="sub-row">
+    <div v-if="subTabs.length" class="sub-row">
       <button
         v-for="item in subTabs"
         :key="item"
@@ -43,12 +43,15 @@
 <script setup lang="ts">
 import LineIcon from '@/components/LineIcon.vue'
 
-defineProps<{
-  channels: string[]
-  channel: string
-  subTabs: string[]
-  subTab: string
-}>()
+withDefaults(
+  defineProps<{
+    channels: string[]
+    channel: string
+    subTabs?: string[]
+    subTab?: string
+  }>(),
+  { subTabs: () => [], subTab: '' },
+)
 
 defineEmits<{
   selectChannel: [item: string]

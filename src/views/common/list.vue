@@ -122,8 +122,6 @@ const toComicCover = (c: ComicsItem): CoverItem => {
   }
 }
 
-const videoSort = () => 1
-
 const withAds = (list: CoverItem[], cols: number) =>
   interleaveAds(list, makeEmptyAds(estimateAdCount(list.length, cols)), cols)
 
@@ -140,7 +138,14 @@ const load = async () => {
   loading.value = true
   try {
     if (media.value === 'video') {
-      const data = await fetchVideoList(1, 40, '', videoSort())
+      let sort = 1
+      let cate = ''
+      if (type.value === 'recommend' || type.value === 'rank' || type.value === 'hot') sort = 0
+      else if (type.value === 'category' || category.value) {
+        cate = category.value
+        sort = 1
+      }
+      const data = await fetchVideoList(1, 40, '', sort, cate)
       items.value = withAds((data.list || []).map(toVideoCover), 2)
       return
     }

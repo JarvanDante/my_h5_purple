@@ -3,10 +3,9 @@
     <HomeHeader
       :channels="channels"
       :channel="channel"
-      :sub-tabs="subTabs"
-      :sub-tab="subTab"
+      :sub-tabs="[]"
+      sub-tab=""
       @select-channel="selectChannel"
-      @select-sub="selectSub"
       @checkin="go('/checkin')"
       @search="go('/search')"
       @vip="go('/vip')"
@@ -19,7 +18,7 @@
 
     <div class="inner-slide">
       <transition :name="innerName">
-        <div :key="channel + '-' + subTab" class="inner-pane">
+        <div :key="channel" class="inner-pane">
           <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
               <span class="quick-icon">{{ item.emoji }}</span>
@@ -27,8 +26,8 @@
             </button>
           </section>
 
-          <SectionPanel title="日更限定" more @more="go('/list?media=video&type=daily')">
-            <p v-if="!covers.length" class="page-empty">暂无视频，子后台「视频管理」上架后显示</p>
+          <SectionPanel :title="sectionTitle" more @more="go(morePath)">
+            <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
             <div v-else class="video-grid">
               <article v-for="item in covers" :key="item.id" @click="open(item)">
                 <div class="thumb" :class="`tone-${item.tone}`">
@@ -47,12 +46,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import { fetchVideoList, type VideoItem } from '@/api/video'
+import { fetchVideoCategories, fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
@@ -61,23 +60,17 @@ import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Video' })
 
+const fallbackTabs = ['最新', '推荐', '视频榜', '电影', '短剧', '综艺']
 const router = useRouter()
-const channels = ['热门', '最新', '热播', '短视频', '长视频']
-const subTabs = ['推荐', '日更', '排行', '金币', '免费', '片商', '分类']
-const channelSlide = useTabSlide(channels)
-const subSlide = useTabSlide(subTabs)
+const channels = ref([...fallbackTabs])
+const cateKind = ref<Record<string, number>>({})
+const channelSlide = useTabSlide(channels.value, fallbackTabs[0])
 const channel = computed(() => channelSlide.current.value)
-const subTab = computed(() => subSlide.current.value)
 const innerName = ref('tab-left')
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
-}
-
-const selectSub = (item: string) => {
-  subSlide.select(item)
-  innerName.value = subSlide.name.value
 }
 
 const list = ref<VideoItem[]>([])
@@ -106,6 +99,33 @@ const ads = computed<CoverItem[]>(() => {
   return live.length ? live : videos.slice(0, 6)
 })
 
+const currentKind = computed(() => cateKind.value[channel.value])
+
+const sectionTitle = computed(() => {
+  const kind = currentKind.value
+  if (kind === 2 || channel.value === '推荐') return '精选推荐'
+  if (kind === 3 || channel.value.includes('榜')) return channel.value || '视频榜'
+  if (kind === 0) return channel.value || '今日上新'
+  return '今日上新'
+})
+
+const emptyText = computed(() => {
+  const kind = currentKind.value
+  if (kind === 2 || channel.value === '推荐') return '暂无推荐视频'
+  if (kind === 3 || channel.value.includes('榜')) return '暂无视频榜'
+  if (kind === 0) return `暂无「${channel.value}」视频，上架并选择该分类后显示`
+  return '暂无视频，子后台「视频管理」上架后显示'
+})
+
+const morePath = computed(() => {
+  const kind = currentKind.value
+  const name = channel.value
+  if (kind === 3 || name.includes('榜')) return '/list?media=video&type=rank'
+  if (kind === 2 || name === '推荐') return '/list?media=video&type=recommend'
+  if (kind === 1 || name === '最新' || name === '新更' || name === '日更') return '/list?media=video&type=daily'
+  return `/list?media=video&type=category&category=${encodeURIComponent(name)}`
+})
+
 const quicks = [
   { emoji: '👑', label: '抢先看', path: '/vip' },
   { emoji: '▶️', label: '直播', path: '' },
@@ -130,13 +150,51 @@ const onQuick = (item: { label: string; path: string }) => {
   showToast(`${item.label} 稍后接入`)
 }
 
-onMounted(() => {
-  fetchVideoList(1, 6, '', 1)
+const loadList = () => {
+  const kind = cateKind.value[channel.value]
+  let category = ''
+  let sort = 1
+  if (kind === 1) {
+    sort = 1
+  } else if (kind === 2 || kind === 3) {
+    sort = 0
+  } else if (kind === 0 || kind === undefined) {
+    const name = channel.value
+    if (name === '最新' || name === '新更' || name === '日更') sort = 1
+    else if (name === '推荐' || name.includes('榜')) sort = 0
+    else {
+      category = name
+      sort = 1
+    }
+  }
+  fetchVideoList(1, 21, '', sort, category)
     .then((data) => {
-      list.value = (data.list || []).slice(0, 6)
+      list.value = data.list || []
     })
     .catch(toastError)
+}
+
+onMounted(() => {
+  fetchVideoCategories()
+    .then((data) => {
+      const rows = data.list || []
+      if (!rows.length) return
+      const names = rows.map((r) => r.name)
+      const kinds: Record<string, number> = {}
+      rows.forEach((r) => {
+        kinds[r.name] = r.kind
+      })
+      cateKind.value = kinds
+      channels.value = names
+      if (!names.includes(channel.value)) {
+        channelSlide.select(names[0])
+      }
+    })
+    .catch(() => undefined)
+    .finally(loadList)
 })
+
+watch(channel, loadList)
 </script>
 
 <style scoped lang="scss">
