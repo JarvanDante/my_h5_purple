@@ -216,8 +216,8 @@ onMounted(() => {
 .hero {
   position: relative;
   flex-shrink: 0;
-  height: 239px;
-  padding: 0 16px 16px;
+  height: auto;
+  padding: 0 16px 10px;
   overflow: hidden;
   color: #fff;
   background: #1a1618;
@@ -260,7 +260,7 @@ onMounted(() => {
 .nav {
   display: flex;
   justify-content: space-between;
-  height: calc(46px + env(safe-area-inset-top, 0px));
+  height: calc(40px + env(safe-area-inset-top, 0px));
   padding-top: env(safe-area-inset-top, 0px);
   align-items: center;
 }
@@ -286,7 +286,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: 4px;
+  margin-top: 0;
   padding-left: 22px;
 }
 
