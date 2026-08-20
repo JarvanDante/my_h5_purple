@@ -1,60 +1,162 @@
 <template>
-  <van-swipe
+  <div
     v-if="items.length"
-    class="ad-swipe"
-    :autoplay="items.length > 1 ? 3200 : 0"
-    :duration="480"
-    :loop="items.length > 1"
-    lazy-render
-    indicator-color="#e86a96"
+    ref="rail"
+    class="ad-rail"
+    @touchstart.passive="pause"
+    @touchend.passive="resume"
+    @mouseenter="pause"
+    @mouseleave="resume"
   >
-    <van-swipe-item v-for="item in items" :key="item.id">
-      <button type="button" class="ad-slide" @click="$emit('select', item)">
-        <div class="hero-cover" :class="`tone-${item.tone}`">
+    <div
+      class="ad-track"
+      :class="{ moving: animating }"
+      :style="{ transform: `translate3d(${-offset}px, 0, 0)` }"
+    >
+      <button
+        v-for="(item, i) in loopItems"
+        :key="`${item.id}-${i}`"
+        type="button"
+        class="ad-card"
+        :style="{ width: cardWidth ? `${cardWidth}px` : undefined }"
+        @click="$emit('select', item)"
+      >
+        <div class="ad-cover" :class="`tone-${item.tone}`">
           <img v-if="item.cover" :src="item.cover" alt="" />
         </div>
+        <p class="ad-title">{{ item.title }}</p>
         <span class="ad-tag">广告</span>
-        <p v-if="item.title" class="ad-title">{{ item.title }}</p>
       </button>
-    </van-swipe-item>
-  </van-swipe>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { CoverItem } from '@/data/mock'
 
-defineProps<{
+const props = defineProps<{
   items: CoverItem[]
 }>()
 
 defineEmits<{
   select: [item: CoverItem]
 }>()
+
+const rail = ref<HTMLElement>()
+const index = ref(0)
+const animating = ref(true)
+const cardWidth = ref(0)
+const gap = 8
+const visible = 3.35
+const paused = ref(false)
+let timer = 0
+
+const canLoop = computed(() => props.items.length > 3)
+const loopItems = computed(() => {
+  if (!canLoop.value) return props.items
+  return [...props.items, ...props.items.slice(0, 4)]
+})
+const step = computed(() => (cardWidth.value ? cardWidth.value + gap : 0))
+const offset = computed(() => index.value * step.value)
+
+const measure = () => {
+  const w = rail.value?.clientWidth || 0
+  if (!w) return
+  cardWidth.value = (w - gap * 2) / visible
+}
+
+const snapHome = () => {
+  animating.value = false
+  index.value = 0
+}
+
+const tick = () => {
+  if (paused.value || !canLoop.value || !step.value) return
+  animating.value = true
+  index.value += 1
+  if (index.value >= props.items.length) {
+    window.setTimeout(() => {
+      snapHome()
+    }, 420)
+  }
+}
+
+const start = () => {
+  window.clearInterval(timer)
+  if (!canLoop.value) return
+  timer = window.setInterval(tick, 2800)
+}
+
+const pause = () => {
+  paused.value = true
+}
+
+const resume = () => {
+  paused.value = false
+}
+
+const onHide = () => {
+  paused.value = document.hidden
+}
+
+onMounted(() => {
+  measure()
+  nextTick(measure)
+  start()
+  window.addEventListener('resize', measure)
+  document.addEventListener('visibilitychange', onHide)
+})
+
+onUnmounted(() => {
+  window.clearInterval(timer)
+  window.removeEventListener('resize', measure)
+  document.removeEventListener('visibilitychange', onHide)
+})
+
+watch(
+  () => props.items.length,
+  () => {
+    snapHome()
+    nextTick(() => {
+      measure()
+      start()
+    })
+  },
+)
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 @use '@/styles/tones.scss' as *;
 
-.ad-swipe {
-  height: 148px;
-  background: #fff;
+.ad-rail {
+  overflow: hidden;
+  container-type: inline-size;
 }
 
-.ad-slide {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 148px;
+.ad-track {
+  display: flex;
+  gap: 8px;
+  will-change: transform;
+
+  &.moving {
+    transition: transform 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+.ad-card {
+  flex: 0 0 auto;
+  width: calc((100cqi - 16px) / 3.35);
   padding: 0;
   border: 0;
   background: transparent;
-  overflow: hidden;
+  text-align: left;
 }
 
-.hero-cover {
-  width: 100%;
-  height: 100%;
+.ad-cover {
+  aspect-ratio: 3 / 4;
+  border-radius: 10px;
   overflow: hidden;
 
   img {
@@ -65,53 +167,27 @@ defineEmits<{
   }
 }
 
-.ad-tag {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 1;
-  background: rgba(44, 27, 34, 0.45);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-  border-radius: 6px;
-  padding: 3px 6px;
-}
-
 .ad-title {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  margin: 0;
-  padding: 22px 12px 10px;
-  background: linear-gradient(transparent, rgba(44, 27, 34, 0.55));
-  color: #fff;
-  font-size: 13px;
+  margin: 6px 0 0;
+  color: $ink;
+  font-size: 12px;
   font-weight: 700;
-  text-align: left;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.ad-swipe :deep(.van-swipe__indicators) {
-  bottom: 8px;
-}
-
-.ad-swipe :deep(.van-swipe__indicator) {
-  width: 6px;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.45);
-  opacity: 1;
-}
-
-.ad-swipe :deep(.van-swipe__indicator--active) {
-  width: 14px;
-  border-radius: 6px;
-  background: $primary-color;
+.ad-tag {
+  display: inline-block;
+  margin-top: 4px;
+  background: rgba(44, 27, 34, 0.08);
+  color: $text-color-muted;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 4px;
+  padding: 3px 5px;
 }
 
 @include media-tones;
