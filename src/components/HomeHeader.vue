@@ -37,10 +37,6 @@
       <button type="button" class="qbtn" @click="$emit('vip')">VIP</button>
       <button type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
     </div>
-
-    <div v-if="$slots.banner" class="pack-banner">
-      <slot name="banner" />
-    </div>
   </header>
 </template>
 
@@ -218,10 +214,5 @@ defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.pack-banner {
-  position: relative;
-  margin-top: 4px;
 }
 </style>

@@ -11,11 +11,11 @@
       @search="go('/search')"
       @vip="go('/vip')"
       @favorite="go('/favorite')"
-    >
-      <template v-if="ads.length" #banner>
-        <AdSwipe :items="ads" @select="open" />
-      </template>
-    </HomeHeader>
+    />
+
+    <section v-if="ads.length" class="ad-rail-wrap">
+      <AdSwipe :items="ads" @select="open" />
+    </section>
 
     <div class="inner-slide">
       <transition :name="innerName">
