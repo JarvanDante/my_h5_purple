@@ -98,24 +98,28 @@ defineEmits<{
 }
 
 .home-header--pack:not(.home-header--single) {
-  padding-top: calc(10px + env(safe-area-inset-top, 0px));
-
+  padding-bottom: 8px;
 
   .sub-row {
-    margin-top: 2px;
-    padding: 8px 0 10px;
+    margin-top: 0;
+    padding: 0 0 0;
+    height: 32px;
     gap: 20px;
   }
 
   .sub-item {
-    font-size: 13.5px;
-    line-height: 22px;
-    padding: 2px 2px;
+    font-size: 13px;
+    line-height: 32px;
+    padding: 0;
     letter-spacing: 0.02em;
 
     &.active {
       font-weight: 700;
     }
+  }
+
+  .search-row {
+    margin-top: 6px;
   }
 }
 
