@@ -1,5 +1,5 @@
 <template>
-  <header class="home-header home-header--pack">
+  <header class="home-header home-header--pack" :class="{ 'home-header--single': !subTabs.length }">
     <div class="channel-row">
       <div class="channel-tabs">
         <button
@@ -72,6 +72,24 @@ defineEmits<{
   z-index: 50;
   background: $background-topbar;
   padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 12px;
+}
+
+.home-header--single {
+  padding-top: calc(22px + env(safe-area-inset-top, 0px));
+  padding-bottom: 14px;
+
+  .channel-row {
+    min-height: 36px;
+    padding-bottom: 12px;
+  }
+
+  .channel-item {
+    padding: 6px 0 4px;
+  }
+
+  .search-row {
+    margin-top: 4px;
+  }
 }
 
 .channel-row,
