@@ -26,13 +26,15 @@
     </div>
 
     <div v-if="floatAd" class="float-ad" @click.stop>
-      <div class="float-thumb" />
-      <div class="float-txt">
-        <b>广告位预留</b>
-        <p>开通会员可关闭广告</p>
-      </div>
       <button type="button" class="float-x" aria-label="关闭" @click="floatAd = false">×</button>
-      <button type="button" class="float-vip" @click="goVip">VIP去广告</button>
+      <div class="float-thumb" />
+      <div class="float-body">
+        <div class="float-txt">
+          <b>广告位预留</b>
+          <p>开通会员可关闭广告</p>
+        </div>
+        <button type="button" class="float-vip" @click="goVip">VIP去广告</button>
+      </div>
     </div>
 
     <footer v-show="chrome" class="bar" @click.stop>
@@ -57,20 +59,6 @@
           </span>
           目录
         </button>
-        <div class="mode">
-          <button type="button" class="mode-btn" :class="{ on: mode === 'v' }" @click="mode = 'v'">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            上下
-          </button>
-          <button type="button" class="mode-btn" :class="{ on: mode === 'h' }" @click="setHorizontal">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M4 12h16M8 8 4 12l4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-            左右
-          </button>
-        </div>
         <button type="button" class="act" :class="{ on: auto }" @click="toggleAuto">
           <span class="act-ico" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none">
@@ -141,7 +129,6 @@ const chapters = ref<ChapterItem[]>([])
 const catalogOpen = ref(false)
 const page = ref(1)
 const auto = ref(false)
-const mode = ref<'v' | 'h'>('v')
 const asc = ref(false)
 const floatAd = ref(true)
 let observer: IntersectionObserver | null = null
@@ -246,11 +233,6 @@ const toggleAuto = () => {
     }
     el.scrollBy({ top: 2 })
   }, 16)
-}
-
-const setHorizontal = () => {
-  mode.value = 'h'
-  showToast('左右翻页即将支持')
 }
 
 const goVip = () => {
@@ -382,23 +364,31 @@ h1 {
   right: 16px;
   bottom: 118px;
   z-index: 9;
-  min-height: 72px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(18, 16, 22, 0.88);
-  display: grid;
-  grid-template-columns: 52px 1fr auto;
-  grid-template-rows: auto auto;
-  column-gap: 10px;
+  height: 96px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(18, 16, 22, 0.9);
+  display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .float-thumb {
-  grid-row: 1 / span 2;
-  width: 52px;
-  height: 52px;
-  border-radius: 6px;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 8px;
   background: #ffe3b8;
+}
+
+.float-body {
+  flex: 1;
+  min-width: 0;
+  height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-right: 28px;
 }
 
 .float-txt {
@@ -406,38 +396,40 @@ h1 {
 
   b {
     display: block;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
   }
 
   p {
     margin-top: 4px;
-    font-size: 11px;
+    font-size: 12px;
     color: #f5a6c4;
   }
 }
 
 .float-x {
-  align-self: start;
-  width: 22px;
-  height: 22px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
   border: 0;
   border-radius: 50%;
-  background: transparent;
-  color: #bbb;
-  font-size: 18px;
-  line-height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 16px;
+  line-height: 22px;
 }
 
 .float-vip {
-  grid-column: 3;
+  align-self: flex-end;
   border: 0;
-  height: 26px;
-  padding: 0 10px;
-  border-radius: 13px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 14px;
   background: #ffb07a;
   color: #3a2418;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -460,31 +452,23 @@ h1 {
 }
 
 .actions {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  gap: 56px;
+  margin-top: 12px;
 }
 
 .act {
   border: 0;
   background: transparent;
-  color: #eee;
-  font-size: 11px;
+  color: #f2f2f5;
+  font-size: 12px;
+  font-weight: 600;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-
-  &:first-child {
-    justify-self: center;
-    margin-right: 12px;
-  }
-
-  &:last-child {
-    justify-self: center;
-    margin-left: 12px;
-  }
+  gap: 6px;
 
   &.on {
     color: #ffd84d;
@@ -492,49 +476,22 @@ h1 {
 }
 
 .act-ico {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   svg {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 }
 
-.mode {
-  display: flex;
-  padding: 3px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.mode-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 30px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 15px;
-  background: transparent;
-  color: #ddd;
-  font-size: 12px;
-  font-weight: 600;
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-
-  &.on {
-    background: #ffd84d;
-    color: #1a1a1f;
-  }
+.act.on .act-ico {
+  background: rgba(255, 216, 77, 0.18);
 }
 
 .drawer-mask {
