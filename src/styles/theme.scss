@@ -48,8 +48,8 @@
   border: 0;
 
   &.active {
-    color: $primary-color;
-    background: $primary-soft;
+    color: $ink;
+    background: transparent;
     font-weight: 800;
   }
 }
@@ -80,7 +80,7 @@
 
   &.active {
     color: $primary-color;
-    background: $primary-soft;
+    background: transparent;
     font-weight: 700;
   }
 }
@@ -94,9 +94,9 @@
   flex: 1;
   height: 36px;
   border-radius: $radius-pill;
-  background: $background-page;
+  background: $background-surface2;
   border: 1px solid $line;
-  color: $text-color-muted;
+  color: $text-color-secondary;
   display: flex;
   align-items: center;
   gap: 6px;

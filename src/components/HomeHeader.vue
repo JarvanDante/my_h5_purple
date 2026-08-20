@@ -80,8 +80,7 @@ defineEmits<{
   position: relative;
   background: #fff;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 12px;
-  border-radius: 0 0 16px 16px;
-  box-shadow: $shadow-card;
+  box-shadow: 0 1px 0 $line;
 }
 
 .channel-row,
@@ -131,12 +130,14 @@ defineEmits<{
 }
 
 .channel-item {
-  font-size: 16px;
-  padding: 5px 12px;
+  font-size: 15px;
+  padding: 4px 8px;
+  color: $text-color-secondary;
 
   &.active {
-    color: $primary-color;
-    background: $primary-soft;
+    color: $ink;
+    background: transparent;
+    font-size: 18px;
     font-weight: 800;
   }
 }
@@ -167,12 +168,14 @@ defineEmits<{
 
 .sub-item {
   font-size: 13px;
-  padding: 4px 10px;
+  padding: 4px 8px 6px;
+  border-radius: 0;
 
   &.active {
     color: $primary-color;
-    background: $primary-soft;
+    background: transparent;
     font-weight: 700;
+    box-shadow: inset 0 -2px 0 $primary-color;
   }
 }
 
@@ -253,7 +256,7 @@ defineEmits<{
 }
 
 .pack-action.vip {
-  color: $primary-color;
+  color: $text-color-secondary;
 }
 
 .pack-banner {

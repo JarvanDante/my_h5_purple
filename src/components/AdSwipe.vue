@@ -23,9 +23,9 @@
       >
         <div class="ad-cover" :class="`tone-${item.tone}`">
           <img v-if="item.cover" :src="item.cover" alt="" />
+          <span class="ad-tag">广告</span>
         </div>
         <p class="ad-title">{{ item.title }}</p>
-        <span class="ad-tag">广告</span>
       </button>
     </div>
   </div>
@@ -155,6 +155,7 @@ watch(
 }
 
 .ad-cover {
+  position: relative;
   aspect-ratio: 3 / 4;
   border-radius: 10px;
   overflow: hidden;
@@ -171,7 +172,7 @@ watch(
   margin: 6px 0 0;
   color: $ink;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,12 +180,14 @@ watch(
 }
 
 .ad-tag {
-  display: inline-block;
-  margin-top: 4px;
-  background: $background-surface2;
-  color: $text-color-secondary;
-  font-size: 10px;
-  font-weight: 700;
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  z-index: 1;
+  background: rgba(26, 26, 31, 0.45);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
   line-height: 1;
   border-radius: 4px;
   padding: 3px 5px;
