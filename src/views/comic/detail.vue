@@ -1,7 +1,6 @@
 <template>
   <div class="page-shell sub-page comic-detail">
     <header class="hero">
-      <div v-if="cover" class="hero-tile" :style="{ backgroundImage: `url(${cover})` }" />
       <div v-if="cover" class="hero-blur" :style="{ backgroundImage: `url(${cover})` }" />
       <div class="hero-mask" />
       <div class="nav">
@@ -215,34 +214,23 @@ onMounted(() => {
   padding: 0 14px 16px;
   overflow: hidden;
   color: #fff;
+  background: #2a2428;
 }
 
-.hero-tile,
 .hero-blur {
   position: absolute;
-  inset: 0;
-  background-position: center;
-}
-
-.hero-tile {
-  background-repeat: repeat;
-  background-size: 72px auto;
-  opacity: 0.55;
-  filter: brightness(0.45) saturate(0.9);
-}
-
-.hero-blur {
+  inset: -28px;
   background-repeat: no-repeat;
+  background-position: center top;
   background-size: cover;
-  filter: blur(22px) brightness(0.42);
-  transform: scale(1.12);
-  opacity: 0.85;
+  filter: blur(28px) saturate(1.05);
+  transform: scale(1.08);
 }
 
 .hero-mask {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(20, 10, 16, 0.25) 0%, rgba(20, 10, 16, 0.55) 100%);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.52) 100%);
 }
 
 .nav,
