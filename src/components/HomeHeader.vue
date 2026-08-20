@@ -39,16 +39,14 @@
         <span class="search-ico">⌕</span>
         <span>搜索更多{{ channel }}</span>
       </div>
-      <div class="action-stack">
-        <button type="button" class="pack-action vip" @click="$emit('vip')">
-          <span class="pack-ico">👑</span>
-          <span>VIP充值</span>
-        </button>
-        <button type="button" class="pack-action fav" @click="$emit('favorite')">
-          <span class="pack-ico">★</span>
-          <span>收藏</span>
-        </button>
-      </div>
+      <button type="button" class="pack-action vip" @click="$emit('vip')">
+        <span class="pack-ico">👑</span>
+        <span>VIP</span>
+      </button>
+      <button type="button" class="pack-action fav" @click="$emit('favorite')">
+        <span class="pack-ico">★</span>
+        <span>收藏</span>
+      </button>
     </div>
 
     <div v-if="$slots.banner" class="pack-banner">
@@ -188,65 +186,56 @@ defineEmits<{
 }
 
 .search-row {
-  margin-top: 12px;
-  align-items: stretch;
-  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
 .search-pill {
   flex: 1;
   min-width: 0;
-  min-height: 52px;
+  height: 34px;
   border-radius: $radius-pill;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(232, 106, 150, 0.14);
   color: $text-color-muted;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px;
+  gap: 6px;
+  padding: 0 12px;
   font-size: 13px;
   white-space: nowrap;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .search-ico {
-  font-size: 16px;
+  font-size: 15px;
   color: $primary-color;
-}
-
-.action-stack {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  flex-shrink: 0;
 }
 
 .pack-action {
   border: 0;
   background: transparent;
   padding: 0;
-  min-width: 44px;
+  min-width: 36px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1px;
   color: $ink;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   line-height: 1.1;
 }
 
 .pack-ico {
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .pack-action.vip .pack-ico {
@@ -261,6 +250,6 @@ defineEmits<{
 
 .pack-banner {
   position: relative;
-  margin-top: 12px;
+  margin-top: 6px;
 }
 </style>
