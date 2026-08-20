@@ -229,14 +229,13 @@ onMounted(() => {
   overflow: hidden;
 
   img {
-    position: absolute;
-    left: 50%;
-    top: 46%;
-    width: auto;
-    height: 230%;
-    max-width: none;
-    transform: translate(-50%, -50%);
-    filter: blur(2px);
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 28%;
+    transform: scale(1.06);
+    filter: blur(2px) brightness(0.78);
   }
 }
 
@@ -245,9 +244,9 @@ onMounted(() => {
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.16) 0%,
-    rgba(0, 0, 0, 0.3) 55%,
-    rgba(0, 0, 0, 0.42) 100%
+    rgba(0, 0, 0, 0.12) 0%,
+    rgba(0, 0, 0, 0.28) 60%,
+    rgba(0, 0, 0, 0.4) 100%
   );
 }
 
