@@ -181,8 +181,8 @@ watch(
 .ad-tag {
   display: inline-block;
   margin-top: 4px;
-  background: rgba(44, 27, 34, 0.08);
-  color: $text-color-muted;
+  background: $background-surface2;
+  color: $text-color-secondary;
   font-size: 10px;
   font-weight: 700;
   line-height: 1;

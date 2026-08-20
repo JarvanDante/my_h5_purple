@@ -1,7 +1,5 @@
 <template>
   <header class="home-header home-header--pack">
-    <div class="pack-glow" aria-hidden="true" />
-
     <div class="channel-row">
       <div class="channel-tabs">
         <button
@@ -16,7 +14,7 @@
         </button>
       </div>
       <button type="button" class="checkin-btn" @click="$emit('checkin')">
-        <span>🎁</span>
+        <LineIcon name="gift" />
         签到
       </button>
     </div>
@@ -36,43 +34,15 @@
 
     <div class="search-row">
       <div class="search-pill" @click="$emit('search')">
-        <span class="search-ico">⌕</span>
+        <span class="search-ico"><LineIcon name="search" /></span>
         <span>搜索更多{{ channel }}</span>
       </div>
       <button type="button" class="pack-action vip" @click="$emit('vip')">
-        <svg class="pack-img" viewBox="0 0 32 32" aria-hidden="true">
-          <defs>
-            <linearGradient id="hh-vip-g" x1="16" y1="4" x2="16" y2="28" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#f4b896" />
-              <stop offset="1" stop-color="#d44d7e" />
-            </linearGradient>
-          </defs>
-          <rect x="2" y="4.5" width="28" height="23" rx="6" fill="url(#hh-vip-g)" />
-          <text
-            x="16"
-            y="20"
-            text-anchor="middle"
-            fill="#fff8f6"
-            font-size="9.5"
-            font-weight="800"
-            font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif"
-          >
-            会员
-          </text>
-        </svg>
+        <span class="cta-ico">会员</span>
         <span>VIP充值</span>
       </button>
       <button type="button" class="pack-action fav" @click="$emit('favorite')">
-        <svg class="pack-img" viewBox="0 0 32 32" aria-hidden="true">
-          <defs>
-            <linearGradient id="hh-fav-g" x1="16" y1="3" x2="16" y2="29" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#f29ab4" />
-              <stop offset="1" stop-color="#d44d7e" />
-            </linearGradient>
-          </defs>
-          <rect x="3" y="3" width="26" height="26" rx="7" fill="url(#hh-fav-g)" />
-          <path d="M19.2 3H26v13.4l-3.4-2.5-3.4 2.5V3Z" fill="#fff8f6" />
-        </svg>
+        <span class="pack-img"><LineIcon name="fav" /></span>
         <span>收藏</span>
       </button>
     </div>
@@ -84,6 +54,8 @@
 </template>
 
 <script setup lang="ts">
+import LineIcon from '@/components/LineIcon.vue'
+
 defineProps<{
   channels: string[]
   channel: string
@@ -106,22 +78,10 @@ defineEmits<{
 
 .home-header--pack {
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, #ffffff 0%, #fff7fa 58%, #ffe8f0 100%);
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 16px;
-  border-radius: 0 0 24px 24px;
-  box-shadow: 0 16px 32px rgba(232, 106, 150, 0.12);
-}
-
-.pack-glow {
-  position: absolute;
-  top: -48px;
-  right: -36px;
-  width: 168px;
-  height: 168px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(232, 106, 150, 0.2), transparent 68%);
-  pointer-events: none;
+  background: #fff;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 12px;
+  border-radius: 0 0 16px 16px;
+  box-shadow: $shadow-card;
 }
 
 .channel-row,
@@ -175,7 +135,7 @@ defineEmits<{
   padding: 5px 12px;
 
   &.active {
-    color: $primary-color-deep;
+    color: $primary-color;
     background: $primary-soft;
     font-weight: 800;
   }
@@ -184,17 +144,20 @@ defineEmits<{
 .checkin-btn {
   margin-left: 8px;
   border: 0;
-  background: linear-gradient(180deg, #fff 0%, $primary-soft 100%);
-  color: $primary-color-deep;
+  background: transparent;
+  color: $text-color-secondary;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   white-space: nowrap;
-  border-radius: $radius-pill;
-  padding: 5px 10px;
-  box-shadow: inset 0 0 0 1px rgba(232, 106, 150, 0.16);
+  padding: 4px 2px;
+
+  :deep(.line-icon) {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .sub-row {
@@ -207,7 +170,7 @@ defineEmits<{
   padding: 4px 10px;
 
   &.active {
-    color: $primary-color-deep;
+    color: $primary-color;
     background: $primary-soft;
     font-weight: 700;
   }
@@ -216,7 +179,7 @@ defineEmits<{
 .search-row {
   margin-top: 8px;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .search-pill {
@@ -224,9 +187,9 @@ defineEmits<{
   min-width: 0;
   height: 34px;
   border-radius: $radius-pill;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(232, 106, 150, 0.14);
-  color: $text-color-muted;
+  background: $background-surface2;
+  border: 1px solid $line;
+  color: $text-color-secondary;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -237,8 +200,15 @@ defineEmits<{
 }
 
 .search-ico {
-  font-size: 15px;
-  color: $primary-color;
+  width: 16px;
+  height: 16px;
+  color: $text-color-secondary;
+  display: flex;
+
+  :deep(.line-icon) {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .pack-action {
@@ -250,22 +220,44 @@ defineEmits<{
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  color: $ink;
+  color: $text-color-secondary;
   font-size: 9px;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
 }
 
 .pack-img {
-  width: 24px;
-  height: 24px;
-  display: block;
-  overflow: visible;
-  filter: drop-shadow(0 2px 4px rgba(212, 77, 126, 0.18));
+  width: 22px;
+  height: 22px;
+  color: $text-color;
+  display: flex;
+
+  :deep(.line-icon) {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.cta-ico {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: $primary-color;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.04em;
+}
+
+.pack-action.vip {
+  color: $primary-color;
 }
 
 .pack-banner {
   position: relative;
-  margin-top: 6px;
+  margin-top: 8px;
 }
 </style>

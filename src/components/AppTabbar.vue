@@ -90,22 +90,28 @@ const go = (path: string) => {
   justify-content: flex-end;
   gap: 1px;
   padding-bottom: 4px;
-  color: $ink;
+  color: $text-color-secondary;
   cursor: pointer;
 
   &.active {
+    color: $primary-color;
+
     .tab-icon {
-      width: 30px;
-      height: 30px;
-      transform: translateY(-2px);
+      color: $primary-color;
     }
 
     .tab-label {
-      font-weight: 800;
+      font-weight: 700;
     }
 
-    .shape {
-      fill: $accent-yellow;
+    .shape,
+    .ring {
+      stroke: $primary-color;
+    }
+
+    .mark,
+    .mark-fill {
+      fill: $primary-color;
     }
   }
 
@@ -118,8 +124,7 @@ const go = (path: string) => {
   width: 22px;
   height: 22px;
   display: flex;
-  color: $ink;
-  transition: width 0.16s ease, height 0.16s ease, transform 0.16s ease;
+  color: $text-color-secondary;
 
   svg {
     width: 100%;
@@ -131,19 +136,19 @@ const go = (path: string) => {
 .shape,
 .ring {
   fill: none;
-  stroke: $ink;
+  stroke: currentColor;
   stroke-width: 1.7;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 .mark {
-  fill: $ink;
+  fill: currentColor;
   stroke: none;
 }
 
 .mark-fill {
-  fill: $ink;
+  fill: currentColor;
   stroke: none;
 }
 

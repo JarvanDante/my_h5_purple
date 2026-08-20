@@ -22,7 +22,7 @@
         <div :key="channel + '-' + subTab" class="inner-pane">
           <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
-              <span class="quick-icon">{{ item.icon }}</span>
+              <span class="quick-icon"><LineIcon :name="item.icon" /></span>
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -52,6 +52,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
+import LineIcon from '@/components/LineIcon.vue'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
@@ -106,16 +107,10 @@ const ads = computed<CoverItem[]>(() => {
 })
 
 const quicks = [
-  { icon: '👑', label: '抢先看', bg: '#ffe4ec', path: '/vip' },
-  { icon: '📹', label: '直播', bg: '#ffe8f0', path: '' },
-  { icon: '📖', label: '专题', bg: '#fff3e0', path: '/list?media=video&type=topic' },
-  { icon: '🪙', label: '金币专区', bg: '#fff6d8', path: '/wallet' },
-  { icon: '🎁', label: '热门', bg: '#ffe4d6', path: '/list?media=video&type=hot' },
-  { icon: '🏆', label: '排行', bg: '#e8f1ff', path: '/list?media=video&type=rank' },
-  { icon: '🎬', label: '片商', bg: '#f3e8ff', path: '/list?media=video&type=category' },
-  { icon: '⭐', label: '演员', bg: '#ffe8ea', path: '' },
-  { icon: '📁', label: '分类', bg: '#e8f8ef', path: '/list?media=video&type=category' },
-  { icon: '✨', label: '原创', bg: '#e8f4ff', path: '/list?media=video&type=daily' },
+  { icon: 'vip', label: '抢先看', path: '/vip' },
+  { icon: 'play', label: '直播', path: '' },
+  { icon: 'topic', label: '专题', path: '/list?media=video&type=topic' },
+  { icon: 'wallet', label: '金币专区', path: '/wallet' },
 ]
 
 const go = (path: string) => router.push(path)
@@ -192,7 +187,7 @@ onMounted(() => {
 .badge {
   top: 6px;
   left: 6px;
-  background: $primary-color;
+  background: rgba(26, 26, 31, 0.55);
   border: 0;
   border-radius: 6px;
   padding: 1px 6px;

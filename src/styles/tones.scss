@@ -1,10 +1,12 @@
 @use './variables.scss' as *;
 
 @mixin media-tones {
-  .tone-0 { background: linear-gradient(160deg, #ffe6ef, #f7b7cc); }
-  .tone-1 { background: linear-gradient(160deg, #fff1e6, #f3c9a6); }
-  .tone-2 { background: linear-gradient(160deg, #eef2ff, #c9d4f7); }
-  .tone-3 { background: linear-gradient(160deg, #eefaf4, #bfe8d4); }
-  .tone-4 { background: linear-gradient(160deg, #fff4d4, #f3d48a); }
-  .tone-5 { background: linear-gradient(160deg, #f3e8ff, #d4c2f0); }
+  .tone-0,
+  .tone-1,
+  .tone-2,
+  .tone-3,
+  .tone-4,
+  .tone-5 {
+    background: #ececee;
+  }
 }

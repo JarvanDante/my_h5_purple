@@ -112,11 +112,11 @@ defineEmits<{
   font-size: 10px;
   border-radius: 6px;
   padding: 1px 6px;
-  background: $primary-color;
+  background: rgba(26, 26, 31, 0.55);
   border: 0;
 
   &.vip {
-    background: $primary-color-deep;
+    background: $primary-color;
   }
 }
 
@@ -163,8 +163,8 @@ defineEmits<{
 
 .chip {
   flex-shrink: 0;
-  background: $primary-color;
-  color: #fff;
+  background: $background-surface2;
+  color: $text-color-secondary;
   font-size: 10px;
   border-radius: 8px;
   padding: 1px 6px;
@@ -178,8 +178,8 @@ defineEmits<{
   line-height: 1.4;
   padding: 2px 6px;
   border-radius: 8px;
-  background: #fde8d8;
-  color: #c56a2d;
+  background: $background-surface2;
+  color: $text-color-secondary;
 }
 
 .mosaic .thumb::after {
@@ -197,9 +197,9 @@ defineEmits<{
     line-height: 1.4;
     padding: 1px 6px;
     border-radius: 8px;
-    background: $primary-soft;
-    color: $ink;
-    border: 1px solid rgba($ink, 0.12);
+    background: $background-surface2;
+    color: $text-color-secondary;
+    border: 0;
   }
 }
 </style>
