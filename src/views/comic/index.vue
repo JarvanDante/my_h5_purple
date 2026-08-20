@@ -12,12 +12,8 @@
       @vip="go('/vip')"
       @favorite="go('/favorite')"
     >
-      <template v-if="covers[0]" #banner>
-        <section class="hero-banner" @click="open(covers[0])">
-          <div class="hero-cover" :class="`tone-${covers[0].tone}`">
-            <img v-if="covers[0].cover" :src="covers[0].cover" alt="" />
-          </div>
-        </section>
+      <template v-if="banners.length" #banner>
+        <AdSwipe :items="banners" @select="open" />
       </template>
     </HomeHeader>
 
@@ -44,6 +40,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
@@ -84,6 +81,7 @@ const quicks = [
 ]
 
 const list = ref<ComicsItem[]>([])
+const banners = ref<CoverItem[]>([])
 const covers = computed<CoverItem[]>(() =>
   list.value.map((c) => {
     const cate = comicCategories(c)[0] || ''
@@ -98,6 +96,11 @@ const covers = computed<CoverItem[]>(() =>
     }
   }),
 )
+
+watch(covers, (rows) => {
+  if (banners.value.length || !rows.length) return
+  banners.value = rows.slice(0, 6)
+})
 
 const go = (path: string) => {
   router.push(path)
@@ -187,26 +190,9 @@ watch(subTab, loadList)
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
-
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
 }
-
-.hero-cover {
-  height: 148px;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-}
-
-@include media-tones;
 </style>

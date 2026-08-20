@@ -267,13 +267,10 @@ defineEmits<{
   box-shadow: 0 10px 22px rgba(44, 27, 34, 0.1);
 }
 
-.pack-banner :deep(.hero-banner) {
+.pack-banner :deep(.hero-banner),
+.pack-banner :deep(.ad-swipe) {
   margin: 0;
   border-radius: 0;
   box-shadow: none;
-}
-
-.pack-banner :deep(.hero-cover) {
-  height: 148px;
 }
 </style>

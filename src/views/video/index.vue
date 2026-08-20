@@ -12,12 +12,8 @@
       @vip="go('/vip')"
       @favorite="go('/favorite')"
     >
-      <template v-if="ads[0]" #banner>
-        <section class="hero-banner" @click="open(ads[0])">
-          <div class="hero-cover" :class="`tone-${ads[0].tone}`">
-            <img v-if="ads[0].cover" :src="ads[0].cover" alt="" />
-          </div>
-        </section>
+      <template v-if="ads.length" #banner>
+        <AdSwipe :items="ads" @select="open" />
       </template>
     </HomeHeader>
 
@@ -54,6 +50,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import AdSwipe from '@/components/AdSwipe.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -155,18 +152,6 @@ onMounted(() => {
   position: relative;
   overflow: hidden;
   min-height: 50vh;
-}
-
-.hero-cover {
-  height: 148px;
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
 }
 
 .video-grid {
