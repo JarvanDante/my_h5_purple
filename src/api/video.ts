@@ -6,6 +6,8 @@ export type VideoItem = {
   description: string
   cover_url: string
   source_url: string
+  category?: string
+  categories?: string[]
   duration: number
   created_at: string
 }
