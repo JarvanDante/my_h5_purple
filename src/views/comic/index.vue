@@ -29,7 +29,7 @@
 
           <SectionPanel :title="sectionTitle" more @more="go(morePath)">
             <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
-            <MediaGrid v-else :items="covers" :cols="isCartoon ? 'cols-2' : 'cols-3'" :wide="isCartoon" @select="open" />
+            <MediaGrid v-else :items="covers" :cols="isCartoon ? 'cols-2' : 'cols-3'" :poster="isCartoon" @select="open" />
           </SectionPanel>
         </div>
       </transition>

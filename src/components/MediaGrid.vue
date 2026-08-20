@@ -1,15 +1,15 @@
 <template>
-  <div class="media-grid" :class="[cols, { wide, mosaic: mosaicMode }]">
+  <div class="media-grid" :class="[cols, { wide, poster, mosaic: mosaicMode }]">
     <article v-for="item in items" :key="`${item.isAd ? 'ad' : 'm'}-${item.id}`" class="card" @click="$emit('select', item)">
       <div class="thumb" :class="`tone-${item.tone}`">
         <CoverMosaic v-if="item.mosaic && item.cover && !item.isAd" :src="item.cover" />
         <img v-else-if="item.cover && !item.isAd" :src="item.cover" alt="" />
         <span v-if="item.isAd" class="ad-mark">广告</span>
         <span v-else-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
-        <p v-if="!wide && !item.mosaic && !item.isAd" class="cover-title ellipsis">{{ item.title }}</p>
+        <p v-if="!wide && !poster && !item.mosaic && !item.isAd" class="cover-title ellipsis">{{ item.title }}</p>
         <span v-if="item.duration && !item.isAd" class="duration">{{ item.duration }}</span>
       </div>
-      <p v-if="item.mosaic || item.isAd" class="card-title ellipsis">{{ item.title }}</p>
+      <p v-if="item.mosaic || item.isAd || poster" class="card-title ellipsis">{{ item.title }}</p>
       <p v-if="item.badge && !item.isAd" class="foot-badge">{{ item.badge }}</p>
       <p v-else-if="item.labels?.length" class="labels">
         <span v-for="lb in item.labels" :key="lb">{{ lb }}</span>
@@ -32,6 +32,7 @@ const props = defineProps<{
   items: CoverItem[]
   cols?: 'cols-2' | 'cols-3'
   wide?: boolean
+  poster?: boolean
 }>()
 
 const mosaicMode = computed(() => props.items.some((item) => item.mosaic))
@@ -123,6 +124,11 @@ defineEmits<{
 
 .wide.cols-2 .thumb {
   aspect-ratio: 16 / 9;
+}
+
+.poster.cols-2 .thumb {
+  height: auto;
+  aspect-ratio: 170 / 227;
 }
 
 .card-title {

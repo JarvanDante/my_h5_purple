@@ -8,7 +8,8 @@
         v-else
         :items="items"
         :cols="media === 'video' || media === 'cartoon' ? 'cols-2' : 'cols-3'"
-        :wide="media === 'video' || media === 'cartoon'"
+        :wide="media === 'video'"
+        :poster="media === 'cartoon'"
         @select="open"
       />
     </div>
