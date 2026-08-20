@@ -96,6 +96,8 @@ defineEmits<{
 }
 
 .home-header--pack:not(.home-header--single) {
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+
   .channel-row {
     height: auto;
     min-height: 36px;
