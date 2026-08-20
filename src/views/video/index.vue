@@ -151,19 +151,26 @@ onMounted(() => {
 
 .video-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px 8px;
+}
+
+.video-grid > article {
+  min-width: 0;
 }
 
 .thumb {
   position: relative;
+  width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: $radius-thumb;
   overflow: hidden;
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
+    max-width: 100%;
     object-fit: cover;
   }
 
