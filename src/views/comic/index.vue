@@ -13,8 +13,8 @@
       @favorite="go('/favorite')"
     />
 
-    <section v-if="banners.length" class="ad-rail-wrap">
-      <AdSwipe :items="banners" @select="open" />
+    <section class="ad-rail-wrap">
+      <AdSwipe :items="banners" />
     </section>
 
     <div class="inner-slide">
@@ -29,7 +29,7 @@
 
           <SectionPanel :title="sectionTitle" more @more="go(morePath)">
             <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
-            <MediaGrid v-else :items="covers" cols="cols-2" @select="open" />
+            <MediaGrid v-else :items="covers" cols="cols-3" @select="open" />
           </SectionPanel>
         </div>
       </transition>
@@ -129,9 +129,11 @@ const emptyText = computed(() => {
 
 const morePath = computed(() => {
   const kind = currentKind.value
-  if (kind === 3 || subTab.value === '漫画榜') return '/list?media=comic&type=rank'
-  if (kind === 2 || subTab.value === '推荐') return '/list?media=comic&type=recommend'
-  return '/list?media=comic&type=daily'
+  const name = subTab.value
+  if (kind === 3 || name === '漫画榜') return '/list?media=comic&type=rank'
+  if (kind === 2 || name === '推荐') return '/list?media=comic&type=recommend'
+  if (kind === 1 || name === '新更' || name === '最新') return '/list?media=comic&type=daily'
+  return `/list?media=comic&type=category&category=${encodeURIComponent(name)}`
 })
 
 const loadList = () => {

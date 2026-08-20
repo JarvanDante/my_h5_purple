@@ -13,8 +13,8 @@
       @favorite="go('/favorite')"
     />
 
-    <section v-if="ads.length" class="ad-rail-wrap">
-      <AdSwipe :items="ads" @select="open" />
+    <section class="ad-rail-wrap">
+      <AdSwipe :items="ads" />
     </section>
 
     <div class="inner-slide">
@@ -56,6 +56,7 @@ import { fetchVideoList, type VideoItem } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
+import { videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Video' })
@@ -118,7 +119,7 @@ const open = (item: CoverItem) => {
     showToast('示例广告')
     return
   }
-  router.push(`/video/${item.id}`)
+  router.push(videoPath(item.id))
 }
 
 const onQuick = (item: { label: string; path: string }) => {

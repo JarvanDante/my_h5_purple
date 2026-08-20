@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="items.length"
     ref="rail"
     class="ad-rail"
     @touchstart.passive="pause"
@@ -19,14 +18,11 @@
         type="button"
         class="ad-card"
         :style="{ width: cardWidth ? `${cardWidth}px` : undefined }"
-        @click="$emit('select', item)"
+        @click.stop
       >
-        <div class="ad-cover" :class="`tone-${item.tone}`">
-          <img v-if="item.cover" :src="item.cover" alt="" />
+        <div class="ad-cover" :style="{ background: slotColor(i) }">
           <span class="ad-tag">广告</span>
         </div>
-        <p class="ad-title">{{ item.title }}</p>
-        <span class="ad-label">广告</span>
       </button>
     </div>
   </div>
@@ -36,13 +32,12 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { CoverItem } from '@/data/mock'
 
-const props = defineProps<{
-  items: CoverItem[]
-}>()
-
-defineEmits<{
-  select: [item: CoverItem]
-}>()
+const props = withDefaults(
+  defineProps<{
+    items?: CoverItem[]
+  }>(),
+  { items: () => [] },
+)
 
 const rail = ref<HTMLElement>()
 const index = ref(0)
@@ -53,10 +48,20 @@ const visible = 3.35
 const paused = ref(false)
 let timer = 0
 
-const canLoop = computed(() => props.items.length > 3)
+const palette = ['#ffd0e0', '#cde4ff', '#ffe3b8', '#c8f0d4', '#e3d4ff', '#fff0a8']
+
+const slotColor = (i: number) => palette[i % palette.length]
+
+const sourceItems = computed(() =>
+  props.items.length
+    ? props.items
+    : [1, 2, 3, 4].map((n) => ({ id: `ad-${n}`, title: '', tone: n })),
+)
+
+const canLoop = computed(() => sourceItems.value.length > 3)
 const loopItems = computed(() => {
-  if (!canLoop.value) return props.items
-  return [...props.items, ...props.items.slice(0, 4)]
+  if (!canLoop.value) return sourceItems.value
+  return [...sourceItems.value, ...sourceItems.value.slice(0, 4)]
 })
 const step = computed(() => (cardWidth.value ? cardWidth.value + gap : 0))
 const offset = computed(() => index.value * step.value)
@@ -76,7 +81,7 @@ const tick = () => {
   if (paused.value || !canLoop.value || !step.value) return
   animating.value = true
   index.value += 1
-  if (index.value >= props.items.length) {
+  if (index.value >= sourceItems.value.length) {
     window.setTimeout(() => {
       snapHome()
     }, 420)
@@ -128,9 +133,6 @@ watch(
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
-
 .ad-rail {
   overflow: hidden;
   container-type: inline-size;
@@ -160,34 +162,6 @@ watch(
   aspect-ratio: 3 / 4;
   border-radius: 10px;
   overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-}
-
-.ad-title {
-  margin: 6px 0 0;
-  color: $ink;
-  font-size: 11.5px;
-  font-weight: 500;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ad-label {
-  display: inline-block;
-  margin-top: 2px;
-  color: $text-color-secondary;
-  font-size: 9.5px;
-  background: $background-surface2;
-  padding: 1px 6px;
-  border-radius: 4px;
 }
 
 .ad-tag {
@@ -203,6 +177,4 @@ watch(
   border-radius: 4px;
   padding: 3px 5px;
 }
-
-@include media-tones;
 </style>
