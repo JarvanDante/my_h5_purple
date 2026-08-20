@@ -40,11 +40,39 @@
         <span>搜索更多{{ channel }}</span>
       </div>
       <button type="button" class="pack-action vip" @click="$emit('vip')">
-        <img class="pack-img" :src="iconVip" alt="" />
+        <svg class="pack-img" viewBox="0 0 32 32" aria-hidden="true">
+          <defs>
+            <linearGradient id="hh-vip-g" x1="16" y1="4" x2="16" y2="28" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#f4b896" />
+              <stop offset="1" stop-color="#d44d7e" />
+            </linearGradient>
+          </defs>
+          <rect x="2" y="4.5" width="28" height="23" rx="6" fill="url(#hh-vip-g)" />
+          <text
+            x="16"
+            y="20"
+            text-anchor="middle"
+            fill="#fff8f6"
+            font-size="9.5"
+            font-weight="800"
+            font-family="-apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif"
+          >
+            会员
+          </text>
+        </svg>
         <span>VIP充值</span>
       </button>
       <button type="button" class="pack-action fav" @click="$emit('favorite')">
-        <img class="pack-img" :src="iconFav" alt="" />
+        <svg class="pack-img" viewBox="0 0 32 32" aria-hidden="true">
+          <defs>
+            <linearGradient id="hh-fav-g" x1="16" y1="3" x2="16" y2="29" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#f29ab4" />
+              <stop offset="1" stop-color="#d44d7e" />
+            </linearGradient>
+          </defs>
+          <rect x="3" y="3" width="26" height="26" rx="7" fill="url(#hh-fav-g)" />
+          <path d="M19.2 3H26v13.4l-3.4-2.5-3.4 2.5V3Z" fill="#fff8f6" />
+        </svg>
         <span>收藏</span>
       </button>
     </div>
@@ -56,9 +84,6 @@
 </template>
 
 <script setup lang="ts">
-import iconFav from '@/assets/icons/sc.png'
-import iconVip from '@/assets/icons/vip.png'
-
 defineProps<{
   channels: string[]
   channel: string
@@ -232,10 +257,10 @@ defineEmits<{
 }
 
 .pack-img {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: block;
-  object-fit: contain;
+  overflow: visible;
   filter: drop-shadow(0 2px 4px rgba(212, 77, 126, 0.18));
 }
 
