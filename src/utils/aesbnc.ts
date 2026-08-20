@@ -1,5 +1,5 @@
 /** 对齐公司 AesUtil::decryptRaw: AES-128-ECB + PKCS7。默认与后端 image_aes.key 相同。 */
-const DEFAULT_KEY = '525202f9149e061d'
+const DEFAULT_KEY = 'dafb787c76b5ce8a'
 
 function resolveKey() {
   const raw = (import.meta.env.VITE_AES_BNC_KEY || DEFAULT_KEY).trim()
