@@ -1,7 +1,9 @@
 <template>
   <div class="page-shell sub-page comic-detail">
     <header class="hero">
-      <div v-if="cover" class="hero-blur" :style="{ backgroundImage: `url(${cover})` }" />
+      <div v-if="cover" class="hero-bg">
+        <img :src="cover" alt="" />
+      </div>
       <div class="hero-mask" />
       <div class="nav">
         <button type="button" class="nav-btn" aria-label="返回" @click="back">
@@ -211,26 +213,32 @@ onMounted(() => {
 .hero {
   position: relative;
   flex-shrink: 0;
-  padding: 0 14px 16px;
+  padding: 0 14px 18px;
   overflow: hidden;
   color: #fff;
-  background: #2a2428;
+  background: #1a1618;
 }
 
-.hero-blur {
+.hero-bg {
   position: absolute;
-  inset: -28px;
-  background-repeat: no-repeat;
-  background-position: center top;
-  background-size: cover;
-  filter: blur(28px) saturate(1.05);
-  transform: scale(1.08);
+  inset: 0;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 18%;
+    transform: scale(1.55);
+    filter: blur(18px);
+  }
 }
 
 .hero-mask {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28) 0%, rgba(0, 0, 0, 0.52) 100%);
+  background: rgba(0, 0, 0, 0.28);
 }
 
 .nav,
@@ -273,10 +281,10 @@ onMounted(() => {
   width: 92px;
   height: 128px;
   flex-shrink: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
-  outline: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  outline: 2px solid #fff;
 }
 
 .meta {
