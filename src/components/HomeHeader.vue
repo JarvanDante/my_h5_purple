@@ -40,11 +40,22 @@
         <span>搜索更多{{ channel }}</span>
       </div>
       <button type="button" class="pack-action vip" @click="$emit('vip')">
-        <span class="pack-ico">👑</span>
-        <span>VIP</span>
+        <span class="pack-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="2.2" y="5.2" width="19.6" height="15.2" rx="3.2" />
+            <rect x="4.2" y="3.2" width="15.6" height="4.2" rx="1.6" />
+          </svg>
+          <em>会员</em>
+        </span>
+        <span>VIP充值</span>
       </button>
       <button type="button" class="pack-action fav" @click="$emit('favorite')">
-        <span class="pack-ico">★</span>
+        <span class="pack-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="3.4" />
+            <path d="M15.2 3H21v8.2l-2.9-2.1-2.9 2.1V3Z" />
+          </svg>
+        </span>
         <span>收藏</span>
       </button>
     </div>
@@ -217,11 +228,11 @@ defineEmits<{
   border: 0;
   background: transparent;
   padding: 0;
-  min-width: 36px;
+  min-width: 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1px;
+  gap: 2px;
   color: $ink;
   font-size: 9px;
   font-weight: 700;
@@ -229,23 +240,43 @@ defineEmits<{
 }
 
 .pack-ico {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
+  position: relative;
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
-.pack-action.vip .pack-ico {
-  background: linear-gradient(180deg, #ffe08a, #f2c14b);
-  color: #8a5a00;
+.pack-ico svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.pack-action.fav .pack-ico {
-  background: linear-gradient(180deg, #ffd0e0, #e86a96);
+.pack-action.vip .pack-ico svg {
+  fill: #f58220;
+}
+
+.pack-action.vip .pack-ico svg rect:last-child {
+  fill: #ff9a3c;
+}
+
+.pack-action.vip .pack-ico em {
+  position: absolute;
+  inset: 7px 0 0;
+  font-style: normal;
+  font-size: 7px;
+  font-weight: 800;
   color: #fff;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.pack-action.fav .pack-ico svg {
+  fill: #f58220;
+}
+
+.pack-action.fav .pack-ico path {
+  fill: #fff;
 }
 
 .pack-banner {
