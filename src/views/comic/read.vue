@@ -17,15 +17,22 @@
 
     <div ref="rootRef" class="scroll" @click="toggleChrome">
       <p v-if="!pics.length" class="empty">{{ empty }}</p>
-      <img
-        v-for="(pic, i) in pics"
-        :key="pic.url + i"
-        :src="pic.url"
-        class="pic"
-        alt=""
-        :data-index="i"
-        draggable="false"
-      />
+      <template v-for="(pic, i) in pics" :key="pic.url + i">
+        <img :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
+        <div v-if="i === midAdIndex" class="page-ad">
+          <span>广告</span>
+        </div>
+      </template>
+    </div>
+
+    <div v-if="floatAd" class="float-ad" @click.stop>
+      <div class="float-thumb" />
+      <div class="float-txt">
+        <b>广告位预留</b>
+        <p>开通会员可关闭广告</p>
+      </div>
+      <button type="button" class="float-x" aria-label="关闭" @click="floatAd = false">×</button>
+      <button type="button" class="float-vip" @click="goVip">VIP去广告</button>
     </div>
 
     <footer v-show="chrome" class="bar" @click.stop>
@@ -43,33 +50,68 @@
       </div>
       <div class="actions">
         <button type="button" class="act" @click="catalogOpen = true">
-          <span class="act-ico">☰</span>
+          <span class="act-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 7h14M5 12h14M5 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </span>
           目录
         </button>
+        <div class="mode">
+          <button type="button" class="mode-btn" :class="{ on: mode === 'v' }" @click="mode = 'v'">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 4v16M8 8l4-4 4 4M8 16l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            上下
+          </button>
+          <button type="button" class="mode-btn" :class="{ on: mode === 'h' }" @click="setHorizontal">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 12h16M8 8 4 12l4 4M16 8l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            左右
+          </button>
+        </div>
         <button type="button" class="act" :class="{ on: auto }" @click="toggleAuto">
-          <span class="act-ico">▶</span>
+          <span class="act-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M8 6.5v11l10-5.5L8 6.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            </svg>
+          </span>
           自动翻
         </button>
       </div>
     </footer>
 
-    <div v-if="catalogOpen" class="sheet-mask" @click.stop="catalogOpen = false">
-      <div class="sheet" @click.stop>
-        <div class="sheet-head">
-          <strong>目录</strong>
-          <button type="button" @click="catalogOpen = false">关闭</button>
+    <div v-if="catalogOpen" class="drawer-mask" @click.stop="catalogOpen = false">
+      <aside class="drawer" @click.stop>
+        <div class="drawer-head">
+          <strong class="ellipsis">{{ comicTitle || '目录' }}</strong>
+          <button type="button" class="sort-btn" @click="asc = !asc">
+            <span>{{ asc ? '1' : 'N' }}</span>
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M8 8.5 12 4.5 16 8.5M8 15.5 12 19.5 16 15.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
         </div>
-        <button
-          v-for="ch in chapters"
-          :key="ch.id"
-          type="button"
-          class="sheet-item"
-          :class="{ current: ch.id === chapterId, lock: !ch.playable }"
-          @click="openChapter(ch)"
-        >
-          第{{ ch.seq }}话
-        </button>
-      </div>
+        <div class="drawer-list">
+          <button
+            v-for="ch in sortedChapters"
+            :key="ch.id"
+            type="button"
+            class="drawer-item"
+            :class="{ current: ch.id === chapterId, lock: !ch.playable }"
+            @click="openChapter(ch)"
+          >
+            <span class="thumb">
+              <img v-if="cover" :src="cover" alt="" />
+            </span>
+            <span class="name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
+            <span class="go" :class="{ last: ch.id === chapterId }">
+              {{ ch.id === chapterId ? '上次' : ch.playable ? '观看' : '锁' }}
+            </span>
+          </button>
+        </div>
+      </aside>
     </div>
   </div>
 </template>
@@ -78,8 +120,13 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import { fetchComicsChapters, readChapter, type ChapterItem } from '@/api/comics'
-import { toastError } from '@/utils/request'
+import {
+  fetchComicsChapters,
+  fetchComicsDetail,
+  readChapter,
+  type ChapterItem,
+} from '@/api/comics'
+import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,10 +135,15 @@ const chrome = ref(true)
 const empty = ref('加载中…')
 const pics = ref<{ url: string }[]>([])
 const title = ref('')
+const comicTitle = ref('')
+const cover = ref('')
 const chapters = ref<ChapterItem[]>([])
 const catalogOpen = ref(false)
 const page = ref(1)
 const auto = ref(false)
+const mode = ref<'v' | 'h'>('v')
+const asc = ref(false)
+const floatAd = ref(true)
 let observer: IntersectionObserver | null = null
 let autoTimer = 0
 
@@ -101,6 +153,15 @@ const seq = computed(() => {
   if (hit?.seq) return hit.seq
   const m = title.value.match(/第\s*(\d+)\s*话/)
   return m ? Number(m[1]) : 1
+})
+const midAdIndex = computed(() => {
+  if (pics.value.length < 4) return -1
+  return Math.floor(pics.value.length / 2) - 1
+})
+const sortedChapters = computed(() => {
+  const list = [...chapters.value]
+  list.sort((a, b) => (asc.value ? a.seq - b.seq : b.seq - a.seq))
+  return list
 })
 
 const bindObserver = async () => {
@@ -131,9 +192,14 @@ const load = async () => {
   pics.value = data.pics || []
   if (!pics.value.length) empty.value = '本章暂无图片'
   const comicId = Number(route.params.id)
-  if (comicId && !chapters.value.length) {
-    const cat = await fetchComicsChapters(comicId)
+  if (comicId) {
+    const [cat, detail] = await Promise.all([
+      fetchComicsChapters(comicId),
+      cover.value ? Promise.resolve(null) : fetchComicsDetail(comicId).catch(() => null),
+    ])
     chapters.value = cat.list || []
+    comicTitle.value = cat.title || detail?.title || ''
+    if (detail?.cover) cover.value = mediaUrl(detail.cover)
   }
   await bindObserver()
   rootRef.value?.scrollTo({ top: 0 })
@@ -180,6 +246,15 @@ const toggleAuto = () => {
     }
     el.scrollBy({ top: 2 })
   }, 16)
+}
+
+const setHorizontal = () => {
+  mode.value = 'h'
+  showToast('左右翻页即将支持')
+}
+
+const goVip = () => {
+  router.push('/vip')
 }
 
 const openChapter = (ch: ChapterItem) => {
@@ -239,7 +314,7 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   z-index: 8;
-  background: rgba(28, 16, 40, 0.92);
+  background: rgba(20, 16, 28, 0.88);
 }
 
 .top {
@@ -288,9 +363,87 @@ h1 {
   background: #111;
 }
 
+.page-ad {
+  height: 120px;
+  margin: 10px 16px;
+  border-radius: 10px;
+  background: #cde4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a6a80;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.float-ad {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 118px;
+  z-index: 9;
+  min-height: 72px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(18, 16, 22, 0.88);
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: 10px;
+  align-items: center;
+}
+
+.float-thumb {
+  grid-row: 1 / span 2;
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  background: #ffe3b8;
+}
+
+.float-txt {
+  min-width: 0;
+
+  b {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  p {
+    margin-top: 4px;
+    font-size: 11px;
+    color: #f5a6c4;
+  }
+}
+
+.float-x {
+  align-self: start;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #bbb;
+  font-size: 18px;
+  line-height: 20px;
+}
+
+.float-vip {
+  grid-column: 3;
+  border: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 13px;
+  background: #ffb07a;
+  color: #3a2418;
+  font-size: 11px;
+  font-weight: 700;
+}
+
 .bar {
   bottom: 0;
-  padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 16px calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 .progress {
@@ -302,87 +455,216 @@ h1 {
 
   input {
     flex: 1;
-    accent-color: #f2c14b;
+    accent-color: #ffd84d;
   }
 }
 
 .actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: 10px;
 }
 
 .act {
   border: 0;
   background: transparent;
   color: #eee;
-  font-size: 12px;
+  font-size: 11px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+
+  &:first-child {
+    justify-self: center;
+    margin-right: 12px;
+  }
+
+  &:last-child {
+    justify-self: center;
+    margin-left: 12px;
+  }
 
   &.on {
-    color: #f2c14b;
+    color: #ffd84d;
   }
 }
 
 .act-ico {
-  width: 22px;
-  height: 22px;
-  border: 1px solid currentColor;
-  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
-.sheet-mask {
+.mode {
+  display: flex;
+  padding: 3px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 15px;
+  background: transparent;
+  color: #ddd;
+  font-size: 12px;
+  font-weight: 600;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &.on {
+    background: #ffd84d;
+    color: #1a1a1f;
+  }
+}
+
+.drawer-mask {
   position: absolute;
   inset: 0;
   z-index: 20;
   background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: flex-end;
 }
 
-.sheet {
-  width: 100%;
-  max-height: 70%;
-  overflow: auto;
-  background: #2a2130;
-  border-radius: 14px 14px 0 0;
-  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(82%, 320px);
+  background: #fff;
+  color: #1a1a1f;
+  display: flex;
+  flex-direction: column;
+  animation: slide-in 0.22s ease;
 }
 
-.sheet-head {
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.drawer-head {
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 12px 0 14px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1ecee;
 
-  button {
-    border: 0;
-    background: transparent;
-    color: #bbb;
+  strong {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
   }
 }
 
-.sheet-item {
+.sort-btn {
+  width: 36px;
+  height: 32px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  font-size: 12px;
+  font-weight: 700;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.drawer-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawer-item {
   width: 100%;
-  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 64px;
+  padding: 0 12px;
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: transparent;
-  color: #eee;
+  border-bottom: 1px solid #f4f0f2;
+  background: #fff;
   text-align: left;
+}
 
-  &.current {
-    color: #f2c14b;
-  }
+.thumb {
+  width: 40px;
+  height: 52px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f1ecee;
+  flex-shrink: 0;
 
-  &.lock {
-    color: #777;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.go {
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 13px;
+  border: 1px solid #e07a2f;
+  color: #e07a2f;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+.drawer-item.current .name {
+  color: #e07a2f;
+}
+
+.drawer-item.lock .name {
+  color: #bbb;
+}
+
+.go.last {
+  background: #fff1e4;
 }
 </style>
