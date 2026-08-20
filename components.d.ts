@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AdSwipe: typeof import('./src/components/AdSwipe.vue')['default']
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
     CoverMosaic: typeof import('./src/components/CoverMosaic.vue')['default']
     HlsPlayer: typeof import('./src/components/HlsPlayer.vue')['default']
@@ -16,5 +17,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SectionPanel: typeof import('./src/components/SectionPanel.vue')['default']
+    VanSwipe: typeof import('vant/es')['Swipe']
+    VanSwipeItem: typeof import('vant/es')['SwipeItem']
   }
 }
