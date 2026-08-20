@@ -46,7 +46,8 @@ defineEmits<{
 
 .media-grid {
   display: grid;
-  gap: 12px 8px;
+  gap: 11px;
+  padding-bottom: 12px;
 
   &.cols-2 {
     grid-template-columns: repeat(2, 1fr);
@@ -95,10 +96,10 @@ defineEmits<{
 }
 
 .card-title {
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 7px;
+  font-size: 12.5px;
   color: $ink;
-  font-weight: 600;
+  font-weight: 550;
 }
 
 @include media-tones;
@@ -109,9 +110,10 @@ defineEmits<{
   left: 6px;
   z-index: 2;
   color: #fff;
-  font-size: 10px;
-  border-radius: 6px;
-  padding: 1px 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  border-radius: 5px;
+  padding: 2px 7px;
   background: $primary-color;
   border: 0;
 
@@ -171,14 +173,14 @@ defineEmits<{
 }
 
 .foot-badge {
-  margin-top: 4px;
-  display: inline-block;
+  margin-top: 3px;
+  display: block;
   max-width: 100%;
-  font-size: 10px;
+  font-size: 10.5px;
   line-height: 1.4;
-  padding: 2px 6px;
-  border-radius: 8px;
-  background: $background-surface2;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
   color: $text-color-secondary;
 }
 

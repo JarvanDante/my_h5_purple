@@ -48,7 +48,7 @@ const rail = ref<HTMLElement>()
 const index = ref(0)
 const animating = ref(true)
 const cardWidth = ref(0)
-const gap = 8
+const gap = 9
 const visible = 3.35
 const paused = ref(false)
 let timer = 0
@@ -138,7 +138,7 @@ watch(
 
 .ad-track {
   display: flex;
-  gap: 8px;
+  gap: 9px;
   will-change: transform;
 
   &.moving {
@@ -148,7 +148,7 @@ watch(
 
 .ad-card {
   flex: 0 0 auto;
-  width: calc((100cqi - 16px) / 3.35);
+  width: calc((100cqi - 18px) / 3.35);
   padding: 0;
   border: 0;
   background: transparent;
