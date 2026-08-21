@@ -20,12 +20,10 @@
       </div>
     </header>
 
-    <section v-if="ads.length" class="ad-strip">
-      <article v-for="ad in ads" :key="ad.id" class="ad-card" @click="openVideo(ad.id)">
-        <div class="ad-cover" :class="`tone-${ad.tone}`">
-          <EncryptedImage v-if="ad.cover" :src="ad.cover" alt="" />
-        </div>
-        <p class="ad-title ellipsis">{{ ad.title }}</p>
+    <section class="ad-strip">
+      <article v-for="n in 4" :key="n" class="ad-card">
+        <div class="ad-cover" />
+        <p class="ad-title">广告位</p>
         <span class="ad-tag">广告</span>
       </article>
     </section>
@@ -64,16 +62,13 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PostCard from '@/components/PostCard.vue'
-import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
 import { fetchPostList, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
-import { fetchVideoList } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
-import { videoPath } from '@/utils/idcrypt'
-import { getToken, mediaUrl, toastError } from '@/utils/request'
+import { getToken, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
 
@@ -84,7 +79,6 @@ const slide = useTabSlide(tabs, '推荐')
 const tab = computed(() => slide.current.value)
 const name = computed(() => slide.name.value)
 const list = ref<PostItem[]>([])
-const ads = ref<{ id: string; title: string; cover?: string; tone: number }[]>([])
 const followed = ref(new Set<number>())
 const liked = ref(new Set<number>())
 const myId = computed(() => userStore.user?.id || 0)
@@ -97,7 +91,6 @@ const hint = computed(() => {
 const select = (item: string) => slide.select(item)
 const go = (path: string) => router.push(path)
 const goPost = (id: number) => router.push(`/planet/${id}`)
-const openVideo = (id: string) => router.push(videoPath(id))
 
 const topicsOf = (post: PostItem) => {
   if (post.topics?.length) return post.topics
@@ -186,22 +179,11 @@ watch(tab, load)
 onMounted(() => {
   load()
   loadFollows()
-  fetchVideoList(1, 4, '', 1)
-    .then((data) => {
-      ads.value = (data.list || []).slice(0, 4).map((v) => ({
-        id: String(v.id),
-        title: v.title,
-        cover: mediaUrl(v.cover_url),
-        tone: v.id % 6,
-      }))
-    })
-    .catch(() => undefined)
 })
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
 
 .planet-page {
   background: #f3f3f3;
@@ -306,21 +288,14 @@ onMounted(() => {
   width: 92px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
-  overflow: hidden;
-
-  :deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  background: #f0f0f0;
 }
 
 .ad-title {
   margin-top: 6px;
   font-size: 12px;
   font-weight: 700;
-  color: #222;
+  color: #c8c8c8;
 }
 
 .ad-tag {
@@ -374,6 +349,4 @@ onMounted(() => {
     right: calc(50% - #{$phone-max-width} / 2 + 16px);
   }
 }
-
-@include media-tones;
 </style>
