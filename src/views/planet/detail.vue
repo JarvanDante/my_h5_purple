@@ -9,6 +9,7 @@
       :liked="liked"
       :mine="post.user_id === myId"
       detail
+      @profile="goUser"
       @follow="onFollow"
       @like="onLike"
       @share="onShare"
@@ -31,7 +32,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
 import PostCard from '@/components/PostCard.vue'
@@ -42,6 +43,7 @@ import { useUserStore } from '@/stores/user'
 import { getToken, toastError } from '@/utils/request'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 const post = ref<PostItem | null>(null)
 const comments = ref<CommentItem[]>([])
@@ -50,6 +52,7 @@ const liked = ref(false)
 const draft = ref('')
 const busy = ref(false)
 const myId = computed(() => userStore.user?.id || 0)
+const goUser = (userId: number) => router.push(`/user/${userId}`)
 
 const load = async () => {
   const id = Number(route.params.id)

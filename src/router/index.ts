@@ -112,6 +112,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '选择帖子板块' },
   },
   {
+    path: '/user/:id',
+    name: 'UserHome',
+    component: () => import('@/views/user/home.vue'),
+    meta: { title: '用户主页' },
+  },
+  {
     path: '/planet/:id',
     name: 'PostDetail',
     component: () => import('@/views/planet/detail.vue'),

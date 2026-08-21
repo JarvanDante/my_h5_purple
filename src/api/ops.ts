@@ -133,8 +133,10 @@ export function addComment(contentId: number, content: string) {
   })
 }
 
-export function fetchPostList(sort = 'new', page = 1, size = 20) {
-  return request<{ list: PostItem[]; total: number }>(`/post/list?sort=${sort}&page=${page}&size=${size}`)
+export function fetchPostList(sort = 'new', page = 1, size = 20, userId?: number) {
+  const q = new URLSearchParams({ sort, page: String(page), size: String(size) })
+  if (userId) q.set('user_id', String(userId))
+  return request<{ list: PostItem[]; total: number }>(`/post/list?${q}`)
 }
 
 export function fetchPostDetail(id: number) {

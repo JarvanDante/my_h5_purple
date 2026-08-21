@@ -83,6 +83,13 @@ export type PublicUser = {
   id: number
   nickname: string
   img: string
+  fans?: number
+  follow?: number
+  signature?: string
+}
+
+export function fetchUserHome(id: number) {
+  return request<{ user: PublicUser; is_followed: boolean }>(`/user/home/${id}`)
 }
 
 export function toggleFollow(homeId: number) {

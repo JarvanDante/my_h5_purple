@@ -44,6 +44,7 @@
             :liked="liked.has(post.id)"
             :mine="post.user_id === myId"
             @open="goPost"
+            @profile="goUser"
             @follow="onFollow"
             @like="onLike"
             @comment="goPost"
@@ -91,6 +92,7 @@ const hint = computed(() => {
 const select = (item: string) => slide.select(item)
 const go = (path: string) => router.push(path)
 const goPost = (id: number) => router.push(`/planet/${id}`)
+const goUser = (userId: number) => router.push(`/user/${userId}`)
 
 const topicsOf = (post: PostItem) => {
   if (post.topics?.length) return post.topics

@@ -1,11 +1,11 @@
 <template>
-  <article class="post-card" :class="{ detail }" @click="onOpen">
-    <div class="user-row">
-      <div class="avatar" :class="`tone-${post.user_id % 6}`">
+  <article class="post-card" :class="{ detail, compact: hideUser }">
+    <div v-if="!hideUser" class="user-row">
+      <div class="avatar" :class="`tone-${post.user_id % 6}`" @click.stop="onProfile">
         <EncryptedImage v-if="avatarSrc" :src="avatarSrc" alt="" />
         <span v-else>{{ name.slice(0, 1) }}</span>
       </div>
-      <div class="user-meta">
+      <div class="user-meta" @click.stop="onProfile">
         <strong>{{ name }}</strong>
         <span>发布时间 {{ formatTime(post.created_at) }}</span>
       </div>
@@ -20,13 +20,14 @@
       </button>
     </div>
 
-    <div class="body">
+    <div class="body" @click="onBody">
       <p class="text">
         <span v-if="essence" class="flag essence">精华</span>
         <span v-if="top" class="flag top"><LineIcon name="pin" />置顶</span>
         <span v-if="post.title" class="title">{{ post.title }}</span>
         <span v-if="post.content" class="body-text">{{ post.title && !detail ? ' ' : '' }}{{ post.content }}</span>
       </p>
+      <p v-if="hideUser" class="posted">发布时间 {{ formatTime(post.created_at) }}</p>
 
       <div v-if="detail && (pics.length || videoSrc)" class="gallery">
         <button
@@ -58,7 +59,7 @@
           :key="`${slot.type}-${i}`"
           class="cell"
           :class="slot.type"
-          @click.stop="onMediaClick(slot)"
+          @click.stop="onMediaClick"
         >
           <EncryptedImage v-if="slot.type === 'image'" :src="slot.src" alt="" />
           <template v-else>
@@ -108,12 +109,14 @@ const props = withDefaults(
     liked?: boolean
     mine?: boolean
     detail?: boolean
+    hideUser?: boolean
   }>(),
-  { topics: () => [], essence: false, top: false, followed: false, liked: false, mine: false, detail: false },
+  { topics: () => [], essence: false, top: false, followed: false, liked: false, mine: false, detail: false, hideUser: false },
 )
 
 const emit = defineEmits<{
   open: [id: number]
+  profile: [userId: number]
   follow: [userId: number]
   like: [id: number]
   comment: [id: number]
@@ -151,11 +154,15 @@ const formatTime = (raw: string) => {
 const videoEl = ref<HTMLVideoElement | null>(null)
 const videoPlaying = ref(false)
 
-const onOpen = () => {
+const onProfile = () => {
+  emit('profile', props.post.user_id)
+}
+
+const onBody = () => {
   if (!props.detail) emit('open', props.post.id)
 }
 
-const onMediaClick = (slot: MediaSlot) => {
+const onMediaClick = () => {
   if (!props.detail) emit('open', props.post.id)
 }
 
@@ -188,6 +195,11 @@ const playVideo = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.avatar,
+.user-meta {
+  cursor: pointer;
 }
 
 .avatar {
@@ -271,6 +283,12 @@ const playVideo = () => {
 
 .title {
   font-weight: 700;
+}
+
+.posted {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9a9a9a;
 }
 
 .flag {
