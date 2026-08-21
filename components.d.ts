@@ -16,6 +16,7 @@ declare module 'vue' {
     LineIcon: typeof import('./src/components/LineIcon.vue')['default']
     MediaGrid: typeof import('./src/components/MediaGrid.vue')['default']
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']
+    PostCard: typeof import('./src/components/PostCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SectionPanel: typeof import('./src/components/SectionPanel.vue')['default']

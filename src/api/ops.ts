@@ -98,6 +98,8 @@ export function drawLottery(lotteryType = 1, payType = 1) {
 export type PostItem = {
   id: number
   user_id: number
+  nickname?: string
+  img?: string
   title: string
   content: string
   pics: string[]
@@ -105,6 +107,28 @@ export type PostItem = {
   comment_count: number
   view_count?: number
   created_at: string
+}
+
+export type CommentItem = {
+  id: number
+  user_id: number
+  content: string
+  like_count: number
+  created_at: string
+}
+
+export function fetchComments(contentId: number, page = 1, size = 20) {
+  return request<{ list: CommentItem[]; total: number }>('/comment/list', {
+    method: 'POST',
+    body: JSON.stringify({ media_type: 2, content_id: contentId, page, size }),
+  })
+}
+
+export function addComment(contentId: number, content: string) {
+  return request<{ id: number }>('/comment/add', {
+    method: 'POST',
+    body: JSON.stringify({ media_type: 2, content_id: contentId, content }),
+  })
 }
 
 export function fetchPostList(sort = 'new', page = 1, size = 20) {

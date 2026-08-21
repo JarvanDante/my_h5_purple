@@ -1,7 +1,10 @@
 import { request } from '@/utils/request'
 
+export const MEDIA_VIDEO = 1
+export const MEDIA_POST = 2
 export const MEDIA_COMICS = 3
 export const COLLECT_FAV = 1
+export const COLLECT_LIKE = 2
 
 export function operateCollect(id: number, mediaType: number, flag: boolean, type = COLLECT_FAV) {
   return request<Record<string, never>>('/collect/operate', {

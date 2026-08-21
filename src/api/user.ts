@@ -78,3 +78,20 @@ export function mockPayRecharge(orderNo: string) {
     body: JSON.stringify({ order_no: orderNo }),
   })
 }
+
+export type PublicUser = {
+  id: number
+  nickname: string
+  img: string
+}
+
+export function toggleFollow(homeId: number) {
+  return request<{ followed: boolean }>('/user/follow', {
+    method: 'POST',
+    body: JSON.stringify({ home_id: homeId }),
+  })
+}
+
+export function fetchFollows(page = 1, size = 50) {
+  return request<{ list: PublicUser[]; total: number }>(`/user/follows?page=${page}&size=${size}`)
+}
