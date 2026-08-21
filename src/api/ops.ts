@@ -127,7 +127,7 @@ export function fetchComments(contentId: number, page = 1, size = 20) {
 }
 
 export function addComment(contentId: number, content: string) {
-  return request<{ id: number }>('/comment/add', {
+  return request<{ id: number; status: number }>('/comment/add', {
     method: 'POST',
     body: JSON.stringify({ media_type: 2, content_id: contentId, content }),
   })

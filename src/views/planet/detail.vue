@@ -121,8 +121,13 @@ const submitComment = async () => {
   busy.value = true
   try {
     await userStore.ensureLogin()
-    await addComment(post.value.id, text)
+    const res = await addComment(post.value.id, text)
     draft.value = ''
+    if (res.status === 0) {
+      showToast('已提交，审核通过后显示')
+      return
+    }
+    showToast('评论成功')
     post.value.comment_count += 1
     const c = await fetchComments(post.value.id, 1, 30)
     comments.value = c.list || []
