@@ -28,12 +28,16 @@
         <span v-if="post.content">{{ post.title ? ' ' : '' }}{{ post.content }}</span>
       </p>
 
-      <div v-if="pics.length" class="pics" :class="`n-${Math.min(pics.length, 3)}`">
-        <EncryptedImage v-for="(pic, i) in pics.slice(0, 3)" :key="i" :src="pic" alt="" />
+      <div v-if="pics.length || videoSrc" class="pics" :class="`n-${Math.min(pics.length + (videoSrc ? 1 : 0), 3)}`">
+        <EncryptedImage v-for="(pic, i) in pics.slice(0, videoSrc ? 2 : 3)" :key="i" :src="pic" alt="" />
+        <div v-if="videoSrc" class="vid" @click.stop>
+          <video :src="videoSrc" :controls="detail" :poster="pics[0]" playsinline />
+          <span v-if="!detail" class="play">▶</span>
+        </div>
       </div>
 
-      <div v-if="topics.length" class="topics">
-        <span v-for="item in topics" :key="item">{{ item }}</span>
+      <div v-if="displayTopics.length" class="topics">
+        <span v-for="item in displayTopics" :key="item">{{ item }}</span>
       </div>
     </div>
 
@@ -84,6 +88,8 @@ const emit = defineEmits<{
 const name = computed(() => props.post.nickname?.trim() || `用户${props.post.user_id}`)
 const avatarSrc = computed(() => mediaUrl(props.post.img))
 const pics = computed(() => (props.post.pics || []).map((p) => mediaUrl(p)).filter(Boolean))
+const videoSrc = computed(() => mediaUrl(props.post.video_url))
+const displayTopics = computed(() => (props.post.topics?.length ? props.post.topics : props.topics))
 
 const formatTime = (raw: string) => {
   if (!raw) return ''
@@ -223,11 +229,12 @@ const onOpen = () => {
   &.n-1 {
     grid-template-columns: 1fr;
 
-    :deep(img) {
+    :deep(img),
+    video {
       width: 100%;
       max-height: 280px;
       object-fit: contain;
-      background: #f7f7f7;
+      background: #111;
       border-radius: 4px;
     }
   }
@@ -236,12 +243,29 @@ const onOpen = () => {
   &.n-3 {
     grid-template-columns: repeat(3, 1fr);
 
-    :deep(img) {
+    :deep(img),
+    video {
       width: 100%;
       aspect-ratio: 1;
       object-fit: cover;
       border-radius: 4px;
     }
+  }
+}
+
+.vid {
+  position: relative;
+
+  .play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
   }
 }
 

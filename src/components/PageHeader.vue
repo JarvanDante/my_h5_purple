@@ -15,7 +15,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 
-defineProps<{ title: string }>()
+const props = withDefaults(defineProps<{ title: string; fallback?: string }>(), { fallback: '/comic' })
 const router = useRouter()
 
 const back = () => {
@@ -23,7 +23,7 @@ const back = () => {
     router.back()
     return
   }
-  router.replace('/comic')
+  router.replace(props.fallback)
 }
 </script>
 

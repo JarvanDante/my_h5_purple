@@ -100,6 +100,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '站内消息' },
   },
   {
+    path: '/planet/compose',
+    name: 'PlanetCompose',
+    component: () => import('@/views/planet/compose.vue'),
+    meta: { title: '发布帖子' },
+  },
+  {
+    path: '/planet/topics',
+    name: 'PlanetTopics',
+    component: () => import('@/views/planet/topics.vue'),
+    meta: { title: '选择帖子板块' },
+  },
+  {
     path: '/planet/:id',
     name: 'PostDetail',
     component: () => import('@/views/planet/detail.vue'),

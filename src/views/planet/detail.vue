@@ -4,7 +4,7 @@
     <PostCard
       v-if="post"
       :post="post"
-      :topics="['广场']"
+      :topics="post.topics || []"
       :followed="followed"
       :liked="liked"
       :mine="post.user_id === myId"

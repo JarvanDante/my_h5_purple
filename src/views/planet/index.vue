@@ -56,25 +56,6 @@
     </div>
 
     <button type="button" class="fab" aria-label="发帖" @click="openCompose">+</button>
-
-    <div v-if="showCompose" class="compose-mask" @click.self="showCompose = false">
-      <div class="compose">
-        <h3>发帖</h3>
-        <input v-model="draftTitle" type="text" maxlength="64" placeholder="标题" />
-        <textarea v-model="draftContent" rows="5" maxlength="1000" placeholder="说点什么…" />
-        <div class="draft-pics">
-          <EncryptedImage v-for="(pic, i) in draftPics" :key="i" :src="pic" alt="" />
-          <label v-if="draftPics.length < 3" class="add-pic">
-            +
-            <input type="file" accept="image/*" hidden @change="onPickPic" />
-          </label>
-        </div>
-        <div class="compose-actions">
-          <button type="button" @click="showCompose = false">取消</button>
-          <button type="button" class="ok" :disabled="composeBusy" @click="submitPost">发布</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -86,13 +67,13 @@ import PostCard from '@/components/PostCard.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
-import { createPost, fetchPostList, type PostItem } from '@/api/ops'
+import { fetchPostList, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
 import { fetchVideoList } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
 import { videoPath } from '@/utils/idcrypt'
-import { getToken, mediaUrl, toastError, uploadMedia } from '@/utils/request'
+import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
 
@@ -106,11 +87,6 @@ const list = ref<PostItem[]>([])
 const ads = ref<{ id: string; title: string; cover?: string; tone: number }[]>([])
 const followed = ref(new Set<number>())
 const liked = ref(new Set<number>())
-const showCompose = ref(false)
-const composeBusy = ref(false)
-const draftTitle = ref('')
-const draftContent = ref('')
-const draftPics = ref<string[]>([])
 const myId = computed(() => userStore.user?.id || 0)
 
 const hint = computed(() => {
@@ -124,10 +100,10 @@ const goPost = (id: number) => router.push(`/planet/${id}`)
 const openVideo = (id: string) => router.push(videoPath(id))
 
 const topicsOf = (post: PostItem) => {
-  if (tab.value === '活动专区') return ['活动公告', '最新公告']
-  if (tab.value === '日常专区') return ['日常']
-  if (post.title.includes('活动') || post.content.includes('活动')) return ['活动公告']
-  return ['广场', tab.value]
+  if (post.topics?.length) return post.topics
+  if (tab.value === '活动专区') return ['活动公告']
+  if (tab.value === '日常专区') return ['日常分享']
+  return ['广场']
 }
 
 const load = () => {
@@ -200,42 +176,9 @@ const onShare = async (id: number) => {
 const openCompose = async () => {
   try {
     await userStore.ensureLogin()
-    draftTitle.value = ''
-    draftContent.value = ''
-    draftPics.value = []
-    showCompose.value = true
+    router.push('/planet/compose')
   } catch (err) {
     toastError(err)
-  }
-}
-
-const onPickPic = async (e: Event) => {
-  const file = (e.target as HTMLInputElement).files?.[0]
-  ;(e.target as HTMLInputElement).value = ''
-  if (!file) return
-  try {
-    const data = await uploadMedia(file, 'image')
-    draftPics.value = [...draftPics.value, mediaUrl(data.url)]
-  } catch (err) {
-    toastError(err)
-  }
-}
-
-const submitPost = async () => {
-  const title = draftTitle.value.trim()
-  if (!title) {
-    showToast('请填写标题')
-    return
-  }
-  composeBusy.value = true
-  try {
-    await createPost(title, draftContent.value.trim(), draftPics.value)
-    showCompose.value = false
-    showToast('已提交，审核通过后显示')
-  } catch (err) {
-    toastError(err)
-  } finally {
-    composeBusy.value = false
   }
 }
 
@@ -424,90 +367,6 @@ onMounted(() => {
   font-weight: 400;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
   z-index: 20;
-}
-
-.compose-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.compose {
-  width: 100%;
-  max-width: $phone-max-width;
-  background: #fff;
-  border-radius: 16px 16px 0 0;
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-
-  h3 {
-    text-align: center;
-    margin: 0 0 12px;
-    color: #222;
-  }
-
-  input,
-  textarea {
-    width: 100%;
-    border: 1px solid #eee;
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 14px;
-    margin-bottom: 8px;
-    outline: none;
-    resize: none;
-    color: #222;
-  }
-}
-
-.draft-pics {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-
-  :deep(img) {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: 8px;
-  }
-}
-
-.add-pic {
-  width: 64px;
-  height: 64px;
-  border: 1px dashed #ddd;
-  border-radius: 8px;
-  color: #bbb;
-  font-size: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.compose-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-
-  button {
-    flex: 1;
-    height: 40px;
-    border: 0;
-    border-radius: $radius-pill;
-    background: #f3f3f3;
-    color: #666;
-    font-size: 14px;
-  }
-
-  .ok {
-    background: #ffd400;
-    color: #222;
-    font-weight: 700;
-  }
 }
 
 @media (min-width: $desktop-preview-min) {

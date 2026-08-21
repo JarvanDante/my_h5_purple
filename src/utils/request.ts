@@ -63,7 +63,7 @@ export function mediaUrl(path?: string) {
 }
 
 /** H5 用户上传明文图, 服务端加密为 .bnc。 */
-export async function uploadMedia(file: File, purpose: 'image' | 'avatar' = 'image') {
+export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'video' = 'image') {
   const headers = new Headers()
   const token = getToken()
   if (token) headers.set('Authorization', token)
