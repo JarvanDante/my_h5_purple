@@ -1,7 +1,9 @@
 <template>
   <div class="page-shell topics-page">
-    <PageHeader title="选择帖子板块" fallback="/planet/compose" />
-    <p v-if="!list.length" class="empty">暂无话题</p>
+    <PageHeader title="选择帖子板块" fallback="/planet/compose">
+      <button type="button" class="done" @click="confirm">完成</button>
+    </PageHeader>
+    <p v-if="!list.length" class="empty">暂无板块</p>
     <div v-else class="pills">
       <button
         v-for="item in list"
@@ -20,6 +22,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
 import { fetchPostTopics, type RepoTag } from '@/api/ops'
 import { usePostDraftStore } from '@/stores/postDraft'
@@ -31,8 +34,25 @@ const list = ref<RepoTag[]>([])
 const picked = ref(new Set(draft.topics))
 
 const toggle = (name: string) => {
-  draft.topics = [name]
-  picked.value = new Set([name])
+  const next = new Set(picked.value)
+  if (next.has(name)) {
+    next.delete(name)
+  } else {
+    if (next.size >= 10) {
+      showToast('最多选 10 个板块')
+      return
+    }
+    next.add(name)
+  }
+  picked.value = next
+}
+
+const confirm = () => {
+  if (!picked.value.size) {
+    showToast('请至少选择一个板块')
+    return
+  }
+  draft.topics = [...picked.value]
   router.back()
 }
 
@@ -51,6 +71,15 @@ onMounted(() => {
 .topics-page {
   background: #fff;
   min-height: 100%;
+}
+
+.done {
+  border: 0;
+  background: transparent;
+  color: $primary-color;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 4px;
 }
 
 .empty {

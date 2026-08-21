@@ -4,9 +4,9 @@
 
     <section class="form">
       <button type="button" class="row" @click="goTopics">
-        <span class="label">选择话题</span>
+        <span class="label">选择板块</span>
         <span class="value" :class="{ ph: !draft.topics.length }">
-          {{ draft.topics.length ? draft.topics.join('、') : '请选择话题' }}
+          {{ draft.topics.length ? draft.topics.join('、') : '请选择板块' }}
         </span>
         <span class="pick">选择 ›</span>
       </button>
@@ -112,7 +112,7 @@ const submit = async () => {
   const title = draft.title.trim()
   const content = draft.content.trim()
   if (!draft.topics.length) {
-    showToast('请选择话题')
+    showToast('请选择板块')
     return
   }
   if (!title) {
