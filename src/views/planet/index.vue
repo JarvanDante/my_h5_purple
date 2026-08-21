@@ -268,7 +268,7 @@ onMounted(() => {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #6b1c2e;
+  background: $background-topbar;
   padding: env(safe-area-inset-top, 0px) 8px 0 12px;
 }
 
@@ -297,7 +297,7 @@ onMounted(() => {
 .channel-item {
   border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.72);
+  color: $text-color-secondary;
   font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
@@ -305,7 +305,7 @@ onMounted(() => {
   position: relative;
 
   &.active {
-    color: #fff;
+    color: $primary-color;
     font-size: 17px;
     font-weight: 800;
 
@@ -317,7 +317,7 @@ onMounted(() => {
       width: 18px;
       height: 3px;
       border-radius: 2px;
-      background: #fff;
+      background: $primary-color;
       transform: translateX(-50%);
     }
   }
@@ -328,7 +328,7 @@ onMounted(() => {
   height: 40px;
   border: 0;
   background: transparent;
-  color: #fff;
+  color: $primary-color;
   flex-shrink: 0;
   display: flex;
   align-items: center;
