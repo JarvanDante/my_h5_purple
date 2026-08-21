@@ -22,7 +22,7 @@
         <span>{{ item.created_at }}</span>
       </article>
       <div class="reply">
-        <input v-model="draft" type="text" maxlength="200" placeholder="写评论…" @keyup.enter="submitComment" />
+        <input v-model="draft" type="text" maxlength="200" placeholder="请输入评论" @keyup.enter="submitComment" />
         <button type="button" :disabled="busy" @click="submitComment">发送</button>
       </div>
     </section>

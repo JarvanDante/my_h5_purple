@@ -25,10 +25,34 @@
         <span v-if="essence" class="flag essence">精华</span>
         <span v-if="top" class="flag top"><LineIcon name="pin" />置顶</span>
         <span v-if="post.title" class="title">{{ post.title }}</span>
-        <span v-if="post.content">{{ post.title ? ' ' : '' }}{{ post.content }}</span>
+        <span v-if="post.content" class="body-text">{{ post.title && !detail ? ' ' : '' }}{{ post.content }}</span>
       </p>
 
-      <div v-if="mediaSlots.length" class="media" :class="`n-${mediaSlots.length}`">
+      <div v-if="detail && (pics.length || videoSrc)" class="gallery">
+        <button
+          v-for="(pic, i) in pics"
+          :key="pic"
+          type="button"
+          class="shot"
+          @click.stop="previewPics(i)"
+        >
+          <EncryptedImage :src="pic" alt="" />
+          <span class="zoom"><LineIcon name="search" /></span>
+        </button>
+        <div v-if="videoSrc" class="shot video" @click.stop="playVideo">
+          <video
+            ref="videoEl"
+            :src="videoSrc"
+            playsinline
+            preload="metadata"
+            :controls="videoPlaying"
+            @ended="videoPlaying = false"
+          />
+          <span v-if="!videoPlaying" class="play" />
+        </div>
+      </div>
+
+      <div v-else-if="mediaSlots.length" class="media" :class="`n-${mediaSlots.length}`">
         <div
           v-for="(slot, i) in mediaSlots"
           :key="`${slot.type}-${i}`"
@@ -38,8 +62,8 @@
         >
           <EncryptedImage v-if="slot.type === 'image'" :src="slot.src" alt="" />
           <template v-else>
-            <video :src="slot.src" :controls="detail" playsinline preload="metadata" />
-            <span v-if="!detail" class="play" />
+            <video :src="slot.src" playsinline preload="metadata" />
+            <span class="play" />
           </template>
         </div>
       </div>
@@ -59,16 +83,19 @@
       </button>
       <button type="button" aria-label="分享" @click.stop="$emit('share', post.id)">
         <LineIcon name="share" />
+        <template v-if="detail">分享</template>
       </button>
     </div>
   </article>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { showImagePreview } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import type { PostItem } from '@/api/ops'
+import { resolveMediaSrc } from '@/utils/aesbnc'
 import { mediaUrl } from '@/utils/request'
 
 const props = withDefaults(
@@ -121,13 +148,29 @@ const formatTime = (raw: string) => {
   return raw.replace(/^\d{4}-/, '').slice(0, 11)
 }
 
+const videoEl = ref<HTMLVideoElement | null>(null)
+const videoPlaying = ref(false)
+
 const onOpen = () => {
   if (!props.detail) emit('open', props.post.id)
 }
 
 const onMediaClick = (slot: MediaSlot) => {
-  if (props.detail && slot.type === 'video') return
   if (!props.detail) emit('open', props.post.id)
+}
+
+const previewPics = async (index: number) => {
+  const urls = (await Promise.all(pics.value.map((p) => resolveMediaSrc(p)))).filter(Boolean)
+  if (!urls.length) return
+  showImagePreview({ images: urls, startPosition: index })
+}
+
+const playVideo = () => {
+  if (videoPlaying.value) return
+  videoPlaying.value = true
+  videoEl.value?.play().catch(() => {
+    videoPlaying.value = false
+  })
 }
 </script>
 
@@ -218,6 +261,12 @@ const onMediaClick = (slot: MediaSlot) => {
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  .post-card.detail & {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 
 .title {
@@ -298,6 +347,59 @@ const onMediaClick = (slot: MediaSlot) => {
   }
 }
 
+.gallery {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shot {
+  position: relative;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: #111;
+  border-radius: 6px;
+  overflow: hidden;
+  display: block;
+
+  :deep(img) {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    vertical-align: top;
+  }
+
+  video {
+    width: 100%;
+    max-height: 70vh;
+    display: block;
+    background: #000;
+  }
+}
+
+.zoom {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  :deep(.line-icon) {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .play {
   position: absolute;
   inset: 0;
@@ -311,10 +413,10 @@ const onMediaClick = (slot: MediaSlot) => {
     width: 0;
     height: 0;
     border-style: solid;
-    border-width: 8px 0 8px 14px;
+    border-width: 14px 0 14px 22px;
     border-color: transparent transparent transparent #fff;
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.45));
-    margin-left: 3px;
+    filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
+    margin-left: 4px;
   }
 }
 
