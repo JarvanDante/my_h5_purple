@@ -62,7 +62,15 @@ export function mediaUrl(path?: string) {
   return path.startsWith('/') ? path : `/${path}`
 }
 
-/** H5 用户上传明文图, 服务端加密为 .bnc。 */
+function uploadFailMessage(text: string, status: number) {
+  if (/ParseMul|request body too large|entity too large/i.test(text)) {
+    return '文件过大，请压缩后重试'
+  }
+  const trimmed = text.replace(/\s+/g, ' ').trim()
+  return trimmed.slice(0, 80) || `上传失败(${status})`
+}
+
+/** H5 用户上传明文图, 服务端加密为 .bnc。视频明文直传。 */
 export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'video' = 'image') {
   const headers = new Headers()
   const token = getToken()
@@ -71,7 +79,13 @@ export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'vid
   body.append('file', file)
   body.append('purpose', purpose)
   const res = await fetch(`${BASE}/media/upload`, { method: 'POST', headers, body })
-  const json = (await res.json()) as Envelope<{ url: string; object_key: string }>
+  const text = await res.text()
+  let json: Envelope<{ url: string; object_key: string }>
+  try {
+    json = JSON.parse(text) as Envelope<{ url: string; object_key: string }>
+  } catch {
+    throw new ApiError(-1, uploadFailMessage(text, res.status))
+  }
   if (json.code !== 0) {
     throw new ApiError(json.code, json.message || '上传失败')
   }

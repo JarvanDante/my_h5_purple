@@ -42,12 +42,12 @@
         </p>
         <div class="media-grid">
           <div v-if="draft.videoUrl" class="thumb video">
-            <video :src="draft.videoUrl" muted />
+            <video :src="mediaUrl(draft.videoUrl)" muted />
             <button type="button" class="del" @click="draft.videoUrl = ''">×</button>
           </div>
           <label v-else class="add">
             + 添加视频
-            <input type="file" accept="video/mp4,video/quicktime,video/webm" hidden @change="onPickVideo" />
+            <input type="file" accept="video/*" hidden @change="onPickVideo" />
           </label>
         </div>
       </div>
@@ -65,7 +65,7 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { createPost } from '@/api/ops'
 import { usePostDraftStore } from '@/stores/postDraft'
-import { toastError, uploadMedia } from '@/utils/request'
+import { mediaUrl, toastError, uploadMedia } from '@/utils/request'
 
 const router = useRouter()
 const draft = usePostDraftStore()

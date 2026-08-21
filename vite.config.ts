@@ -23,6 +23,8 @@ export default defineConfig({
       '/front': {
         target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
         changeOrigin: true,
+        timeout: 600_000,
+        proxyTimeout: 600_000,
       },
       '/static': {
         target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
