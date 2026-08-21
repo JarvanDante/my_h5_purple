@@ -45,6 +45,9 @@
             <video :src="mediaUrl(draft.videoUrl)" muted />
             <button type="button" class="del" @click="draft.videoUrl = ''">×</button>
           </div>
+          <div v-else-if="videoUploading" class="thumb video uploading">
+            <span>上传中 {{ videoPercent }}%</span>
+          </div>
           <label v-else class="add">
             + 添加视频
             <input type="file" accept="video/*" hidden @change="onPickVideo" />
@@ -53,33 +56,45 @@
       </div>
     </section>
 
-    <button type="button" class="submit" :disabled="busy" @click="submit">提交</button>
+    <button type="button" class="submit" :disabled="busy || videoUploading" @click="submit">提交</button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { showDialog, showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { createPost } from '@/api/ops'
 import { usePostDraftStore } from '@/stores/postDraft'
+import { formatFileSize, IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '@/utils/fileSize'
+import { uploadVideoResumable } from '@/utils/multipart-upload'
 import { mediaUrl, toastError, uploadMedia } from '@/utils/request'
 
 const router = useRouter()
 const draft = usePostDraftStore()
 const busy = ref(false)
+const videoUploading = ref(false)
+const videoPercent = ref(0)
 
 const goTopics = () => router.push('/planet/topics')
+
+function rejectOversize(kind: '图片' | '视频', bytes: number, limitLabel: string) {
+  return showDialog({
+    title: `${kind}过大`,
+    message: `当前文件 ${formatFileSize(bytes)}，超过 ${limitLabel} 上限，请压缩后再上传`,
+    confirmButtonText: '知道了',
+  }).then(() => false).catch(() => false)
+}
 
 const onPickImage = async (e: Event) => {
   const input = e.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
   if (!file) return
-  if (file.size > 1024 * 1024) {
-    showToast('单张图片不能超过 1M')
+  if (file.size > IMAGE_MAX_BYTES) {
+    await rejectOversize('图片', file.size, '1M')
     return
   }
   try {
@@ -95,16 +110,21 @@ const onPickVideo = async (e: Event) => {
   const file = input.files?.[0]
   input.value = ''
   if (!file) return
-  if (file.size > 600 * 1024 * 1024) {
-    showToast('视频不能超过 600M')
+  if (file.size > VIDEO_MAX_BYTES) {
+    await rejectOversize('视频', file.size, '600M')
     return
   }
+  videoUploading.value = true
+  videoPercent.value = 0
   try {
-    showToast('视频上传中…')
-    const data = await uploadMedia(file, 'video')
+    const data = await uploadVideoResumable(file, (percent) => {
+      videoPercent.value = percent
+    })
     draft.videoUrl = data.url
   } catch (err) {
     toastError(err)
+  } finally {
+    videoUploading.value = false
   }
 }
 
@@ -255,6 +275,17 @@ textarea {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.thumb.uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2b2b2b;
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+  padding: 8px;
 }
 
 .del {
