@@ -28,11 +28,19 @@
         <span v-if="post.content">{{ post.title ? ' ' : '' }}{{ post.content }}</span>
       </p>
 
-      <div v-if="pics.length || videoSrc" class="pics" :class="`n-${Math.min(pics.length + (videoSrc ? 1 : 0), 3)}`">
-        <EncryptedImage v-for="(pic, i) in pics.slice(0, videoSrc ? 2 : 3)" :key="i" :src="pic" alt="" />
-        <div v-if="videoSrc" class="vid" @click.stop>
-          <video :src="videoSrc" :controls="detail" :poster="pics[0]" playsinline />
-          <span v-if="!detail" class="play">▶</span>
+      <div v-if="mediaSlots.length" class="media" :class="`n-${mediaSlots.length}`">
+        <div
+          v-for="(slot, i) in mediaSlots"
+          :key="`${slot.type}-${i}`"
+          class="cell"
+          :class="slot.type"
+          @click.stop="onMediaClick(slot)"
+        >
+          <EncryptedImage v-if="slot.type === 'image'" :src="slot.src" alt="" />
+          <template v-else>
+            <video :src="slot.src" :controls="detail" playsinline preload="metadata" />
+            <span v-if="!detail" class="play" />
+          </template>
         </div>
       </div>
 
@@ -85,11 +93,28 @@ const emit = defineEmits<{
   share: [id: number]
 }>()
 
+type MediaSlot = { type: 'image' | 'video'; src: string }
+
 const name = computed(() => props.post.nickname?.trim() || `用户${props.post.user_id}`)
 const avatarSrc = computed(() => mediaUrl(props.post.img))
 const pics = computed(() => (props.post.pics || []).map((p) => mediaUrl(p)).filter(Boolean))
 const videoSrc = computed(() => mediaUrl(props.post.video_url))
 const displayTopics = computed(() => (props.post.topics?.length ? props.post.topics : props.topics))
+
+/** 左大图 + 右上第二张 + 右下视频(或除前两张外的最后一张)。 */
+const mediaSlots = computed<MediaSlot[]>(() => {
+  const images = pics.value
+  const video = videoSrc.value
+  const slots: MediaSlot[] = []
+  if (images[0]) slots.push({ type: 'image', src: images[0] })
+  if (images[1]) slots.push({ type: 'image', src: images[1] })
+  if (video) {
+    slots.push({ type: 'video', src: video })
+  } else if (images.length > 2) {
+    slots.push({ type: 'image', src: images[images.length - 1] })
+  }
+  return slots
+})
 
 const formatTime = (raw: string) => {
   if (!raw) return ''
@@ -97,6 +122,11 @@ const formatTime = (raw: string) => {
 }
 
 const onOpen = () => {
+  if (!props.detail) emit('open', props.post.id)
+}
+
+const onMediaClick = (slot: MediaSlot) => {
+  if (props.detail && slot.type === 'video') return
   if (!props.detail) emit('open', props.post.id)
 }
 </script>
@@ -221,51 +251,70 @@ const onOpen = () => {
   }
 }
 
-.pics {
+.media {
   margin-top: 10px;
   display: grid;
-  gap: 6px;
+  gap: 5px;
 
   &.n-1 {
     grid-template-columns: 1fr;
 
-    :deep(img),
-    video {
-      width: 100%;
+    .cell {
+      aspect-ratio: 16 / 10;
       max-height: 280px;
-      object-fit: contain;
-      background: #111;
-      border-radius: 4px;
     }
   }
 
-  &.n-2,
-  &.n-3 {
-    grid-template-columns: repeat(3, 1fr);
+  &.n-2 {
+    grid-template-columns: 2fr 1fr;
+    aspect-ratio: 2.05 / 1;
+  }
 
-    :deep(img),
-    video {
-      width: 100%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      border-radius: 4px;
+  &.n-3 {
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    aspect-ratio: 2.05 / 1;
+
+    .cell:first-child {
+      grid-row: 1 / span 2;
     }
   }
 }
 
-.vid {
+.cell {
   position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ececec;
 
-  .play {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 18px;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
-    pointer-events: none;
+  :deep(img),
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 0 8px 14px;
+    border-color: transparent transparent transparent #fff;
+    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.45));
+    margin-left: 3px;
   }
 }
 
