@@ -2,7 +2,7 @@
   <div class="page-shell sub-page comic-detail">
     <header class="hero">
       <div v-if="cover" class="hero-bg">
-        <EncryptedImage :src="cover" alt="" />
+        <EncryptedImage class="hero-bg-img" :src="cover" alt="" />
       </div>
       <div class="hero-mask" />
       <div class="hero-visual">
@@ -238,8 +238,7 @@ onMounted(() => {
 .hero {
   position: relative;
   flex-shrink: 0;
-  width: 375px;
-  max-width: 100%;
+  width: 100%;
   height: 198px;
   box-sizing: border-box;
   overflow: hidden;
@@ -261,9 +260,12 @@ onMounted(() => {
   overflow: hidden;
 
   :deep(img) {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    max-width: none;
     object-fit: cover;
     object-position: center 28%;
     transform: scale(1.06);
@@ -284,8 +286,7 @@ onMounted(() => {
 
 .hero-extra {
   flex-shrink: 0;
-  width: 375px;
-  max-width: 100%;
+  width: 100%;
   padding: 12px 16px 14px;
   background: #0d0d12;
 }
