@@ -219,10 +219,12 @@ watch(channel, loadFloors)
 
 .quick-strip {
   margin: 0 12px 14px;
-  padding: 14px 6px 12px;
+  height: 88px;
+  padding: 0 6px;
   background: #1c1c22;
   border-radius: 14px;
   display: flex;
+  align-items: center;
   justify-content: space-around;
 }
 
@@ -237,8 +239,8 @@ watch(channel, loadFloors)
 }
 
 .quick-icon {
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   background: transparent;
   border-radius: 0;
