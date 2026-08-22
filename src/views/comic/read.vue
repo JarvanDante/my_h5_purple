@@ -302,8 +302,8 @@ onBeforeUnmount(() => {
 
 .top {
   top: 0;
-  height: calc(46px + env(safe-area-inset-top, 0px));
-  padding: env(safe-area-inset-top, 0px) 6px 0;
+  height: calc(42px + var(--app-header-top));
+  padding: var(--app-header-top) 6px 0;
   display: flex;
   align-items: center;
 }

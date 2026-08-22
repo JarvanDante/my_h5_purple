@@ -225,7 +225,7 @@ onMounted(() => {
   top: 0;
   z-index: 50;
   background: #0b0b0d;
-  padding: calc(env(safe-area-inset-top, 0px) + 10px) 8px 0 12px;
+  padding: var(--app-header-top) 8px 0 12px;
   border-bottom: 1px solid rgba(255, 92, 147, 0.55);
 }
 
@@ -233,7 +233,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 4px;
-  height: 52px;
+  height: 44px;
 }
 
 .channel-tabs {

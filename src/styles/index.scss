@@ -2,6 +2,7 @@
 @use './theme.scss';
 
 :root {
+  --app-header-top: env(safe-area-inset-top, 0px);
   --van-primary-color: #{$primary-color};
   --van-danger-color: #{$danger-color};
   --color-primary: #{$primary-color};
@@ -57,7 +58,8 @@ html {
 }
 
 .page-nav {
-  height: 46px;
+  height: calc(42px + var(--app-header-top));
+  padding-top: var(--app-header-top);
   display: flex;
   align-items: center;
   justify-content: center;

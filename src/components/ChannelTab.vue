@@ -63,7 +63,7 @@ const uid = useId().replace(/\W/g, '')
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  padding: 8px 6px;
+  padding: 2px 6px 8px;
   white-space: nowrap;
 }
 

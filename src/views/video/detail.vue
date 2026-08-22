@@ -432,7 +432,7 @@ onBeforeUnmount(() => {
 
 .back-btn {
   position: absolute;
-  top: calc(8px + env(safe-area-inset-top, 0px));
+  top: var(--app-header-top);
   left: 8px;
   z-index: 4;
   width: 32px;

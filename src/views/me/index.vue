@@ -323,8 +323,8 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 46px;
-  padding-top: env(safe-area-inset-top, 0px);
+  height: 40px;
+  padding-top: var(--app-header-top);
 }
 
 .top-right {

@@ -97,7 +97,7 @@ defineEmits<{
   top: 0;
   z-index: 50;
   background: $background-topbar;
-  padding: env(safe-area-inset-top, 0px) 12px 12px;
+  padding: var(--app-header-top) 12px 12px;
 }
 
 .home-header--pack .channel-row {
@@ -321,11 +321,11 @@ defineEmits<{
 
 .home-header--dark {
   background: #0b0b0d;
-  padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 12px;
+  padding: var(--app-header-top) 12px 8px;
 
   .channel-row {
-    height: 58px;
-    min-height: 58px;
+    height: 46px;
+    min-height: 46px;
     overflow: visible;
 
     &::after {
@@ -350,7 +350,7 @@ defineEmits<{
 
   .search-row {
     margin-top: 0;
-    padding-top: 10px;
+    padding-top: 6px;
     border-top: 0;
   }
 

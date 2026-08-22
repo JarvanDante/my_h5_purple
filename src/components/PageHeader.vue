@@ -34,12 +34,12 @@ const back = () => {
   position: sticky;
   top: 0;
   z-index: 20;
-  height: 46px;
+  height: calc(42px + var(--app-header-top));
   background: #0b0b0d;
   color: #f2f2f5;
   display: flex;
   align-items: center;
-  padding: 0 8px;
+  padding: var(--app-header-top) 8px 0;
   box-shadow: 0 1px 0 rgba(255, 92, 147, 0.35);
 }
 
