@@ -187,17 +187,17 @@ onMounted(load)
 
 .follow {
   border: 0;
-  background: #ffd400;
-  color: #222;
+  background: #ff3d7f;
+  color: #1a0a12;
   font-size: 12px;
   font-weight: 700;
-  border-radius: 6px;
-  padding: 5px 10px;
+  border-radius: 14px;
+  padding: 5px 12px;
   flex-shrink: 0;
 
   &.on {
-    background: #f2f2f2;
-    color: #888;
+    background: #24242e;
+    color: #8c8c9c;
   }
 }
 
