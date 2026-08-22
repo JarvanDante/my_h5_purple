@@ -347,17 +347,16 @@ defineEmits<{
     background: transparent;
 
     &.active {
-      color: #fff;
-      font-size: 17px;
+      color: #ff5c93;
+      font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.06em;
       background: transparent;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+      text-shadow: 0 0 12px rgba(255, 92, 147, 0.55);
 
       .channel-text {
         position: relative;
         z-index: 1;
-        padding: 5px 14px;
       }
 
       &::before {
@@ -365,27 +364,11 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: calc(100% + 18px);
-        height: 28px;
-        transform: translate(-50%, -50%);
-        border-radius: 999px;
-        background: linear-gradient(180deg, rgba(255, 130, 170, 0.42) 0%, rgba(255, 92, 147, 0.22) 100%);
-        box-shadow:
-          0 0 16px rgba(255, 92, 147, 0.28),
-          inset 0 1px 0 rgba(255, 255, 255, 0.28);
-        pointer-events: none;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 120%;
+        width: 56px;
         height: 36px;
         transform: translate(-50%, -50%);
-        border-radius: 999px;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.55) 0%, rgba(255, 92, 147, 0.18) 42%, transparent 72%);
         pointer-events: none;
       }
     }
