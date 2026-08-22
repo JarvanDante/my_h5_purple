@@ -256,6 +256,7 @@ onMounted(() => {
 
 .home-header .site-name {
   font-size: 18px;
+  color: #f2f2f5;
 }
 
 .profile {
@@ -282,7 +283,7 @@ onMounted(() => {
   h1 {
     font-size: 18px;
     font-weight: 700;
-    color: $ink;
+    color: #f2f2f5;
   }
 }
 
@@ -330,8 +331,8 @@ onMounted(() => {
     height: 36px;
     border: 1.4px solid $line;
     border-radius: $radius-pill;
-    background: #fff;
-    color: $primary-color-deep;
+    background: #1c1c22;
+    color: #ff8ab3;
     font-size: 13px;
     font-weight: 700;
   }
@@ -396,7 +397,7 @@ onMounted(() => {
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: #333;
+    color: #d5d5dc;
   }
 }
 
@@ -404,7 +405,7 @@ onMounted(() => {
 .t-icon {
   width: 26px;
   height: 26px;
-  color: #333;
+  color: #d5d5dc;
   display: flex;
 
   :deep(svg) {
@@ -425,7 +426,7 @@ onMounted(() => {
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: #333;
+    color: #d5d5dc;
   }
 }
 
@@ -453,7 +454,7 @@ onMounted(() => {
     align-items: center;
     gap: 6px;
     font-size: 12px;
-    color: #333;
+    color: #d5d5dc;
   }
 }
 

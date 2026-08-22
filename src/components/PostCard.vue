@@ -186,9 +186,9 @@ const playVideo = () => {
 @use '@/styles/tones.scss' as *;
 
 .post-card {
-  background: #fff;
+  background: #1c1c22;
   padding: 14px 14px 10px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #2a2a32;
 }
 
 .user-row {
@@ -230,7 +230,7 @@ const playVideo = () => {
     display: block;
     font-size: 15px;
     font-weight: 700;
-    color: #222;
+    color: #f2f2f5;
     line-height: 1.25;
   }
 
@@ -264,7 +264,7 @@ const playVideo = () => {
 .text {
   font-size: 15px;
   line-height: 1.55;
-  color: #222;
+  color: #e8e8ee;
   word-break: break-word;
 
   .post-card:not(.detail) & {

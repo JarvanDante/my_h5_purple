@@ -35,12 +35,12 @@ const back = () => {
   top: 0;
   z-index: 20;
   height: 46px;
-  background: #fff;
-  color: $ink;
+  background: #0b0b0d;
+  color: #f2f2f5;
   display: flex;
   align-items: center;
   padding: 0 8px;
-  box-shadow: 0 1px 0 $line;
+  box-shadow: 0 1px 0 rgba(255, 92, 147, 0.35);
 }
 
 .back {
@@ -48,7 +48,7 @@ const back = () => {
   height: 36px;
   border: 0;
   background: transparent;
-  color: $ink;
+  color: #f2f2f5;
   display: flex;
   align-items: center;
   justify-content: center;

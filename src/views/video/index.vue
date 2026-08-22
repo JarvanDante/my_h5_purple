@@ -1,15 +1,14 @@
 <template>
   <div class="page-shell video-page">
     <HomeHeader
+      dark
       :channels="channels"
       :channel="channel"
-      :sub-tabs="[]"
-      sub-tab=""
+      search-text="输入你想搜索的关键字"
       @select-channel="selectChannel"
       @checkin="go('/checkin')"
       @search="go('/search')"
       @vip="go('/vip')"
-      @favorite="go('/favorite')"
     />
 
     <section class="ad-rail-wrap">
@@ -267,7 +266,7 @@ watch(channel, loadList)
 .title {
   margin-top: 6px;
   font-size: 13px;
-  color: $ink;
+  color: #f2f2f5;
   font-weight: 600;
   line-height: 1.35;
   overflow: hidden;

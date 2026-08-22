@@ -3,16 +3,13 @@
     <header class="planet-header">
       <div class="channel-row">
         <div class="channel-tabs">
-          <button
+          <ChannelTab
             v-for="item in tabs"
             :key="item"
-            type="button"
-            class="channel-item"
-            :class="{ active: tab === item }"
-            @click="select(item)"
-          >
-            {{ item }}
-          </button>
+            :label="item"
+            :active="tab === item"
+            @select="select(item)"
+          />
         </div>
         <button type="button" class="search-btn" aria-label="搜索" @click="go('/search')">
           <LineIcon name="search" />
@@ -62,6 +59,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import ChannelTab from '@/components/ChannelTab.vue'
 import PostCard from '@/components/PostCard.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
@@ -219,31 +217,34 @@ onMounted(() => {
 @use '@/styles/variables.scss' as *;
 
 .planet-page {
-  background: #f3f3f3;
+  background: #0b0b0d;
 }
 
 .planet-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: $background-topbar;
-  padding: env(safe-area-inset-top, 0px) 8px 0 12px;
+  background: #0b0b0d;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 8px 0 12px;
+  border-bottom: 1px solid rgba(255, 92, 147, 0.55);
 }
 
 .channel-row {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 4px;
-  height: 46px;
+  height: 52px;
 }
 
 .channel-tabs {
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: flex-end;
-  gap: 18px;
+  align-items: center;
+  gap: 22px;
+  padding-left: 10px;
   overflow-x: auto;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 
@@ -252,41 +253,12 @@ onMounted(() => {
   }
 }
 
-.channel-item {
-  border: 0;
-  background: transparent;
-  color: $text-color-secondary;
-  font-size: 15px;
-  font-weight: 500;
-  white-space: nowrap;
-  padding: 0 0 10px;
-  position: relative;
-
-  &.active {
-    color: $primary-color;
-    font-size: 17px;
-    font-weight: 800;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      bottom: 4px;
-      width: 18px;
-      height: 3px;
-      border-radius: 2px;
-      background: $primary-color;
-      transform: translateX(-50%);
-    }
-  }
-}
-
 .search-btn {
   width: 40px;
   height: 40px;
   border: 0;
   background: transparent;
-  color: $primary-color;
+  color: #d5d5dc;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -303,7 +275,7 @@ onMounted(() => {
   gap: 10px;
   padding: 12px 12px 8px;
   overflow-x: auto;
-  background: #fff;
+  background: #0b0b0d;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 
@@ -321,7 +293,7 @@ onMounted(() => {
   width: 92px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
-  background: #f0f0f0;
+  background: #1c1c22;
 }
 
 .ad-title {
@@ -336,7 +308,7 @@ onMounted(() => {
   margin-top: 3px;
   font-size: 10px;
   color: #9a9a9a;
-  background: #f3f3f3;
+  background: #1c1c22;
   border-radius: 3px;
   padding: 1px 5px;
 }
@@ -349,15 +321,15 @@ onMounted(() => {
 
 .feed {
   padding: 8px 0 72px;
-  background: #f3f3f3;
+  background: #0b0b0d;
 }
 
 .empty {
   padding: 48px 16px;
-  color: #999;
+  color: #8d8d96;
   font-size: 13px;
   text-align: center;
-  background: #fff;
+  background: #1c1c22;
 }
 
 .fab {

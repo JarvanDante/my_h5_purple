@@ -64,7 +64,7 @@ const openItem = (item: CoverItem) => {
 
   h3 {
     font-size: 15px;
-    color: $ink;
+    color: #f2f2f5;
   }
 
   p {

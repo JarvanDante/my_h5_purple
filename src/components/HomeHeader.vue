@@ -5,7 +5,17 @@
   >
     <div class="channel-row">
       <div class="channel-tabs">
+        <template v-if="dark">
+          <ChannelTab
+            v-for="item in channels"
+            :key="item"
+            :label="item"
+            :active="channel === item"
+            @select="$emit('selectChannel', item)"
+          />
+        </template>
         <button
+          v-else
           v-for="item in channels"
           :key="item"
           type="button"
@@ -13,56 +23,7 @@
           :class="{ active: channel === item }"
           @click="$emit('selectChannel', item)"
         >
-          <svg v-if="dark && channel === item" class="channel-ring channel-ring--back" viewBox="0 0 96 44" aria-hidden="true">
-            <defs>
-              <linearGradient id="channel-orbit" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
-                <stop offset="0%" stop-color="#c2185b" />
-                <stop offset="60%" stop-color="#ff9fbf" />
-                <stop offset="100%" stop-color="#fff5f8" />
-              </linearGradient>
-              <filter id="channel-orbit-glow" x="-60%" y="-60%" width="220%" height="220%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <clipPath id="channel-orbit-back">
-                <rect x="0" y="0" width="96" height="22" />
-              </clipPath>
-              <clipPath id="channel-orbit-front">
-                <rect x="0" y="22" width="96" height="22" />
-              </clipPath>
-            </defs>
-            <g filter="url(#channel-orbit-glow)" clip-path="url(#channel-orbit-back)">
-              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
-            </g>
-            <path class="spark" d="M78 10.5l1.15 2.55 2.55 1.15-2.55 1.15L78 17.9l-1.15-2.55-2.55-1.15 2.55-1.15z" />
-            <path class="spark" d="M18 11.2l0.85 1.9 1.9 0.85-1.9 0.85L18 16.7l-0.85-1.9-1.9-0.85 1.9-0.85z" />
-          </svg>
           <span class="channel-text">{{ item }}</span>
-          <svg v-if="dark && channel === item" class="channel-ring channel-ring--front" viewBox="0 0 96 44" aria-hidden="true">
-            <defs>
-              <linearGradient id="channel-orbit-front" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
-                <stop offset="0%" stop-color="#c2185b" />
-                <stop offset="60%" stop-color="#ff9fbf" />
-                <stop offset="100%" stop-color="#fff5f8" />
-              </linearGradient>
-              <filter id="channel-orbit-glow-front" x="-60%" y="-60%" width="220%" height="220%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
-                <feMerge>
-                  <feMergeNode in="blur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-              <clipPath id="channel-orbit-front-clip">
-                <rect x="0" y="22" width="96" height="22" />
-              </clipPath>
-            </defs>
-            <g filter="url(#channel-orbit-glow-front)" clip-path="url(#channel-orbit-front-clip)">
-              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
-            </g>
-          </svg>
         </button>
       </div>
       <button v-if="!dark" type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
@@ -101,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import ChannelTab from '@/components/ChannelTab.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import signIcon from '@/assets/icons/sign.png'
 import vipIcon from '@/assets/icons/vip.png'
@@ -380,71 +342,10 @@ defineEmits<{
   }
 
   .channel-tabs {
+    align-items: center;
     gap: 26px;
     padding-left: 22px;
     overflow: visible;
-  }
-
-  .channel-item {
-    position: relative;
-    color: #d5d5dc;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    padding: 8px 6px;
-    border-radius: 0;
-    background: transparent;
-
-    .channel-ring {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 86px;
-      height: 40px;
-      transform: translate(-50%, -50%) rotate(180deg);
-      overflow: visible;
-      pointer-events: none;
-    }
-
-    .channel-ring--back {
-      z-index: 2;
-    }
-
-    .channel-ring--front {
-      z-index: 0;
-    }
-
-    .spark {
-      fill: #fff6ea;
-      filter: drop-shadow(0 0 2px rgba(255, 240, 220, 0.9));
-    }
-
-    &.active {
-      color: #fff;
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      background: transparent;
-
-      .channel-text {
-        position: relative;
-        z-index: 1;
-      }
-
-      &::before {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 64px;
-        height: 34px;
-        transform: translate(-50%, -50%);
-        border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.14) 46%, transparent 72%);
-        pointer-events: none;
-        z-index: 0;
-      }
-    }
   }
 
   .search-row {
