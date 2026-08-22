@@ -327,9 +327,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .me-page {
   position: relative;
-  padding: 0 16px 28px;
+  padding: 0 16px calc(#{$tabbar-height} + 28px + env(safe-area-inset-bottom, 0px));
   background: #0b0b0d;
 }
 
