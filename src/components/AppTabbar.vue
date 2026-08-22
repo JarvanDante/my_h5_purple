@@ -10,23 +10,25 @@
     >
       <span class="tab-icon" aria-hidden="true">
         <svg v-if="item.key === 'comic'" viewBox="0 0 24 24" fill="none">
-          <path class="shape" d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z" />
-          <path class="shape" d="M8.5 9.5h.01M15.5 9.5h.01M8.5 15c1 1.2 5 1.2 7 0" />
+          <path class="body" d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5z" />
+          <circle class="dot" cx="8.5" cy="9.5" r="1.05" />
+          <circle class="dot" cx="15.5" cy="9.5" r="1.05" />
+          <path class="cut-line" d="M8.5 15c1 1.2 5 1.2 7 0" />
         </svg>
         <svg v-else-if="item.key === 'video'" viewBox="0 0 24 24" fill="none">
-          <rect class="shape" x="3" y="5.5" width="18" height="13" rx="2.5" />
-          <path class="shape" d="M10.5 9.8l4.5 2.7-4.5 2.7z" />
+          <rect class="body" x="3" y="5.5" width="18" height="13" rx="2.5" />
+          <path class="cut" d="M10.5 9.8l4.5 2.7-4.5 2.7z" />
         </svg>
         <svg v-else-if="item.key === 'planet'" viewBox="0 0 24 24" fill="none">
-          <circle class="shape" cx="12" cy="12" r="4.2" />
+          <circle class="body" cx="12" cy="12" r="4.2" />
           <ellipse class="ring" cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-22 12 12)" />
         </svg>
         <svg v-else-if="item.key === 'ai'" viewBox="0 0 24 24" fill="none">
-          <path class="shape" d="M12 3.5l2.2 5 5 .5-3.8 3.4 1.1 5.1L12 15l-4.5 2.5 1.1-5.1L4.8 9l5-.5z" />
+          <path class="body" d="M12 3.5l2.2 5 5 .5-3.8 3.4 1.1 5.1L12 15l-4.5 2.5 1.1-5.1L4.8 9l5-.5z" />
         </svg>
         <svg v-else viewBox="0 0 24 24" fill="none">
-          <circle class="shape" cx="12" cy="8.5" r="3.8" />
-          <path class="shape" d="M4.8 20c1-3.6 3.8-5.5 7.2-5.5S18.2 16.4 19.2 20" />
+          <circle class="body" cx="12" cy="8.2" r="3.7" />
+          <path class="body" d="M5.2 20c.8-3.5 3.5-5.3 6.8-5.3s6 1.8 6.8 5.3H5.2z" />
         </svg>
       </span>
       <span class="tab-label">{{ item.label }}</span>
@@ -73,7 +75,7 @@ const go = (path: string) => {
   align-items: flex-start;
   justify-content: space-around;
   z-index: 1000;
-  overflow: hidden;
+  overflow: visible;
 
   &::before {
     content: '';
@@ -117,23 +119,49 @@ const go = (path: string) => {
   &.active {
     color: $primary-color;
 
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(255, 92, 147, 0.38) 0%, rgba(255, 92, 147, 0.12) 48%, transparent 72%);
+    }
+
     .tab-icon {
       color: $primary-color;
-      filter: drop-shadow(0 2px 6px rgba(255, 92, 147, 0.22));
+      width: 24px;
+      height: 24px;
+      filter:
+        drop-shadow(0 0 8px rgba(255, 92, 147, 0.7))
+        drop-shadow(0 4px 14px rgba(255, 92, 147, 0.35));
     }
 
     .tab-label {
       font-weight: 600;
     }
 
-    .shape,
-    .ring {
-      stroke: $primary-color;
+    .body {
+      fill: currentColor;
+      stroke: currentColor;
     }
 
-    .mark,
-    .mark-fill {
-      fill: $primary-color;
+    .cut,
+    .dot {
+      fill: #101014;
+      stroke: none;
+    }
+
+    .cut-line {
+      stroke: #101014;
+    }
+
+    .ring {
+      stroke: $primary-color;
     }
   }
 
@@ -155,8 +183,9 @@ const go = (path: string) => {
   }
 }
 
-.shape,
-.ring {
+.body,
+.ring,
+.cut-line {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -164,12 +193,14 @@ const go = (path: string) => {
   stroke-linecap: round;
 }
 
-.mark {
-  fill: currentColor;
-  stroke: none;
+.cut {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
 }
 
-.mark-fill {
+.dot {
   fill: currentColor;
   stroke: none;
 }
