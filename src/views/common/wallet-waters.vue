@@ -76,6 +76,7 @@ const sceneLabel = (scene: string) => {
     vip: '开通会员',
     exchange: '兑换到账',
     lottery: '抽奖',
+    redeem_code: '兑换码到账',
     redeem_goods: '兑换商品',
     withdraw: '提现',
   }
