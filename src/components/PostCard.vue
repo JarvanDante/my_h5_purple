@@ -252,8 +252,8 @@ const playVideo = () => {
   flex-shrink: 0;
 
   &.on {
-    background: #24242e;
-    color: #8c8c9c;
+    background: #331020;
+    color: #ff6699;
   }
 }
 

@@ -136,15 +136,18 @@ onMounted(load)
 @use '@/styles/tones.scss' as *;
 
 .user-home {
-  background: #f3f3f3;
+  background: #0d0d12;
+  color: #f5f5f8;
 }
 
 .head {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
-  background: #fff;
+  margin: 12px 16px 0;
+  padding: 14px;
+  background: #191920;
+  border-radius: 13px;
 }
 
 .avatar {
@@ -175,13 +178,13 @@ onMounted(load)
     display: block;
     font-size: 16px;
     font-weight: 700;
-    color: #222;
+    color: #f5f5f8;
   }
 
   p {
     margin-top: 4px;
     font-size: 12px;
-    color: #9a9a9a;
+    color: #8c8c9c;
   }
 }
 
@@ -192,18 +195,18 @@ onMounted(load)
   font-size: 12px;
   font-weight: 700;
   border-radius: 14px;
-  padding: 5px 12px;
+  padding: 6px 14px;
   flex-shrink: 0;
 
   &.on {
-    background: #24242e;
-    color: #8c8c9c;
+    background: #331020;
+    color: #ff6699;
   }
 }
 
 .feed {
-  margin-top: 8px;
-  background: #fff;
+  margin-top: 12px;
+  background: #0d0d12;
   padding-bottom: 24px;
 }
 
@@ -211,7 +214,7 @@ onMounted(load)
 .end {
   padding: 28px 16px;
   text-align: center;
-  color: #bbb;
+  color: #8c8c9c;
   font-size: 13px;
 }
 
