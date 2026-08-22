@@ -35,10 +35,10 @@
               </clipPath>
             </defs>
             <g filter="url(#channel-orbit-glow)" clip-path="url(#channel-orbit-back)">
-              <g transform="translate(48 22) scale(1 -1) translate(-48 -22)">
-                <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
-              </g>
+              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
             </g>
+            <path class="spark" d="M78 10.5l1.15 2.55 2.55 1.15-2.55 1.15L78 17.9l-1.15-2.55-2.55-1.15 2.55-1.15z" />
+            <path class="spark" d="M18 11.2l0.85 1.9 1.9 0.85-1.9 0.85L18 16.7l-0.85-1.9-1.9-0.85 1.9-0.85z" />
           </svg>
           <span class="channel-text">{{ item }}</span>
           <svg v-if="dark && channel === item" class="channel-ring channel-ring--front" viewBox="0 0 96 44" aria-hidden="true">
@@ -60,12 +60,8 @@
               </clipPath>
             </defs>
             <g filter="url(#channel-orbit-glow-front)" clip-path="url(#channel-orbit-front-clip)">
-              <g transform="translate(48 22) scale(1 -1) translate(-48 -22)">
-                <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
-              </g>
+              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
             </g>
-            <path class="spark" d="M76 29.6l1.15 2.55 2.55 1.15-2.55 1.15L76 37l-1.15-2.55-2.55-1.15 2.55-1.15z" />
-            <path class="spark" d="M20 28.8l0.85 1.9 1.9 0.85-1.9 0.85L20 34.3l-0.85-1.9-1.9-0.85 1.9-0.85z" />
           </svg>
         </button>
       </div>
@@ -405,17 +401,17 @@ defineEmits<{
       top: 50%;
       width: 86px;
       height: 40px;
-      transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%) rotate(180deg);
       overflow: visible;
       pointer-events: none;
     }
 
     .channel-ring--back {
-      z-index: 0;
+      z-index: 2;
     }
 
     .channel-ring--front {
-      z-index: 2;
+      z-index: 0;
     }
 
     .spark {
