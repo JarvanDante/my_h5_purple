@@ -76,6 +76,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '钱包' },
   },
   {
+    path: '/wallet/waters',
+    name: 'WalletWaters',
+    component: () => import('@/views/common/wallet-waters.vue'),
+    meta: { title: '余额明细' },
+  },
+  {
     path: '/redeem',
     name: 'Redeem',
     component: () => import('@/views/common/redeem.vue'),

@@ -87,7 +87,7 @@ const shown = computed(() => {
 
 const select = (item: string) => slide.select(item)
 const goCompose = () => router.push({ path: '/planet/compose', query: { from: 'creator' } })
-const goWallet = () => router.push('/wallet')
+const goWallet = () => router.push('/wallet/waters')
 const soon = () => showToast('提现稍后接入')
 const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 11) : '')
 

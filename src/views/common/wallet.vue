@@ -7,7 +7,7 @@
         <p>当前余额</p>
         <strong>{{ wallet?.balance ?? userStore.user?.balance ?? 0 }}<i>币</i></strong>
       </div>
-      <button type="button" class="detail-btn" @click="showWaters = !showWaters">余额明细</button>
+      <button type="button" class="detail-btn" @click="goWaters">余额明细</button>
     </section>
 
     <section v-if="packs.length" class="packs">
@@ -31,18 +31,6 @@
 
     <p class="hint">到账可能略有延迟，以钱包余额为准。<br />如未到账请稍后刷新或联系客服。</p>
 
-    <section v-if="showWaters" class="waters">
-      <h3>余额明细</h3>
-      <p v-if="!waters.length" class="empty">暂无流水</p>
-      <div v-for="w in waters" :key="w.id" class="row">
-        <div>
-          <b>{{ w.remark || w.scene }}</b>
-          <span>{{ w.created_at }}</span>
-        </div>
-        <em :class="{ out: w.direction === 2 }">{{ w.direction === 2 ? '-' : '+' }}{{ w.amount }}</em>
-      </div>
-    </section>
-
     <div class="pay-bar">
       <button type="button" class="pay-btn" :disabled="!picked || paying" @click="buy">
         {{ paying ? '支付中…' : '购买金币' }}
@@ -54,28 +42,27 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
 import { createRecharge, fetchRechargePackages, mockPayRecharge, type RechargePackage } from '@/api/user'
-import { fetchWalletBalance, fetchWalletWaters, type WalletBalance, type WaterItem } from '@/api/wallet'
+import { fetchWalletBalance, type WalletBalance } from '@/api/wallet'
 import { useUserStore } from '@/stores/user'
 import { toastError } from '@/utils/request'
 
+const router = useRouter()
 const userStore = useUserStore()
 const wallet = ref<WalletBalance | null>(null)
-const waters = ref<WaterItem[]>([])
 const packs = ref<RechargePackage[]>([])
 const current = ref(0)
 const paying = ref(false)
-const showWaters = ref(false)
 const picked = computed(() => packs.value.find((p) => p.id === current.value))
 
 const soon = () => showToast('客服中心稍后接入')
+const goWaters = () => router.push('/wallet/waters')
 
 const loadWallet = async () => {
-  const [b, w] = await Promise.all([fetchWalletBalance(), fetchWalletWaters(1, 20)])
-  wallet.value = b
-  waters.value = w.list || []
+  wallet.value = await fetchWalletBalance()
 }
 
 const buy = async () => {
@@ -158,8 +145,7 @@ onMounted(async () => {
   font-weight: 700;
 }
 
-.packs,
-.waters {
+.packs {
   padding: 18px 16px 0;
 
   h3 {
@@ -230,35 +216,6 @@ onMounted(async () => {
   padding: 16px 0;
   color: #8c8c9c;
   font-size: 13px;
-}
-
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #22222b;
-
-  b {
-    display: block;
-    font-size: 14px;
-    color: #f5f5f8;
-  }
-
-  span {
-    font-size: 11px;
-    color: #8c8c9c;
-  }
-
-  em {
-    font-style: normal;
-    color: #2ee59d;
-    font-weight: 700;
-
-    &.out {
-      color: #ff5a5a;
-    }
-  }
 }
 
 .pay-bar {

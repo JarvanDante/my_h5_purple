@@ -23,6 +23,8 @@ export function fetchWalletBalance() {
   return request<WalletBalance>('/wallet/balance')
 }
 
-export function fetchWalletWaters(page = 1, size = 20) {
-  return request<{ list: WaterItem[]; total: number }>(`/wallet/waters?page=${page}&size=${size}`)
+export function fetchWalletWaters(page = 1, size = 20, direction = '') {
+  const q = new URLSearchParams({ page: String(page), size: String(size) })
+  if (direction) q.set('direction', direction)
+  return request<{ list: WaterItem[]; total: number }>(`/wallet/waters?${q}`)
 }
