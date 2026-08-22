@@ -38,11 +38,12 @@
         <span>{{ searchText || `搜索更多${channel}` }}</span>
       </div>
       <button type="button" class="util-btn vip" @click="$emit('vip')">
-        <LineIcon name="vip" />
+        <img v-if="dark" class="util-ico" :src="vipIcon" alt="" />
+        <LineIcon v-else name="vip" />
         <span>{{ dark ? 'VIP充值' : 'VIP' }}</span>
       </button>
       <button v-if="dark" type="button" class="util-btn checkin" @click="$emit('checkin')">
-        <LineIcon name="daily" />
+        <img class="util-ico" :src="signIcon" alt="" />
         <span>签到</span>
       </button>
       <button v-else type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
@@ -52,6 +53,8 @@
 
 <script setup lang="ts">
 import LineIcon from '@/components/LineIcon.vue'
+import signIcon from '@/assets/icons/sign.png'
+import vipIcon from '@/assets/icons/vip.png'
 
 withDefaults(
   defineProps<{
@@ -307,7 +310,12 @@ defineEmits<{
 
 .home-header--dark {
   background: #0b0b0d;
-  padding-bottom: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 12px;
+
+  .channel-row {
+    height: 44px;
+    min-height: 44px;
+  }
 
   .channel-item {
     color: #8d8d96;
@@ -323,6 +331,12 @@ defineEmits<{
     }
   }
 
+  .search-row {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
   .search-pill {
     height: 36px;
     background: #17171c;
@@ -335,9 +349,29 @@ defineEmits<{
   }
 
   .util-btn {
-    min-width: 44px;
+    flex-direction: row;
+    min-width: 0;
     height: 36px;
-    font-size: 9px;
+    gap: 4px;
+    padding: 0 10px;
+    border-radius: $radius-pill;
+    font-size: 11px;
+    font-weight: 600;
+
+    &.vip {
+      background: #2a1c28;
+    }
+
+    &.checkin {
+      background: #2a2218;
+    }
+  }
+
+  .util-ico {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    mix-blend-mode: lighten;
   }
 }
 </style>
