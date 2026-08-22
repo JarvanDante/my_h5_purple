@@ -342,10 +342,12 @@ defineEmits<{
   }
 
   .channel-tabs {
-    align-items: center;
+    align-items: flex-end;
+    height: 46px;
     gap: 26px;
     padding-left: 22px;
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .search-row {

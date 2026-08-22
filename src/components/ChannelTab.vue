@@ -1,13 +1,13 @@
 <template>
   <button type="button" class="channel-tab" :class="{ active }" @click="$emit('select')">
     <span class="channel-text">{{ label }}</span>
-    <svg v-if="active" class="channel-ring" viewBox="0 0 96 44" aria-hidden="true">
+    <svg class="channel-ring" viewBox="0 0 96 44" aria-hidden="true">
       <defs>
         <linearGradient :id="`${uid}-orbit`" gradientUnits="userSpaceOnUse" x1="48" y1="22" x2="48" y2="40">
           <stop offset="0%" stop-color="#ff8fb3" />
           <stop offset="100%" stop-color="#fff5f8" />
         </linearGradient>
-        <filter :id="`${uid}-glow`" x="-60%" y="-60%" width="220%" height="220%">
+        <filter :id="`${uid}-glow`" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -57,26 +57,32 @@ const uid = useId().replace(/\W/g, '')
   position: relative;
   margin: 0;
   flex-shrink: 0;
+  box-sizing: border-box;
+  height: 44px;
   border: 0;
   background: transparent;
   color: #d5d5dc;
   font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  padding: 2px 6px 8px;
+  line-height: 1;
+  padding: 0 6px 10px;
+  display: inline-flex;
+  align-items: flex-end;
   white-space: nowrap;
 }
 
 .channel-ring {
   position: absolute;
   left: 50%;
-  top: 50%;
+  bottom: 0;
   width: 86px;
   height: 40px;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   overflow: visible;
   pointer-events: none;
   z-index: 2;
+  opacity: 0;
 }
 
 .spark {
@@ -94,14 +100,18 @@ const uid = useId().replace(/\W/g, '')
     z-index: 1;
   }
 
+  .channel-ring {
+    opacity: 1;
+  }
+
   &::before {
     content: '';
     position: absolute;
     left: 50%;
-    top: 58%;
+    bottom: 2px;
     width: 56px;
     height: 22px;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
     border-radius: 50%;
     background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.32) 0%, rgba(255, 92, 147, 0.1) 50%, transparent 72%);
     pointer-events: none;

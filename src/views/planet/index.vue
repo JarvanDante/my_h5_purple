@@ -111,7 +111,8 @@ const applyCategories = (rows: { name: string; kind: number }[]) => {
     if (r.name) kinds[r.name] = r.kind
   })
   cateKind.value = kinds
-  tabs.value = [FOLLOW_TAB, ...(names.length ? names : fallbackCats)]
+  const next = [FOLLOW_TAB, ...(names.length ? names : fallbackCats)]
+  if (next.join('\0') !== tabs.value.join('\0')) tabs.value = next
   if (!tabs.value.includes(tab.value)) tab.value = FOLLOW_TAB
 }
 
@@ -231,7 +232,7 @@ onMounted(() => {
 
 .channel-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 4px;
   height: 44px;
 }
@@ -240,11 +241,12 @@ onMounted(() => {
   flex: 1;
   min-width: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  height: 44px;
   gap: 22px;
   padding-left: 10px;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 
@@ -255,7 +257,7 @@ onMounted(() => {
 
 .search-btn {
   width: 40px;
-  height: 40px;
+  height: 44px;
   border: 0;
   background: transparent;
   color: #d5d5dc;
