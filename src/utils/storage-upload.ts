@@ -1,6 +1,7 @@
 import { request } from '@/utils/request'
 
 export type UploadResult = { url: string; object_key: string }
+export type StoragePurpose = 'image' | 'video' | 'avatar' | 'cover' | 'ad' | 'post' | 'post_video'
 
 type InitRes = {
   id: string
@@ -14,16 +15,21 @@ type ConfirmRes = {
   object_key: string
 }
 
-/** 帖子封面/视频：走统一存储 PaaS，直传 MinIO 桶 my-storage。 */
-export async function uploadPostMedia(
+function defaultName(purpose: StoragePurpose) {
+  if (purpose === 'video' || purpose === 'post_video') return 'video.mp4'
+  return 'image.jpg'
+}
+
+/** 前台帖子/图片/视频/广告/头像：走统一存储，写入桶 my-storage。 */
+export async function uploadToStorage(
   file: File,
-  purpose: 'image' | 'video',
+  purpose: StoragePurpose,
   onProgress?: (percent: number) => void,
 ): Promise<UploadResult> {
   const init = await request<InitRes>('/media/storage/init', {
     method: 'POST',
     body: JSON.stringify({
-      filename: file.name || (purpose === 'video' ? 'video.mp4' : 'image.jpg'),
+      filename: file.name || defaultName(purpose),
       purpose,
       content_type: file.type || '',
       size: file.size,
@@ -35,6 +41,14 @@ export async function uploadPostMedia(
     body: JSON.stringify({ id: init.id }),
   })
   return { url: done.url, object_key: done.object_key || init.id }
+}
+
+export function uploadPostMedia(
+  file: File,
+  purpose: 'image' | 'video',
+  onProgress?: (percent: number) => void,
+) {
+  return uploadToStorage(file, purpose === 'video' ? 'post_video' : 'post', onProgress)
 }
 
 function putToPresign(url: string, file: File, onProgress?: (percent: number) => void) {

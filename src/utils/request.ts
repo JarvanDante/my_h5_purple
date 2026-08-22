@@ -70,8 +70,8 @@ function uploadFailMessage(text: string, status: number) {
   return trimmed.slice(0, 80) || `上传失败(${status})`
 }
 
-/** H5 用户上传明文图, 服务端加密为 .bnc。视频明文直传。 */
-export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'video' = 'image') {
+/** H5 用户上传：走 /media/upload，服务端再写入统一存储 my-storage。 */
+export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'video' | 'ad' = 'image') {
   const headers = new Headers()
   const token = getToken()
   if (token) headers.set('Authorization', token)
