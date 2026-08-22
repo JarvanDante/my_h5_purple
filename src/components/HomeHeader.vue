@@ -13,6 +13,25 @@
           :class="{ active: channel === item }"
           @click="$emit('selectChannel', item)"
         >
+          <svg v-if="dark && channel === item" class="channel-ring" viewBox="0 0 90 40" aria-hidden="true">
+            <defs>
+              <filter id="channel-ring-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <path
+              filter="url(#channel-ring-glow)"
+              fill="rgba(255,92,147,0.12)"
+              stroke="#ff6b9d"
+              stroke-width="1.7"
+              stroke-linejoin="round"
+              d="M11 21 C13 8.5 28 5.5 46 6.5 C67 7.8 80 12 81 21 C82 30.5 66 34.5 45 33.5 C25 32.4 9 29.5 11 21 Z"
+            />
+          </svg>
           <span class="channel-text">{{ item }}</span>
         </button>
       </div>
@@ -338,27 +357,48 @@ defineEmits<{
 
   .channel-item {
     position: relative;
-    color: #9a9aa6;
+    color: #d5d5dc;
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.04em;
-    padding: 8px 4px;
+    padding: 8px 6px;
     border-radius: 0;
     background: transparent;
 
+    .channel-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 78px;
+      height: 36px;
+      transform: translate(-50%, -54%) rotate(-8deg);
+      overflow: visible;
+      pointer-events: none;
+    }
+
     &.active {
-      color: #ff8ab3;
+      color: #fff;
       font-size: 18px;
       font-weight: 700;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.04em;
       background: transparent;
-      text-shadow:
-        0 0 6px rgba(255, 180, 210, 0.7),
-        0 0 16px rgba(255, 92, 147, 0.45);
+      text-shadow: 0 0 10px rgba(255, 92, 147, 0.35);
 
       .channel-text {
         position: relative;
         z-index: 1;
+      }
+
+      .channel-text::after {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: -10px;
+        width: 6px;
+        height: 6px;
+        background: #fff;
+        clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
       }
 
       &::before {
@@ -366,24 +406,11 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 72px;
-        height: 40px;
+        width: 70px;
+        height: 36px;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.08) 48%, transparent 74%);
-        pointer-events: none;
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 42px;
-        height: 26px;
-        transform: translate(-50%, -50%);
-        border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 140, 180, 0.42) 0%, rgba(255, 92, 147, 0.16) 50%, transparent 70%);
+        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.28) 0%, rgba(255, 92, 147, 0.1) 46%, transparent 72%);
         pointer-events: none;
       }
     }
