@@ -88,8 +88,8 @@ const shown = computed(() => {
 const select = (item: string) => slide.select(item)
 const goCompose = () => router.push({ path: '/planet/compose', query: { from: 'creator' } })
 const goWallet = () => router.push('/wallet/waters')
-const soon = () => showToast('提现稍后接入')
-const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 11) : '')
+const soon = () => showToast('请联系客服提现')
+const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 14) : '')
 
 const open = (post: PostItem) => {
   router.push(`/planet/${post.id}`)
@@ -122,12 +122,15 @@ onMounted(load)
 }
 
 .post-btn {
+  height: 28px;
+  margin-right: 8px;
+  padding: 0 12px;
   border: 0;
-  background: transparent;
-  color: #ff3d7f;
-  font-size: 14px;
+  border-radius: 14px;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 13px;
   font-weight: 700;
-  padding: 0 4px;
 }
 
 .earn {
