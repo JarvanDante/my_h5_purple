@@ -13,7 +13,7 @@
           :class="{ active: channel === item }"
           @click="$emit('selectChannel', item)"
         >
-          {{ item }}
+          <span class="channel-text">{{ item }}</span>
         </button>
       </div>
       <button v-if="!dark" type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
@@ -313,28 +313,100 @@ defineEmits<{
   padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 12px;
 
   .channel-row {
-    height: 44px;
-    min-height: 44px;
+    height: 52px;
+    min-height: 52px;
+    overflow: visible;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent 4%, rgba(255, 92, 147, 0.55) 50%, transparent 96%);
+      box-shadow:
+        0 0 10px rgba(255, 92, 147, 0.35),
+        0 4px 16px rgba(255, 92, 147, 0.16);
+    }
+  }
+
+  .channel-tabs {
+    gap: 22px;
+    overflow: visible;
   }
 
   .channel-item {
-    color: #8d8d96;
+    position: relative;
+    color: #8b8b96;
     font-size: 15px;
-    padding: 4px 10px;
-    border-radius: $radius-pill;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    padding: 8px 2px;
+    border-radius: 0;
+    background: transparent;
 
     &.active {
       color: #fff;
-      font-size: 15px;
+      font-size: 18px;
       font-weight: 700;
-      background: $primary-color;
+      letter-spacing: 0.12em;
+      background: transparent;
+      text-shadow:
+        0 0 10px rgba(255, 92, 147, 0.55),
+        0 0 22px rgba(255, 92, 147, 0.28);
+
+      .channel-text {
+        position: relative;
+        z-index: 1;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 2.6em;
+        height: 1.15em;
+        transform: translate(-50%, -50%) rotate(-16deg);
+        border: 1px solid rgba(255, 92, 147, 0.5);
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 92, 147, 0.22);
+        pointer-events: none;
+      }
+
+      .channel-text::before,
+      .channel-text::after {
+        content: '';
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: #fff;
+        clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
+        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85));
+        pointer-events: none;
+      }
+
+      .channel-text::before {
+        top: -7px;
+        right: -8px;
+      }
+
+      .channel-text::after {
+        bottom: -5px;
+        left: -9px;
+        width: 3px;
+        height: 3px;
+        opacity: 0.75;
+      }
     }
   }
 
   .search-row {
-    margin-top: 10px;
+    margin-top: 0;
     padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 0;
   }
 
   .search-pill {
