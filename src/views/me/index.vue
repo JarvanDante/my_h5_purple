@@ -210,7 +210,6 @@ const quicks = [
 const menus = [
   { title: '创作中心', key: 'create', icon: iconDots },
   { title: '意见反馈', key: 'feedback', icon: iconSmile },
-  { title: '我的喜欢', key: 'like', icon: iconHeart },
   { title: '邀请分享', key: 'invite', icon: iconShare },
   { title: '兑换中心', key: 'redeem', icon: iconLink },
   { title: '官方社群', key: 'group', icon: iconGroup },
@@ -262,7 +261,6 @@ const onMenu = (item: { title: string; key: string }) => {
   const paths: Record<string, string> = {
     redeem: '/redeem',
     create: '/creator',
-    like: '/favorite',
     feedback: '/feedback',
   }
   if (paths[item.key]) {
