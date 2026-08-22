@@ -201,7 +201,7 @@ const iconGem =
   '<svg viewBox="0 0 24 24"><path d="M12 3.6 20 9.2 12 20.4 4 9.2 12 3.6Z" fill="url(#g)"/><defs><linearGradient id="g" x1="4" y1="4" x2="20" y2="20"><stop stop-color="#ffe08a"/><stop offset="1" stop-color="#ff9a3c"/></linearGradient></defs></svg>'
 
 const quicks = [
-  { title: '我的购买', path: '', icon: iconBag },
+  { title: '我的购买', path: '/purchase', icon: iconBag },
   { title: '我的收藏', path: '/favorite', icon: iconStar },
   { title: '我的关注', path: '', icon: iconHeart },
   { title: '历史记录', path: '', icon: iconClock },

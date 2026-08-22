@@ -142,6 +142,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '收藏' },
   },
   {
+    path: '/purchase',
+    name: 'Purchase',
+    component: () => import('@/views/common/purchase.vue'),
+    meta: { title: '我的购买' },
+  },
+  {
     path: '/list',
     name: 'List',
     component: () => import('@/views/common/list.vue'),
