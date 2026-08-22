@@ -58,7 +58,7 @@ import { fetchCartoonList, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
-import { videoPath } from '@/utils/idcrypt'
+import { comicPath, videoPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 
@@ -154,7 +154,7 @@ const open = (item: CoverItem) => {
     router.push(videoPath(item.id))
     return
   }
-  router.push(`/comic/${item.id}`)
+  router.push(comicPath(item.id))
 }
 
 const loadComicFloors = () => {

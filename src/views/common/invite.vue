@@ -36,34 +36,39 @@ import PageHeader from '@/components/PageHeader.vue'
 import { fetchShareInfo, reportShare } from '@/api/user'
 import { useConfigStore } from '@/stores/config'
 import { useUserStore } from '@/stores/user'
-import { publicUid } from '@/utils/userid'
+import { encodeId } from '@/utils/idcrypt'
 import { toastError } from '@/utils/request'
 
 const router = useRouter()
 const userStore = useUserStore()
 const configStore = useConfigStore()
-const code = ref('')
-const shareUrl = ref('')
 const busy = ref(false)
 const appName = computed(() => configStore.appName || '漫隐')
 const goLogs = () => router.push('/invite/logs')
+const code = computed(() => encodeId(userStore.user?.id))
+
+const shareBase = computed(() => {
+  const conf = String(configStore.shareUrl || '').trim().replace(/\/$/, '')
+  if (conf && !/example\.com/i.test(conf)) return conf
+  return location.origin.replace(/\/$/, '')
+})
 
 const link = computed(() => {
-  const conf = String(configStore.shareUrl || '').trim()
-  if (conf) {
-    const base = conf.replace(/\/$/, '')
-    return `${base}${base.includes('?') ? '&' : '?'}code=${encodeURIComponent(code.value)}`
+  if (!code.value) return ''
+  try {
+    const url = new URL(shareBase.value)
+    url.searchParams.set('code', code.value)
+    return url.toString()
+  } catch {
+    return `${shareBase.value}?code=${encodeURIComponent(code.value)}`
   }
-  if (shareUrl.value && !shareUrl.value.includes('example.com')) return shareUrl.value
-  const origin = location.origin.replace(/\/$/, '')
-  return `${origin}/?code=${encodeURIComponent(code.value)}`
 })
 
 const officialHost = computed(() => {
   try {
-    return new URL(link.value).origin.replace(/^https?:\/\//, '')
+    return new URL(shareBase.value).host
   } catch {
-    return link.value
+    return location.host
   }
 })
 
@@ -76,12 +81,9 @@ const load = async () => {
   try {
     await userStore.ensureLogin()
     if (!configStore.loaded) await configStore.load().catch(() => undefined)
-    const info = await fetchShareInfo()
-    code.value = info.share_code || publicUid(userStore.user)
-    shareUrl.value = info.share_url || ''
+    await fetchShareInfo().catch(() => undefined)
   } catch (err) {
     toastError(err)
-    code.value = publicUid(userStore.user)
   }
 }
 

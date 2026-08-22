@@ -64,6 +64,7 @@ import { fetchMyPosts, type PostItem } from '@/api/ops'
 import { fetchWalletBalance, type WalletBalance } from '@/api/wallet'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
+import { postPath } from '@/utils/idcrypt'
 import { toastError } from '@/utils/request'
 
 const tabs = [
@@ -92,7 +93,7 @@ const soon = () => showToast('请联系客服提现')
 const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 14) : '')
 
 const open = (post: PostItem) => {
-  router.push(`/planet/${post.id}`)
+  router.push(postPath(post.id))
 }
 
 const load = async () => {

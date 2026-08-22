@@ -26,7 +26,7 @@ import { fetchVideoList, type VideoItem } from '@/api/video'
 import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
-import { videoPath } from '@/utils/idcrypt'
+import { comicPath, videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -132,7 +132,7 @@ const open = (item: CoverItem) => {
     router.push(videoPath(item.id))
     return
   }
-  router.push(`/comic/${item.id}`)
+  router.push(comicPath(item.id))
 }
 
 const load = async () => {

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchUserInfo, login, loginByAccount, type UserInfo } from '@/api/user'
+import { bindInviteCode, fetchUserInfo, login, loginByAccount, type UserInfo } from '@/api/user'
+import { peekInviteCode, takeInviteCode } from '@/utils/invite'
 import { setToken } from '@/utils/request'
 
 const DEVICE_KEY = 'h5_device_id'
@@ -19,6 +20,17 @@ export const useUserStore = defineStore('user', () => {
   const ready = ref(false)
   const loggedIn = computed(() => Boolean(user.value?.id))
 
+  const applyInvite = async () => {
+    const code = peekInviteCode()
+    if (!code || !user.value?.id) return
+    try {
+      await bindInviteCode(code)
+    } catch {
+      // 已绑定或码无效时丢掉，避免每次登录重试
+    }
+    takeInviteCode()
+  }
+
   const ensureLogin = async () => {
     const data = await login({
       device_id: deviceId(),
@@ -28,6 +40,7 @@ export const useUserStore = defineStore('user', () => {
     setToken(data.token)
     user.value = data.user
     ready.value = true
+    await applyInvite()
     return data.user
   }
 
@@ -42,6 +55,7 @@ export const useUserStore = defineStore('user', () => {
     setToken(data.token)
     user.value = data.user
     ready.value = true
+    await applyInvite()
     return data.user
   }
 

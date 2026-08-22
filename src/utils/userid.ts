@@ -1,7 +1,9 @@
-/** 与 dm-php UserService::ENCODE_STR / encodeUserId 一致。 */
+import { encodeId } from '@/utils/idcrypt'
+
+/** 与 dm-php UserService::ENCODE_STR / encodeUserId 一致（账号绑定兜底）。 */
 const ENCODE_STR = 'SCUWDG3HE859QA4B1NOPIV67XLYFJ2RZTKM'
 
-/** 数字 id → 前台「编号」(不是数据库主键)。 */
+/** 数字 id → dm 风格短码。前台展示请用 encodeId / publicUid。 */
 export function encodeUserId(userId?: number) {
   if (!userId || userId <= 0) return ''
   const sLength = ENCODE_STR.length
@@ -18,9 +20,7 @@ export function encodeUserId(userId?: number) {
   return code
 }
 
-/** 展示用编号: 优先接口 username; 旧账号仍是 device_* 时本地按 id 编码。 */
+/** 展示/邀请用编号：加密串，不露数字主键。 */
 export function publicUid(user?: { id?: number; username?: string } | null) {
-  const name = (user?.username || '').trim()
-  if (name && !name.startsWith('device_')) return name
-  return encodeUserId(user?.id)
+  return encodeId(user?.id)
 }

@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useNavStore } from '@/stores/nav'
+import { rememberInviteCode } from '@/utils/invite'
 
 const routes: RouteRecordRaw[] = [
-  { path: '/', redirect: '/comic' },
+  { path: '/', redirect: (to) => ({ path: '/comic', query: to.query }) },
   {
     path: '/comic',
     name: 'Comic',
@@ -207,6 +208,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   document.title = (to.meta.title as string | undefined) || 'Purple'
+  if (to.query.code) rememberInviteCode(to.query.code)
   if (from.path) {
     useNavStore().setByRoute(to.path, from.path)
   }

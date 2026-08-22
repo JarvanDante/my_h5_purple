@@ -105,7 +105,7 @@ import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollec
 import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
 import { useUserStore } from '@/stores/user'
 import type { CoverItem } from '@/data/mock'
-import { decodeId, videoPath } from '@/utils/idcrypt'
+import { routeId, videoPath } from '@/utils/idcrypt'
 import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
 import { pushBrowse } from '@/utils/browseHistory'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
@@ -286,7 +286,7 @@ const toggle = async (kind: 'like' | 'fav') => {
 }
 
 const load = () => {
-  const id = decodeId(route.params.id)
+  const id = routeId(route.params.id)
   if (!id) return
   tab.value = 'intro'
   liked.value = false

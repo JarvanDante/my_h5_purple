@@ -27,6 +27,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import MediaGrid from '@/components/MediaGrid.vue'
 import { aiTools, comics, type CoverItem } from '@/data/mock'
+import { comicPath } from '@/utils/idcrypt'
 
 defineOptions({ name: 'Ai' })
 
@@ -37,7 +38,7 @@ const open = (name: string) => {
 }
 
 const openItem = (item: CoverItem) => {
-  router.push(`/comic/${item.id}`)
+  router.push(comicPath(item.id))
 }
 </script>
 

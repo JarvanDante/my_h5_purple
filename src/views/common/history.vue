@@ -63,7 +63,7 @@ import { showConfirmDialog, showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { videoPath } from '@/utils/idcrypt'
+import { comicPath, videoPath } from '@/utils/idcrypt'
 import { listBrowse, removeBrowse, type BrowseItem, type BrowseKind } from '@/utils/browseHistory'
 
 const tabs = [
@@ -113,7 +113,7 @@ const onCard = (item: BrowseItem) => {
     return
   }
   if (item.kind === 'comic') {
-    router.push(`/comic/${item.id}`)
+    router.push(comicPath(item.id))
   }
 }
 

@@ -115,6 +115,7 @@ import {
   type ChapterItem,
 } from '@/api/comics'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { comicPath, comicReadPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -135,7 +136,7 @@ const floatAd = ref(true)
 let observer: IntersectionObserver | null = null
 let autoTimer = 0
 
-const chapterId = computed(() => Number(route.params.chapterId))
+const chapterId = computed(() => routeId(route.params.chapterId))
 const seq = computed(() => {
   const hit = chapters.value.find((c) => c.id === chapterId.value)
   if (hit?.seq) return hit.seq
@@ -179,7 +180,7 @@ const load = async () => {
   title.value = data.title
   pics.value = data.pics || []
   if (!pics.value.length) empty.value = '本章暂无图片'
-  const comicId = Number(route.params.id)
+  const comicId = routeId(route.params.id)
   if (comicId) {
     const [cat, detail] = await Promise.all([
       fetchComicsChapters(comicId),
@@ -247,12 +248,12 @@ const openChapter = (ch: ChapterItem) => {
   }
   catalogOpen.value = false
   stopAuto()
-  router.replace(`/comic/${route.params.id}/read/${ch.id}`)
+  router.replace(comicReadPath(routeId(route.params.id), ch.id))
 }
 
 const back = () => {
   stopAuto()
-  router.replace(`/comic/${route.params.id}`)
+  router.replace(comicPath(routeId(route.params.id)))
 }
 
 watch(

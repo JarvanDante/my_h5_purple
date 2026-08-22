@@ -26,6 +26,7 @@ import { useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import { comics, hotWords, type CoverItem } from '@/data/mock'
+import { comicPath } from '@/utils/idcrypt'
 
 const router = useRouter()
 const keyword = ref('')
@@ -37,7 +38,7 @@ const doSearch = () => {
 }
 
 const open = (item: CoverItem) => {
-  router.push(`/comic/${item.id}`)
+  router.push(comicPath(item.id))
 }
 </script>
 

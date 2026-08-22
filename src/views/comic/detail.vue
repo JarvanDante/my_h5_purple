@@ -113,6 +113,7 @@ import {
 import { useUserStore } from '@/stores/user'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import { pushBrowse } from '@/utils/browseHistory'
+import { comicReadPath, routeId } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -147,7 +148,7 @@ const loadFav = async () => {
 }
 
 const load = async () => {
-  const id = Number(route.params.id)
+  const id = routeId(route.params.id)
   const [d, c] = await Promise.all([fetchComicsDetail(id), fetchComicsChapters(id)])
   item.value = d
   chapters.value = c.list || []
@@ -179,7 +180,7 @@ const openChapter = (ch: ChapterItem) => {
     showToast(item.value?.need_vip ? '请先开通 VIP' : '请先购买')
     return
   }
-  router.push(`/comic/${route.params.id}/read/${ch.id}`)
+  router.push(comicReadPath(item.value?.id || routeId(route.params.id), ch.id))
 }
 
 const startFirst = () => {

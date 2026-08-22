@@ -97,6 +97,7 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import type { PostItem } from '@/api/ops'
 import { resolveMediaSrc } from '@/utils/aesbnc'
+import { encodeId } from '@/utils/idcrypt'
 import { mediaUrl } from '@/utils/request'
 
 const props = withDefaults(
@@ -125,7 +126,7 @@ const emit = defineEmits<{
 
 type MediaSlot = { type: 'image' | 'video'; src: string }
 
-const name = computed(() => props.post.nickname?.trim() || `用户${props.post.user_id}`)
+const name = computed(() => props.post.nickname?.trim() || `用户${encodeId(props.post.user_id)}`)
 const avatarSrc = computed(() => mediaUrl(props.post.img))
 const pics = computed(() => (props.post.pics || []).map((p) => mediaUrl(p)).filter(Boolean))
 const videoSrc = computed(() => mediaUrl(props.post.video_url))

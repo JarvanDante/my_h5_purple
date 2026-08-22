@@ -75,7 +75,7 @@ import {
 import { fetchComicsDetail } from '@/api/comics'
 import { fetchVideoDetail } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { videoPath } from '@/utils/idcrypt'
+import { comicPath, postPath, videoPath } from '@/utils/idcrypt'
 import { toastError } from '@/utils/request'
 
 type FavItem = { id: number; title: string; cover?: string; tag?: string; sub?: string }
@@ -129,11 +129,11 @@ const onCard = (item: FavItem) => {
     return
   }
   if (tab.value === 'comic') {
-    router.push(`/comic/${item.id}`)
+    router.push(comicPath(item.id))
     return
   }
   if (tab.value === 'post') {
-    router.push(`/planet/${item.id}`)
+    router.push(postPath(item.id))
   }
 }
 

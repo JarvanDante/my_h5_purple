@@ -52,6 +52,7 @@ import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
 import { fetchPostList, type PostItem } from '@/api/ops'
 import { fetchUserHome, toggleFollow, type PublicUser } from '@/api/user'
 import { useUserStore } from '@/stores/user'
+import { encodeId, postPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -61,12 +62,12 @@ const user = ref<PublicUser | null>(null)
 const followed = ref(false)
 const list = ref<PostItem[]>([])
 const liked = ref(new Set<number>())
-const uid = computed(() => Number(route.params.id) || 0)
+const uid = computed(() => routeId(route.params.id))
 const mine = computed(() => uid.value > 0 && uid.value === (userStore.user?.id || 0))
-const name = computed(() => user.value?.nickname?.trim() || (uid.value ? `用户${uid.value}` : ''))
+const name = computed(() => user.value?.nickname?.trim() || (uid.value ? `用户${encodeId(uid.value)}` : ''))
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
 
-const goPost = (id: number) => router.push(`/planet/${id}`)
+const goPost = (id: number) => router.push(postPath(id))
 
 const load = async () => {
   if (!uid.value) return
@@ -114,7 +115,7 @@ const onLike = async (id: number) => {
 }
 
 const onShare = async (id: number) => {
-  const url = `${location.origin}/planet/${id}`
+  const url = `${location.origin}${postPath(id)}`
   try {
     if (navigator.share) {
       await navigator.share({ url })

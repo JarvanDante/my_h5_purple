@@ -18,9 +18,9 @@
       <h3>评论 <em>{{ comments.length }}</em></h3>
       <p v-if="!comments.length" class="empty">还没有评论，来说两句吧～</p>
       <article v-for="item in comments" :key="item.id" class="comment">
-        <i class="avatar">{{ String(item.user_id).slice(-1) }}</i>
+        <i class="avatar">{{ encodeId(item.user_id).slice(-1) || '?' }}</i>
         <div class="meta">
-          <strong>用户{{ item.user_id }}</strong>
+          <strong>用户{{ encodeId(item.user_id) }}</strong>
           <p>{{ item.content }}</p>
           <span>{{ item.created_at }}</span>
         </div>
@@ -45,6 +45,7 @@ import { COLLECT_LIKE, MEDIA_POST, fetchCollectList, operateCollect } from '@/ap
 import { addComment, fetchComments, fetchPostDetail, type CommentItem, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
 import { useUserStore } from '@/stores/user'
+import { encodeId, postPath, routeId, userPath } from '@/utils/idcrypt'
 import { getToken, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -57,10 +58,10 @@ const liked = ref(false)
 const draft = ref('')
 const busy = ref(false)
 const myId = computed(() => userStore.user?.id || 0)
-const goUser = (userId: number) => router.push(`/user/${userId}`)
+const goUser = (userId: number) => router.push(userPath(userId))
 
 const load = async () => {
-  const id = Number(route.params.id)
+  const id = routeId(route.params.id)
   if (!id) return
   try {
     const data = await fetchPostDetail(id)

@@ -67,6 +67,7 @@ import { fetchPostCategories, fetchPostList, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
 import { slideByIndex } from '@/stores/nav'
 import { useUserStore } from '@/stores/user'
+import { postPath, userPath } from '@/utils/idcrypt'
 import { getToken, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
@@ -99,8 +100,8 @@ const select = (item: string) => {
   tab.value = item
 }
 const go = (path: string) => router.push(path)
-const goPost = (id: number) => router.push(`/planet/${id}`)
-const goUser = (userId: number) => router.push(`/user/${userId}`)
+const goPost = (id: number) => router.push(postPath(id))
+const goUser = (userId: number) => router.push(userPath(userId))
 
 const topicsOf = (post: PostItem) => post.topics?.length ? post.topics : []
 
@@ -185,7 +186,7 @@ const onLike = async (id: number) => {
 }
 
 const onShare = async (id: number) => {
-  const url = `${location.origin}/planet/${id}`
+  const url = `${location.origin}${postPath(id)}`
   try {
     if (navigator.share) {
       await navigator.share({ url })

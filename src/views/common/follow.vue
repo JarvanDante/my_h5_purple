@@ -29,7 +29,7 @@
           >
             <EncryptedImage v-if="u.img" class="avatar" :src="mediaUrl(u.img)" alt="" />
             <span v-else class="avatar">{{ (u.nickname || '用').slice(0, 1) }}</span>
-            <strong>{{ u.nickname || `用户${u.id}` }}</strong>
+            <strong>{{ u.nickname || `用户${encodeId(u.id)}` }}</strong>
             <span
               class="act"
               :class="{ on: isFollowed(u.id) }"
@@ -54,6 +54,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import { fetchFans, fetchFollows, toggleFollow, type PublicUser } from '@/api/user'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
+import { encodeId, userPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const tabs = ['粉丝', '关注'] as const
@@ -70,7 +71,7 @@ const emptyText = computed(() => (tab.value === '关注' ? '还没有关注的�
 
 const select = (item: string) => slide.select(item)
 const isFollowed = (id: number) => followed.value.has(id)
-const goUser = (id: number) => router.push(`/user/${id}`)
+const goUser = (id: number) => router.push(userPath(id))
 
 const loadFollowed = async () => {
   const data = await fetchFollows(1, 80)

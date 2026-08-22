@@ -115,7 +115,7 @@
       <div class="bind-card">
         <h3>绑定邀请</h3>
         <p>请输入好友编号</p>
-        <input v-model="bindCode" type="text" maxlength="16" placeholder="如 000C" />
+        <input v-model="bindCode" type="text" maxlength="64" placeholder="粘贴好友邀请码" />
         <div class="bind-actions">
           <button type="button" @click="showBind = false">取消</button>
           <button type="button" class="ok" :disabled="bindBusy" @click="submitBind">确定</button>
