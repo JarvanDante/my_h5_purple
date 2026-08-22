@@ -123,3 +123,7 @@ export function toggleFollow(homeId: number) {
 export function fetchFollows(page = 1, size = 50) {
   return request<{ list: PublicUser[]; total: number }>(`/user/follows?page=${page}&size=${size}`)
 }
+
+export function fetchFans(page = 1, size = 50) {
+  return request<{ list: PublicUser[]; total: number }>(`/user/fans?page=${page}&size=${size}`)
+}

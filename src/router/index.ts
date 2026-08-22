@@ -148,6 +148,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '我的购买' },
   },
   {
+    path: '/follow',
+    name: 'Follow',
+    component: () => import('@/views/common/follow.vue'),
+    meta: { title: '我的关注' },
+  },
+  {
     path: '/list',
     name: 'List',
     component: () => import('@/views/common/list.vue'),
