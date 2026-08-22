@@ -18,9 +18,7 @@
         <div :key="channel" class="floor-pane">
           <section v-if="ready" class="quick-strip">
             <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
-              <span class="quick-icon" :class="item.tone">
-                <LineIcon :name="item.icon" />
-              </span>
+              <img class="quick-icon" :src="item.icon" :alt="item.label" />
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -52,7 +50,10 @@ import HomeHero from '@/components/home/HomeHero.vue'
 import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import LineIcon from '@/components/LineIcon.vue'
+import classIcon from '@/assets/icons/mid/class.png'
+import dailyIcon from '@/assets/icons/mid/daily.png'
+import hotIcon from '@/assets/icons/mid/hot.png'
+import rankIcon from '@/assets/icons/mid/rank.png'
 import { fetchCartoonList, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -78,16 +79,16 @@ const selectChannel = (item: string) => {
 }
 
 const comicQuicks = [
-  { icon: 'topic', label: '专题', path: '/list?media=comic&type=topic', tone: 'purple' },
-  { icon: 'hot', label: '热门', path: '/list?media=comic&type=hot', tone: 'red' },
-  { icon: 'daily', label: '每日', path: '/list?media=comic&type=daily', tone: 'blue' },
-  { icon: 'rank', label: '榜单', path: '/list?media=comic&type=rank', tone: 'gold' },
+  { icon: classIcon, label: '专题', path: '/list?media=comic&type=topic' },
+  { icon: hotIcon, label: '热门', path: '/list?media=comic&type=hot' },
+  { icon: dailyIcon, label: '每日', path: '/list?media=comic&type=daily' },
+  { icon: rankIcon, label: '榜单', path: '/list?media=comic&type=rank' },
 ]
 const cartoonQuicks = [
-  { icon: 'topic', label: '专题', path: '/list?media=cartoon&type=topic', tone: 'purple' },
-  { icon: 'hot', label: '热门', path: '/list?media=cartoon&type=hot', tone: 'red' },
-  { icon: 'daily', label: '每日', path: '/list?media=cartoon&type=daily', tone: 'blue' },
-  { icon: 'rank', label: '榜单', path: '/list?media=cartoon&type=rank', tone: 'gold' },
+  { icon: classIcon, label: '专题', path: '/list?media=cartoon&type=topic' },
+  { icon: hotIcon, label: '热门', path: '/list?media=cartoon&type=hot' },
+  { icon: dailyIcon, label: '每日', path: '/list?media=cartoon&type=daily' },
+  { icon: rankIcon, label: '榜单', path: '/list?media=cartoon&type=rank' },
 ]
 const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
 
@@ -217,11 +218,10 @@ watch(channel, loadFloors)
 }
 
 .quick-strip {
-  margin: 0 12px 16px;
-  padding: 4px 0 2px;
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
+  margin: 0 12px 14px;
+  padding: 14px 6px 12px;
+  background: #1c1c22;
+  border-radius: 14px;
   display: flex;
   justify-content: space-around;
 }
@@ -233,38 +233,14 @@ watch(channel, loadFloors)
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
 }
 
 .quick-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  :deep(.line-icon) {
-    width: 22px;
-    height: 22px;
-  }
-
-  &.purple {
-    background: #7b5cff;
-  }
-
-  &.red {
-    background: #ff4d6a;
-  }
-
-  &.blue {
-    background: #3d8bff;
-  }
-
-  &.gold {
-    background: #f0a202;
-  }
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  mix-blend-mode: lighten;
 }
 
 .quick-label {
@@ -291,7 +267,7 @@ watch(channel, loadFloors)
 }
 
 .comic-page .quick-strip {
-  background: transparent;
+  background: #1c1c22;
   box-shadow: none;
 }
 
