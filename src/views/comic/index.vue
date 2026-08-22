@@ -235,12 +235,12 @@ watch(channel, loadFloors)
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
 }
 
 .quick-icon {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   background: transparent;
   border-radius: 0;
@@ -250,6 +250,7 @@ watch(channel, loadFloors)
 .quick-label {
   color: #c8c8d0;
   font-size: 11px;
+  line-height: 1.1;
 }
 
 .page-empty {
