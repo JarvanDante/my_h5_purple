@@ -1,72 +1,115 @@
 <template>
   <div class="page-shell me-page">
-    <header class="home-header">
-      <div class="channel-row">
-        <h1 class="site-name">我的</h1>
-        <button type="button" class="checkin-btn" @click="go('/checkin')">
-          <span>🎁</span>
-          签到
+    <header class="me-top">
+      <button type="button" class="icon-btn" aria-label="消息" @click="go('/message')">
+        <span v-html="iconChat" />
+        <i class="dot" />
+      </button>
+      <div class="top-right">
+        <button type="button" class="icon-btn" aria-label="客服" @click="soon('在线客服')">
+          <span v-html="iconHead" />
+        </button>
+        <button type="button" class="icon-btn" aria-label="设置" @click="showSettings = true">
+          <span v-html="iconGear" />
         </button>
       </div>
     </header>
 
-    <section class="soft-card profile">
-      <EncryptedImage v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
-      <div v-else class="avatar" />
+    <section class="profile">
+      <button type="button" class="avatar-wrap" @click="onAvatar">
+        <EncryptedImage v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
+        <span v-else class="avatar" />
+      </button>
       <div class="meta">
-        <h1>{{ user?.nickname || '未登录' }}</h1>
-        <button type="button" class="uid-box" @click="copyUid">
-          <span>编号</span>
-          <strong>{{ uid }}</strong>
+        <div class="name-row">
+          <h1>{{ user?.nickname || '未登录' }}</h1>
+          <span class="vip-gem" :class="{ dim: !isVip }" v-html="iconGem" />
+        </div>
+        <button type="button" class="uid-line" @click="copyUid">
+          ID {{ uid }}
           <em>复制</em>
         </button>
       </div>
+      <button type="button" class="welfare" @click="go('/lottery')">
+        <span v-html="iconGift" />
+        福利
+      </button>
     </section>
 
-    <section class="account-row">
-      <button type="button" @click="go('/account/password')">
-        {{ user?.has_password ? '修改密码' : '设置密码' }}
+    <section class="vip-banner" @click="go('/vip')">
+      <div class="vip-copy">
+        <strong>VIP限时特惠 畅享全场</strong>
+        <p>
+          新用户升级会员特惠
+          <span class="timer">
+            <b>{{ clock.h }}</b>
+            <i>:</i>
+            <b>{{ clock.m }}</b>
+            <i>:</i>
+            <b>{{ clock.s }}</b>
+          </span>
+        </p>
+      </div>
+      <button type="button">开通会员 ›</button>
+    </section>
+
+    <section class="stats">
+      <button type="button" @click="go('/coupon')">
+        <strong>{{ user?.credit ?? 0 }}</strong>
+        <span>观影券</span>
       </button>
-      <button type="button" @click="go('/account/login')">账号登录</button>
+      <button type="button" @click="go('/ai')">
+        <strong>0</strong>
+        <span>AI脱衣次数</span>
+      </button>
+      <button type="button" @click="go('/ai')">
+        <strong>0</strong>
+        <span>AI换脸次数</span>
+      </button>
     </section>
 
     <section class="hero-cards">
       <button type="button" class="hero vip" @click="go('/vip')">
         <div>
           <strong>会员中心</strong>
-          <p>开通 VIP 解锁更多内容</p>
+          <p>VIP CENTER</p>
         </div>
-        <i class="deco" />
+        <span class="hero-ico" v-html="iconCrown" />
       </button>
       <button type="button" class="hero wallet" @click="go('/wallet')">
         <div>
           <strong>金币钱包</strong>
-          <p>余额 {{ user?.balance ?? 0 }}</p>
+          <p>COIN WALLET</p>
         </div>
-        <i class="deco" />
+        <span class="hero-ico" v-html="iconCoin" />
       </button>
     </section>
 
-    <section class="soft-card quick">
+    <section class="quick">
       <button v-for="item in quicks" :key="item.title" type="button" @click="onQuick(item)">
         <span class="q-icon" v-html="item.icon" />
         <span>{{ item.title }}</span>
       </button>
     </section>
 
-    <section class="soft-card circle-row">
-      <button v-for="item in circles" :key="item.title" type="button" @click="onCircle(item)">
-        <span class="c-icon" :style="{ background: item.bg, color: item.color }">{{ item.mark }}</span>
-        <span>{{ item.title }}</span>
+    <section class="menu-list">
+      <button v-for="item in menus" :key="item.title" type="button" @click="onMenu(item)">
+        <span class="m-icon" v-html="item.icon" />
+        <span class="m-title">{{ item.title }}</span>
+        <i class="chev">›</i>
       </button>
     </section>
 
-    <section class="soft-card tools">
-      <button v-for="item in tools" :key="item.title" type="button" @click="onTool(item)">
-        <span class="t-icon" v-html="item.icon" />
-        <span>{{ item.title }}</span>
-      </button>
-    </section>
+    <div v-if="showSettings" class="sheet-mask" @click.self="showSettings = false">
+      <div class="sheet">
+        <button type="button" @click="go('/account/password'); showSettings = false">
+          {{ user?.has_password ? '修改密码' : '设置密码' }}
+        </button>
+        <button type="button" @click="go('/account/login'); showSettings = false">账号登录</button>
+        <button type="button" @click="openBind">绑定邀请</button>
+        <button type="button" class="cancel" @click="showSettings = false">取消</button>
+      </div>
+    </div>
 
     <div v-if="showBind" class="bind-mask" @click.self="showBind = false">
       <div class="bind-card">
@@ -83,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { bindInviteCode } from '@/api/user'
@@ -99,56 +142,80 @@ const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
+const isVip = computed(() => Boolean(user.value?.group_name && user.value.group_name !== '普通用户'))
 const showBind = ref(false)
+const showSettings = ref(false)
 const bindCode = ref('')
 const bindBusy = ref(false)
+const clock = ref({ h: '00', m: '00', s: '00' })
+let timer = 0
+
+const pad = (n: number) => String(n).padStart(2, '0')
+const tickClock = () => {
+  const now = new Date()
+  const end = new Date(now)
+  end.setHours(23, 59, 59, 999)
+  const sec = Math.max(0, Math.floor((end.getTime() - now.getTime()) / 1000))
+  clock.value = {
+    h: pad(Math.floor(sec / 3600)),
+    m: pad(Math.floor((sec % 3600) / 60)),
+    s: pad(sec % 60),
+  }
+}
 
 const iconClock =
-  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4.2l2.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v4.2l2.6 1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M8.2 5.2 6.8 3.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
 const iconStar =
   '<svg viewBox="0 0 24 24" fill="none"><path d="m12 4 2.2 5.4L20 10l-4 3.6.9 5.4L12 16.2 7.1 19l.9-5.4L4 10l5.8-.6L12 4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
 const iconBag =
   '<svg viewBox="0 0 24 24" fill="none"><path d="M6.5 8h11l-.8 11H7.3L6.5 8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 8V6.6A3 3 0 0 1 12 3.6 3 3 0 0 1 15 6.6V8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
 const iconGift =
   '<svg viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10" width="15" height="10" rx="1.2" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 10h15M12 10v10M12 10c0-3 3.2-4.6 5-2.6 1 1.1-1.2 2.6-5 2.6ZM12 10c0-3-3.2-4.6-5-2.6-1 1.1 1.2 2.6 5 2.6Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+const iconHeart =
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M12 19.2s-6.6-4.1-8.4-8.1A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8.4 3.7c-1.8 4-8.4 8.1-8.4 8.1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
 const iconBadge =
-  '<svg viewBox="0 0 24 24" fill="none"><path d="m12 3 2.1 4.4 4.9.6-3.6 3.3.9 4.8L12 14.2 7.7 16.1l.9-4.8-3.6-3.3 4.9-.6L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="3.8" width="12" height="16.4" rx="1.6" stroke="currentColor" stroke-width="1.6"/><path d="m8.8 12.2 2.2 2.2 4.2-4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 const iconLink =
-  '<svg viewBox="0 0 24 24" fill="none"><path d="M10 8.2H8.2A3.2 3.2 0 1 0 8.2 14H10M14 15.8h1.8A3.2 3.2 0 1 0 15.8 10H14M9.2 12h5.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M8 12h8M10 9H8.2A3.2 3.2 0 1 0 8.2 15H10M14 15h1.8A3.2 3.2 0 1 0 15.8 9H14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
 const iconApp =
-  '<svg viewBox="0 0 24 24" fill="none"><rect x="6" y="4.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="16.2" r="1" fill="currentColor"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.8 19 8v8l-7 4.2L5 16V8l7-4.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
 const iconHead =
   '<svg viewBox="0 0 24 24" fill="none"><path d="M5.5 13v-1a6.5 6.5 0 1 1 13 0v1M5.5 13.5v3.2A1.8 1.8 0 0 0 7.3 18.5h.6M18.5 13.5v3.2a1.8 1.8 0 0 1-1.8 1.8h-.6M10 19.2h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
 const iconChat =
   '<svg viewBox="0 0 24 24" fill="none"><path d="M6 16.5 4.5 19l3-1.1A8 8 0 1 0 6 16.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
 const iconGear =
   '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="m19 13.2-.9 1.6 1 1.6-1.6 1.6-1.6-1-1.6.9L13.2 19h-2.4L10.2 18l-1.6.9-1.6-1 1-1.6L6 13.2 5 12.6v-1.2L6 10.8l.9-1.6-1-1.6 1.6-1.6 1.6 1 1.6-.9L10.8 5h2.4L13.8 6l1.6-.9 1.6 1-1 1.6.9 1.6 1 .6v1.2l-1 .6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>'
+const iconDots =
+  '<svg viewBox="0 0 24 24" fill="none"><circle cx="8.2" cy="8.2" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="15.8" cy="8.2" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="8.2" cy="15.8" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="15.8" cy="15.8" r="2.1" stroke="currentColor" stroke-width="1.6"/></svg>'
+const iconSmile =
+  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7"/><path d="M8.6 10.2h.01M15.4 10.2h.01M8.8 14c.8 1.4 2.1 2 3.2 2s2.4-.6 3.2-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+const iconShare =
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M14.5 7.5 19 4.8v6.4L14.5 8.6M19 8H9.2A4.2 4.2 0 0 0 5 12.2V19" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+const iconGroup =
+  '<svg viewBox="0 0 24 24" fill="none"><circle cx="10" cy="9" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M4.8 18.2c.6-2.6 2.6-4 5.2-4s4.6 1.4 5.2 4M16.6 8.2c1.4.2 2.4 1.2 2.4 2.6 0 1.3-.9 2.3-2.1 2.6M17.4 16.4c1.6.2 2.8 1 3.2 2.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+const iconCrown =
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M4.5 16.5 6 8.5l6 5 6-5 1.5 8H4.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 8.5 8.2 5.8 12 8.2 15.8 5.8 18 8.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
+const iconCoin =
+  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.2" stroke="currentColor" stroke-width="1.7"/><path d="M10.2 8.8h4.2c1 0 1.8.8 1.8 1.8s-.8 1.8-1.8 1.8H10.8v2.8h4.4M12 8.8V7.6M12 16.8v1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
+const iconGem =
+  '<svg viewBox="0 0 24 24"><path d="M12 3.6 20 9.2 12 20.4 4 9.2 12 3.6Z" fill="url(#g)"/><defs><linearGradient id="g" x1="4" y1="4" x2="20" y2="20"><stop stop-color="#ffe08a"/><stop offset="1" stop-color="#ff9a3c"/></linearGradient></defs></svg>'
 
 const quicks = [
-  { title: '浏览记录', path: '', icon: iconClock },
-  { title: '我的收藏', path: '/favorite', icon: iconStar },
   { title: '我的购买', path: '', icon: iconBag },
-  { title: '邀请好友', path: 'invite', icon: iconGift },
+  { title: '我的收藏', path: '/favorite', icon: iconStar },
+  { title: '我的关注', path: '', icon: iconHeart },
+  { title: '历史记录', path: '', icon: iconClock },
 ]
 
-const circles = [
-  { title: '我的帖子', mark: '帖', bg: '#fff3e6', color: '#f08a24', path: '/planet' },
-  { title: '我的视频', mark: '▶', bg: '#fde2f0', color: '#c5303a', path: '/video' },
-  { title: '粉丝关注', mark: '♡', bg: '#fde2f0', color: '#f7659f', path: '' },
-  { title: 'AI定制', mark: 'AI', bg: '#e8f1ff', color: '#3b7cff', path: '/ai' },
-]
-
-const tools = [
-  { title: '兑换码', key: 'redeem', icon: iconGift },
-  { title: '优惠券', key: 'coupon', icon: iconBag },
-  { title: '抽奖', key: 'lottery', icon: iconStar },
-  { title: '站内消息', key: 'message', icon: iconChat },
-  { title: '账户凭证', key: 'credential', icon: iconBadge },
-  { title: '绑定邀请', key: 'bind', icon: iconLink },
-  { title: '应用中心', key: 'app', icon: iconApp },
-  { title: '在线客服', key: 'kefu', icon: iconHead },
-  { title: '官方群聊', key: 'group', icon: iconChat },
-  { title: '设置', key: 'setting', icon: iconGear },
+const menus = [
+  { title: '创作中心', key: 'create', icon: iconDots },
+  { title: '意见反馈', key: 'feedback', icon: iconSmile },
+  { title: '我的喜欢', key: 'like', icon: iconHeart },
+  { title: '邀请分享', key: 'invite', icon: iconShare },
+  { title: '兑换中心', key: 'redeem', icon: iconLink },
+  { title: '官方社群', key: 'group', icon: iconGroup },
+  { title: '福利应用', key: 'app', icon: iconApp },
+  { title: '账号凭证', key: 'credential', icon: iconBadge },
 ]
 
 const go = (path: string) => {
@@ -173,11 +240,11 @@ const copyUid = () => {
   copyText(uid.value, '用户名已复制')
 }
 
+const onAvatar = () => {
+  if (!userStore.loggedIn) go('/account/login')
+}
+
 const onQuick = (item: { title: string; path: string }) => {
-  if (item.path === 'invite') {
-    copyText(uid.value, `邀请码 ${uid.value} 已复制`)
-    return
-  }
   if (item.path) {
     go(item.path)
     return
@@ -185,28 +252,24 @@ const onQuick = (item: { title: string; path: string }) => {
   soon(item.title)
 }
 
-const onCircle = (item: { title: string; path: string }) => {
-  if (item.path) {
-    go(item.path)
-    return
-  }
-  soon(item.title)
+const openBind = () => {
+  showSettings.value = false
+  bindCode.value = ''
+  showBind.value = true
 }
 
-const onTool = (item: { title: string; key: string }) => {
+const onMenu = (item: { title: string; key: string }) => {
   const paths: Record<string, string> = {
     redeem: '/redeem',
-    coupon: '/coupon',
-    lottery: '/lottery',
-    message: '/message',
+    create: '/planet/compose',
+    like: '/favorite',
   }
   if (paths[item.key]) {
     go(paths[item.key])
     return
   }
-  if (item.key === 'bind') {
-    bindCode.value = ''
-    showBind.value = true
+  if (item.key === 'invite') {
+    copyText(uid.value, `邀请码 ${uid.value} 已复制`)
     return
   }
   if (item.key === 'credential') {
@@ -235,106 +298,259 @@ const submitBind = async () => {
 }
 
 onMounted(() => {
+  tickClock()
+  timer = window.setInterval(tickClock, 1000)
   if (!userStore.loggedIn) {
     userStore.ensureLogin().catch(() => undefined)
   } else {
     userStore.refresh().catch(() => undefined)
   }
 })
+
+onUnmounted(() => {
+  window.clearInterval(timer)
+})
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables.scss' as *;
-
 .me-page {
   position: relative;
+  padding: 0 16px 28px;
+  background: #0b0b0d;
 }
 
-.home-header .channel-row {
+.me-top {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  height: 46px;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-.home-header .site-name {
-  font-size: 18px;
+.top-right {
+  display: flex;
+  gap: 2px;
+}
+
+.icon-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
   color: #f2f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :deep(svg) {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3b5c;
 }
 
 .profile {
   display: flex;
   align-items: center;
   gap: 12px;
+  margin: 6px 0 16px;
+}
+
+.avatar-wrap {
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
 }
 
 .avatar,
 :deep(.avatar) {
+  display: block;
   width: 58px;
   height: 58px;
   border-radius: 50%;
   object-fit: cover;
-  background: linear-gradient(160deg, $secondary-color, $primary-color);
-  flex-shrink: 0;
-  border: 1.6px solid $ink;
+  background: #2a2a32;
 }
 
 .meta {
   flex: 1;
   min-width: 0;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 
   h1 {
-    font-size: 18px;
+    margin: 0;
+    font-size: 20px;
     font-weight: 700;
-    color: #f2f2f5;
+    color: #fff;
   }
 }
 
-.uid-box {
+.vip-gem {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+
+  :deep(svg) {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+
+  &.dim {
+    opacity: 0.35;
+    filter: grayscale(0.4);
+  }
+}
+
+.uid-line {
+  margin-top: 6px;
+  border: 0;
+  background: transparent;
+  color: #8d8d96;
+  font-size: 12px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  height: 28px;
-  padding: 0 6px 0 10px;
-  border: 0;
-  border-radius: $radius-pill;
-  background: $primary-color-deep;
-  color: #fff;
-
-  span {
-    font-size: 11px;
-    font-weight: 500;
-    opacity: 0.9;
-  }
-
-  strong {
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.6px;
-  }
+  gap: 8px;
 
   em {
     font-style: normal;
+    color: #c8c8d0;
     font-size: 11px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: $radius-pill;
-    background: rgba(255, 255, 255, 0.22);
   }
 }
 
-.account-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.welfare {
+  flex-shrink: 0;
+  height: 28px;
+  border: 0;
+  border-radius: 14px 0 0 14px;
+  margin-right: -16px;
+  padding: 0 10px 0 8px;
+  background: #2a2230;
+  color: #ffb14a;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  :deep(svg) {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.vip-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
+  min-height: 72px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: linear-gradient(90deg, #2a1c28, #1a1420);
+}
+
+.vip-copy {
+  min-width: 0;
+
+  strong {
+    display: block;
+    color: #ff5c93;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  p {
+    margin-top: 8px;
+    color: #b8a090;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+
+  b {
+    min-width: 20px;
+    height: 18px;
+    border-radius: 3px;
+    background: #3a2a28;
+    color: #f2d2b0;
+    font-size: 10px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  i {
+    font-style: normal;
+    color: #c8a888;
+  }
+}
+
+.vip-banner > button {
+  flex-shrink: 0;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
   padding: 0 12px;
+  background: #ff5c93;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 18px 0 16px;
 
   button {
-    height: 36px;
-    border: 1.4px solid $line;
-    border-radius: $radius-pill;
-    background: #1c1c22;
-    color: #ff8ab3;
-    font-size: 13px;
+    border: 0;
+    background: transparent;
+    color: #fff;
+
+    & + button {
+      border-left: 1px solid #2a2a32;
+    }
+  }
+
+  strong {
+    display: block;
+    font-size: 22px;
     font-weight: 700;
+    line-height: 1.1;
+  }
+
+  span {
+    display: block;
+    margin-top: 6px;
+    color: #8d8d96;
+    font-size: 11px;
   }
 }
 
@@ -342,18 +558,18 @@ onMounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 0 12px;
 }
 
 .hero {
-  height: 76px;
-  border: 1.6px solid $ink;
+  height: 78px;
+  border: 0;
   border-radius: 12px;
-  padding: 12px 12px 10px;
+  padding: 14px 12px;
   text-align: left;
   color: #fff;
-  position: relative;
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   strong {
     display: block;
@@ -361,121 +577,140 @@ onMounted(() => {
   }
 
   p {
-    margin-top: 6px;
-    font-size: 11px;
-    opacity: 0.92;
+    margin-top: 4px;
+    font-size: 10px;
+    letter-spacing: 0.4px;
+    opacity: 0.55;
   }
 
   &.vip {
-    background: $primary-color;
+    background: linear-gradient(135deg, #3a2a6a, #1c1630);
+    box-shadow: inset 0 0 24px rgba(120, 90, 255, 0.18);
   }
 
   &.wallet {
-    background: #ff7aa8;
+    background: linear-gradient(135deg, #2a2438, #16141c);
+    box-shadow: inset 0 0 24px rgba(255, 92, 147, 0.12);
   }
 }
 
-.deco {
-  position: absolute;
-  right: -8px;
-  bottom: -18px;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+.hero-ico {
+  width: 34px;
+  height: 34px;
+  color: #ffd27a;
+
+  :deep(svg) {
+    width: 34px;
+    height: 34px;
+  }
 }
 
 .quick {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  margin: 18px 0 10px;
 
   button {
     border: 0;
     background: transparent;
+    color: #f2f2f5;
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #d5d5dc;
+    gap: 8px;
   }
 }
 
 .q-icon,
-.t-icon {
-  width: 26px;
-  height: 26px;
-  color: #d5d5dc;
-  display: flex;
+.m-icon {
+  width: 22px;
+  height: 22px;
+  color: #f2f2f5;
 
   :deep(svg) {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
   }
 }
 
-.circle-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-
-  button {
-    border: 0;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #d5d5dc;
-  }
+.menu-list {
+  overflow: hidden;
 }
 
-.c-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.menu-list button {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #f2f2f5;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
+  gap: 10px;
+  padding: 0 2px;
+  font-size: 14px;
 }
 
-.tools {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  row-gap: 16px;
-
-  button {
-    border: 0;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: #d5d5dc;
-  }
+.m-title {
+  flex: 1;
+  text-align: left;
 }
 
+.chev {
+  color: #6a6a74;
+  font-style: normal;
+  font-size: 18px;
+}
+
+.sheet-mask,
 .bind-mask {
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+}
+
+.bind-mask {
+  align-items: center;
   padding: 24px;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  padding: 8px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: #1c1c22;
+  border-radius: 16px 16px 0 0;
+
+  button {
+    width: 100%;
+    height: 48px;
+    border: 0;
+    border-bottom: 1px solid #2a2a32;
+    background: transparent;
+    color: #f2f2f5;
+    font-size: 15px;
+  }
+
+  .cancel {
+    margin-top: 8px;
+    border: 0;
+    border-radius: 10px;
+    background: #121214;
+    color: #8d8d96;
+  }
 }
 
 .bind-card {
   width: 100%;
   max-width: 300px;
-  background: #fff;
+  background: #1c1c22;
   border-radius: 16px;
   padding: 18px 16px 12px;
-  border: 1.6px solid $ink;
+  color: #f2f2f5;
 
   h3 {
     text-align: center;
@@ -486,23 +721,25 @@ onMounted(() => {
     margin: 8px 0 12px;
     text-align: center;
     font-size: 13px;
-    color: #888;
+    color: #8d8d96;
   }
 
   input {
     width: 100%;
     height: 40px;
-    border: 1px solid #eee;
+    border: 1px solid #2a2a32;
     border-radius: 8px;
     padding: 0 12px;
     font-size: 15px;
+    background: #121214;
+    color: #fff;
   }
 }
 
 .bind-actions {
   display: flex;
   margin-top: 12px;
-  border-top: 1px solid #f2f2f2;
+  border-top: 1px solid #2a2a32;
 
   button {
     flex: 1;
@@ -510,13 +747,13 @@ onMounted(() => {
     border: 0;
     background: transparent;
     font-size: 15px;
-    color: #666;
+    color: #8d8d96;
   }
 
   .ok {
-    color: $ink;
+    color: #ff5c93;
     font-weight: 800;
-    border-left: 1px solid #f2f2f2;
+    border-left: 1px solid #2a2a32;
   }
 }
 </style>
