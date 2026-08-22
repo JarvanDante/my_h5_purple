@@ -243,7 +243,7 @@ const playVideo = () => {
 .follow {
   border: 0;
   background: #ff3d7f;
-  color: #1a0a12;
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
   border-radius: 14px;

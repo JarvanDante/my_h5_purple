@@ -343,7 +343,7 @@ onMounted(() => {
   border: 0;
   border-radius: 50%;
   background: #ff3d7f;
-  color: #1a0a12;
+  color: #fff;
   font-size: 34px;
   line-height: 1;
   font-weight: 400;
