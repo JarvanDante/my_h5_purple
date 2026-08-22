@@ -15,15 +15,26 @@
       <div v-else class="avatar" />
       <div class="meta">
         <h1>{{ user?.nickname || '未登录' }}</h1>
-        <button type="button" class="uid-box" @click="copyUid">用户名: {{ uid }}</button>
+        <button type="button" class="uid-box" @click="copyUid">
+          <span>编号</span>
+          <strong>{{ uid }}</strong>
+          <em>复制</em>
+        </button>
       </div>
+    </section>
+
+    <section class="account-row">
+      <button type="button" @click="go('/account/password')">
+        {{ user?.has_password ? '修改密码' : '设置密码' }}
+      </button>
+      <button type="button" @click="go('/account/login')">账号登录</button>
     </section>
 
     <section class="hero-cards">
       <button type="button" class="hero vip" @click="go('/vip')">
         <div>
           <strong>会员中心</strong>
-          <p>升级为VIP获取更多权益</p>
+          <p>开通 VIP 解锁更多内容</p>
         </div>
         <i class="deco" />
       </button>
@@ -43,13 +54,6 @@
       </button>
     </section>
 
-    <section class="soft-card promo-grid">
-      <button v-for="item in promos" :key="item.title" type="button" class="promo" @click="soon(item.title)">
-        <div class="thumb" :class="`tone-${item.tone}`" />
-        <span>{{ item.title }}</span>
-      </button>
-    </section>
-
     <section class="soft-card circle-row">
       <button v-for="item in circles" :key="item.title" type="button" @click="onCircle(item)">
         <span class="c-icon" :style="{ background: item.bg, color: item.color }">{{ item.mark }}</span>
@@ -63,13 +67,6 @@
         <span>{{ item.title }}</span>
       </button>
     </section>
-
-    <aside v-if="showPromo" class="float-promo">
-      <button type="button" class="close" @click="showPromo = false">×</button>
-      <div class="float-art" />
-      <p>同城约会</p>
-      <button type="button" class="cta" @click="soon('同城约会')">立即约会</button>
-    </aside>
 
     <div v-if="showBind" class="bind-mask" @click.self="showBind = false">
       <div class="bind-card">
@@ -102,7 +99,6 @@ const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
-const showPromo = ref(true)
 const showBind = ref(false)
 const bindCode = ref('')
 const bindBusy = ref(false)
@@ -135,19 +131,6 @@ const quicks = [
   { title: '邀请好友', path: 'invite', icon: iconGift },
 ]
 
-const promos = [
-  { title: '空降约爱', tone: 0 },
-  { title: '同城约妹', tone: 1 },
-  { title: '全国空降', tone: 2 },
-  { title: '高端会所', tone: 3 },
-  { title: '极品少妇', tone: 4 },
-  { title: '学生兼职', tone: 5 },
-  { title: '熟女约会', tone: 1 },
-  { title: '包养信息', tone: 0 },
-  { title: '外围模特', tone: 2 },
-  { title: '同城约会', tone: 3 },
-]
-
 const circles = [
   { title: '我的帖子', mark: '帖', bg: '#fff3e6', color: '#f08a24', path: '/planet' },
   { title: '我的视频', mark: '▶', bg: '#fde2f0', color: '#c5303a', path: '/video' },
@@ -155,20 +138,18 @@ const circles = [
   { title: 'AI定制', mark: 'AI', bg: '#e8f1ff', color: '#3b7cff', path: '/ai' },
 ]
 
-const tools = computed(() => [
+const tools = [
   { title: '兑换码', key: 'redeem', icon: iconGift },
   { title: '优惠券', key: 'coupon', icon: iconBag },
   { title: '抽奖', key: 'lottery', icon: iconStar },
   { title: '站内消息', key: 'message', icon: iconChat },
   { title: '账户凭证', key: 'credential', icon: iconBadge },
-  { title: user.value?.has_password ? '修改密码' : '设置密码', key: 'password', icon: iconGear },
-  { title: '账号登录', key: 'login', icon: iconHead },
   { title: '绑定邀请', key: 'bind', icon: iconLink },
   { title: '应用中心', key: 'app', icon: iconApp },
   { title: '在线客服', key: 'kefu', icon: iconHead },
   { title: '官方群聊', key: 'group', icon: iconChat },
   { title: '设置', key: 'setting', icon: iconGear },
-])
+]
 
 const go = (path: string) => {
   router.push(path)
@@ -228,14 +209,6 @@ const onTool = (item: { title: string; key: string }) => {
     showBind.value = true
     return
   }
-  if (item.key === 'password') {
-    go('/account/password')
-    return
-  }
-  if (item.key === 'login') {
-    go('/account/login')
-    return
-  }
   if (item.key === 'credential') {
     copyText(uid.value, '用户名已复制，完整凭证请到子后台查看')
     return
@@ -272,7 +245,6 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
 
 .me-page {
   position: relative;
@@ -315,16 +287,54 @@ onMounted(() => {
 }
 
 .uid-box {
-  margin-top: 6px;
-  height: 22px;
-  padding: 0 8px;
-  border: 1.4px solid $ink;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  height: 28px;
+  padding: 0 6px 0 10px;
+  border: 0;
   border-radius: $radius-pill;
-  background: $primary-color;
-  color: $ink;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  background: $primary-color-deep;
+  color: #fff;
+
+  span {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  strong {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+  }
+
+  em {
+    font-style: normal;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: $radius-pill;
+    background: rgba(255, 255, 255, 0.22);
+  }
+}
+
+.account-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 12px;
+
+  button {
+    height: 36px;
+    border: 1.4px solid $line;
+    border-radius: $radius-pill;
+    background: #fff;
+    color: $primary-color-deep;
+    font-size: 13px;
+    font-weight: 700;
+  }
 }
 
 .hero-cards {
@@ -340,7 +350,7 @@ onMounted(() => {
   border-radius: 12px;
   padding: 12px 12px 10px;
   text-align: left;
-  color: $ink;
+  color: #fff;
   position: relative;
   overflow: hidden;
 
@@ -352,7 +362,7 @@ onMounted(() => {
   p {
     margin-top: 6px;
     font-size: 11px;
-    opacity: 0.9;
+    opacity: 0.92;
   }
 
   &.vip {
@@ -360,7 +370,7 @@ onMounted(() => {
   }
 
   &.wallet {
-    background: $accent-yellow;
+    background: #ff7aa8;
   }
 }
 
@@ -402,35 +412,6 @@ onMounted(() => {
     height: 26px;
   }
 }
-
-.promo-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px 6px;
-}
-
-.promo {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  text-align: center;
-
-  span {
-    display: block;
-    margin-top: 4px;
-    font-size: 11px;
-    color: #333;
-    line-height: 1.2;
-  }
-}
-
-.thumb {
-  width: 100%;
-  aspect-ratio: 1;
-  border-radius: 8px;
-}
-
-@include media-tones;
 
 .circle-row {
   display: grid;
@@ -474,56 +455,6 @@ onMounted(() => {
     font-size: 12px;
     color: #333;
   }
-}
-
-.float-promo {
-  position: absolute;
-  right: 12px;
-  bottom: calc(#{$tabbar-height} + 18px);
-  width: 92px;
-  padding: 8px 8px 10px;
-  border-radius: 10px;
-  border: 1.6px solid $ink;
-  box-shadow: 3px 3px 0 $ink;
-  z-index: 8;
-  text-align: center;
-
-  p {
-    margin: 6px 0 8px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-}
-
-.close {
-  position: absolute;
-  top: 2px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border: 0;
-  background: transparent;
-  color: #999;
-  font-size: 16px;
-  line-height: 1;
-}
-
-.float-art {
-  height: 64px;
-  border-radius: 8px;
-  background: linear-gradient(180deg, #f3c9b8, #c47a6a);
-}
-
-.cta {
-  width: 100%;
-  height: 26px;
-  border: 0;
-  border-radius: 13px;
-  background: $accent-yellow;
-  color: $ink;
-  border: 1.4px solid $ink;
-  font-weight: 800;
-  font-size: 11px;
 }
 
 .bind-mask {
