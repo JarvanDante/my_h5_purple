@@ -30,10 +30,6 @@
         <span>绑定邀请</span>
         <i>›</i>
       </button>
-      <button type="button" @click="go('/account/login')">
-        <span>账号登录</span>
-        <i>›</i>
-      </button>
     </section>
 
     <p class="hint">未退出时本机用设备自动登录。退出后需用上方登录账号 + 密码重新进入，不要用设备号。</p>
