@@ -313,8 +313,8 @@ defineEmits<{
   padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 12px;
 
   .channel-row {
-    height: 52px;
-    min-height: 52px;
+    height: 54px;
+    min-height: 54px;
     overflow: visible;
 
     &::after {
@@ -325,25 +325,24 @@ defineEmits<{
       bottom: 0;
       height: 1px;
       pointer-events: none;
-      background: linear-gradient(90deg, transparent 4%, rgba(255, 92, 147, 0.55) 50%, transparent 96%);
-      box-shadow:
-        0 0 10px rgba(255, 92, 147, 0.35),
-        0 4px 16px rgba(255, 92, 147, 0.16);
+      background: linear-gradient(90deg, transparent 8%, rgba(255, 92, 147, 0.5) 28%, rgba(255, 92, 147, 0.18) 62%, transparent 92%);
+      box-shadow: 0 0 12px rgba(255, 92, 147, 0.22);
     }
   }
 
   .channel-tabs {
-    gap: 22px;
+    gap: 26px;
+    padding-left: 22px;
     overflow: visible;
   }
 
   .channel-item {
     position: relative;
-    color: #8b8b96;
+    color: #9a9aa6;
     font-size: 15px;
     font-weight: 500;
-    letter-spacing: 0.08em;
-    padding: 8px 2px;
+    letter-spacing: 0.04em;
+    padding: 8px 4px;
     border-radius: 0;
     background: transparent;
 
@@ -351,11 +350,11 @@ defineEmits<{
       color: #fff;
       font-size: 18px;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.08em;
       background: transparent;
       text-shadow:
-        0 0 10px rgba(255, 92, 147, 0.55),
-        0 0 22px rgba(255, 92, 147, 0.28);
+        0 0 8px rgba(255, 92, 147, 0.45),
+        0 0 18px rgba(255, 92, 147, 0.2);
 
       .channel-text {
         position: relative;
@@ -367,12 +366,13 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 2.6em;
-        height: 1.15em;
-        transform: translate(-50%, -50%) rotate(-16deg);
-        border: 1px solid rgba(255, 92, 147, 0.5);
+        width: 3em;
+        height: 1.35em;
+        transform: translate(-50%, -50%) rotate(-14deg);
+        border: 1px solid rgba(255, 92, 147, 0.42);
         border-radius: 50%;
-        box-shadow: 0 0 10px rgba(255, 92, 147, 0.22);
+        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.06) 55%, transparent 72%);
+        box-shadow: 0 0 16px rgba(255, 92, 147, 0.18);
         pointer-events: none;
       }
 
@@ -380,25 +380,25 @@ defineEmits<{
       .channel-text::after {
         content: '';
         position: absolute;
-        width: 5px;
-        height: 5px;
+        width: 4px;
+        height: 4px;
         background: #fff;
         clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
-        filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.85));
+        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
         pointer-events: none;
       }
 
       .channel-text::before {
-        top: -7px;
-        right: -8px;
+        top: -6px;
+        right: -7px;
       }
 
       .channel-text::after {
-        bottom: -5px;
-        left: -9px;
+        bottom: -4px;
+        left: -8px;
         width: 3px;
         height: 3px;
-        opacity: 0.75;
+        opacity: 0.7;
       }
     }
   }
