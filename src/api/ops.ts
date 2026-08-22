@@ -133,9 +133,23 @@ export function addComment(contentId: number, content: string) {
   })
 }
 
-export function fetchPostList(sort = 'new', page = 1, size = 20, userId?: number) {
+export type PostCategory = { id: number; name: string; kind: number }
+
+export function fetchPostCategories() {
+  return request<{ list: PostCategory[] }>('/post/categories')
+}
+
+export function fetchPostList(
+  sort = 'new',
+  page = 1,
+  size = 20,
+  userId?: number,
+  extra?: { follow?: number; category?: string },
+) {
   const q = new URLSearchParams({ sort, page: String(page), size: String(size) })
   if (userId) q.set('user_id', String(userId))
+  if (extra?.follow) q.set('follow', String(extra.follow))
+  if (extra?.category) q.set('category', extra.category)
   return request<{ list: PostItem[]; total: number }>(`/post/list?${q}`)
 }
 

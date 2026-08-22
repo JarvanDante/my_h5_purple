@@ -38,7 +38,7 @@
             :key="post.id"
             :post="post"
             :topics="topicsOf(post)"
-            :essence="idx === 0 && tab === '推荐'"
+            :essence="idx === 0 && isRecommend"
             :top="idx === 0"
             :followed="followed.has(post.user_id)"
             :liked="liked.has(post.id)"
@@ -65,53 +65,84 @@ import { showToast } from 'vant'
 import PostCard from '@/components/PostCard.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
-import { fetchPostList, type PostItem } from '@/api/ops'
+import { fetchPostCategories, fetchPostList, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
-import { useTabSlide } from '@/composables/useTabSlide'
+import { slideByIndex } from '@/stores/nav'
 import { useUserStore } from '@/stores/user'
 import { getToken, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })
 
+const FOLLOW_TAB = '关注'
+const fallbackCats = ['推荐', '活动专区', '日常专区']
+
 const router = useRouter()
 const userStore = useUserStore()
-const tabs = ['关注', '推荐', '活动专区', '日常专区', '星球']
-const slide = useTabSlide(tabs, '推荐')
-const tab = computed(() => slide.current.value)
-const name = computed(() => slide.name.value)
+const tabs = ref<string[]>([FOLLOW_TAB, ...fallbackCats])
+const cateKind = ref<Record<string, number>>({})
+const tab = ref(FOLLOW_TAB)
+const name = ref('tab-left')
 const list = ref<PostItem[]>([])
 const followed = ref(new Set<number>())
 const liked = ref(new Set<number>())
 const myId = computed(() => userStore.user?.id || 0)
+const isRecommend = computed(() => cateKind.value[tab.value] === 2 || tab.value === '推荐')
 
 const hint = computed(() => {
-  if (tab.value === '关注') return '关注的人发布后会显示在这里'
+  if (tab.value !== FOLLOW_TAB) return ''
+  if (!getToken()) return '登录后查看关注的人发布的帖子'
+  if (!list.value.length) return '关注的人发布后会显示在这里'
   return ''
 })
 
-const select = (item: string) => slide.select(item)
+const select = (item: string) => {
+  if (item === tab.value) return
+  name.value = slideByIndex(tabs.value.indexOf(tab.value), tabs.value.indexOf(item))
+  tab.value = item
+}
 const go = (path: string) => router.push(path)
 const goPost = (id: number) => router.push(`/planet/${id}`)
 const goUser = (userId: number) => router.push(`/user/${userId}`)
 
-const topicsOf = (post: PostItem) => {
-  if (post.topics?.length) return post.topics
-  if (tab.value === '活动专区') return ['活动公告']
-  if (tab.value === '日常专区') return ['日常分享']
-  return ['广场']
+const topicsOf = (post: PostItem) => post.topics?.length ? post.topics : []
+
+const applyCategories = (rows: { name: string; kind: number }[]) => {
+  const names = rows.map((r) => r.name.trim()).filter((n) => n && n !== FOLLOW_TAB)
+  const kinds: Record<string, number> = {}
+  rows.forEach((r) => {
+    if (r.name) kinds[r.name] = r.kind
+  })
+  cateKind.value = kinds
+  tabs.value = [FOLLOW_TAB, ...(names.length ? names : fallbackCats)]
+  if (!tabs.value.includes(tab.value)) tab.value = FOLLOW_TAB
 }
 
 const load = () => {
-  if (hint.value) {
+  if (tab.value === FOLLOW_TAB && !getToken()) {
     list.value = []
     return
   }
-  const sort = tab.value === '日常专区' ? 'new' : 'hot'
-  fetchPostList(sort, 1, 20)
+  const extra: { follow?: number; category?: string } = {}
+  let sort = 'new'
+  if (tab.value === FOLLOW_TAB) {
+    extra.follow = 1
+  } else {
+    const kind = cateKind.value[tab.value]
+    if (kind === 2) sort = 'hot'
+    else if (kind === 0) extra.category = tab.value
+  }
+  fetchPostList(sort, 1, 20, undefined, extra)
     .then((data) => {
       list.value = data.list || []
     })
     .catch(toastError)
+}
+
+const loadCategories = () => {
+  return fetchPostCategories()
+    .then((data) => applyCategories(data.list || []))
+    .catch(() => applyCategories([]))
+    .finally(load)
 }
 
 const loadFollows = async () => {
@@ -133,6 +164,7 @@ const onFollow = async (userId: number) => {
     else nextSet.delete(userId)
     followed.value = nextSet
     showToast(next ? '已关注' : '已取消关注')
+    if (tab.value === FOLLOW_TAB) load()
   } catch (err) {
     toastError(err)
   }
@@ -179,7 +211,7 @@ const openCompose = async () => {
 
 watch(tab, load)
 onMounted(() => {
-  load()
+  loadCategories()
   loadFollows()
 })
 </script>
