@@ -15,6 +15,15 @@
         >
           <svg v-if="dark && channel === item" class="channel-ring" viewBox="0 0 90 40" aria-hidden="true">
             <defs>
+              <linearGradient id="channel-ring-stroke" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffe0ec" />
+                <stop offset="38%" stop-color="#ff9fbf" />
+                <stop offset="100%" stop-color="#c43a6e" />
+              </linearGradient>
+              <linearGradient id="channel-ring-fill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffb6d0" stop-opacity="0.22" />
+                <stop offset="100%" stop-color="#8a2048" stop-opacity="0.18" />
+              </linearGradient>
               <filter id="channel-ring-glow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
                 <feMerge>
@@ -25,8 +34,8 @@
             </defs>
             <path
               filter="url(#channel-ring-glow)"
-              fill="rgba(255,92,147,0.12)"
-              stroke="#ff6b9d"
+              fill="url(#channel-ring-fill)"
+              stroke="url(#channel-ring-stroke)"
               stroke-width="1.7"
               stroke-linejoin="round"
               d="M11 21 C13 8.5 28 5.5 46 6.5 C67 7.8 80 12 81 21 C82 30.5 66 34.5 45 33.5 C25 32.4 9 29.5 11 21 Z"
