@@ -35,7 +35,9 @@
               </clipPath>
             </defs>
             <g filter="url(#channel-orbit-glow)" clip-path="url(#channel-orbit-back)">
-              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
+              <g transform="translate(48 22) scale(1 -1) translate(-48 -22)">
+                <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
+              </g>
             </g>
           </svg>
           <span class="channel-text">{{ item }}</span>
@@ -58,7 +60,9 @@
               </clipPath>
             </defs>
             <g filter="url(#channel-orbit-glow-front)" clip-path="url(#channel-orbit-front-clip)">
-              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
+              <g transform="translate(48 22) scale(1 -1) translate(-48 -22)">
+                <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
+              </g>
             </g>
             <path class="spark" d="M76 29.6l1.15 2.55 2.55 1.15-2.55 1.15L76 37l-1.15-2.55-2.55-1.15 2.55-1.15z" />
             <path class="spark" d="M20 28.8l0.85 1.9 1.9 0.85-1.9 0.85L20 34.3l-0.85-1.9-1.9-0.85 1.9-0.85z" />
