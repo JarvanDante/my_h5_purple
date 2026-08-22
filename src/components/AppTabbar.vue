@@ -67,15 +67,31 @@ const go = (path: string) => {
   width: 100%;
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 2px 4px env(safe-area-inset-bottom, 0px);
-  background: $background-tabbar;
-  border-top: 1px solid #ffdde9;
+  background: #0b0b0d;
+  border-top: 1px solid rgba(255, 92, 147, 0.16);
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
   z-index: 1000;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 80% at 50% 118%, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.1) 42%, transparent 70%),
+      linear-gradient(0deg, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.06) 38%, transparent 78%);
+  }
 }
 
 .tab-item {
+  position: relative;
+  z-index: 1;
   flex: 1;
   height: 50px;
   border: 0;
@@ -86,7 +102,7 @@ const go = (path: string) => {
   justify-content: flex-end;
   gap: 1px;
   padding-bottom: 4px;
-  color: $tab-idle;
+  color: #7a7a84;
   cursor: pointer;
 
   &.active {
@@ -94,6 +110,7 @@ const go = (path: string) => {
 
     .tab-icon {
       color: $primary-color;
+      filter: drop-shadow(0 0 8px rgba(255, 92, 147, 0.55));
     }
 
     .tab-label {
@@ -120,7 +137,7 @@ const go = (path: string) => {
   width: 22px;
   height: 22px;
   display: flex;
-  color: $tab-idle;
+  color: #7a7a84;
 
   svg {
     width: 100%;
