@@ -154,6 +154,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '我的关注' },
   },
   {
+    path: '/history',
+    name: 'History',
+    component: () => import('@/views/common/history.vue'),
+    meta: { title: '浏览记录' },
+  },
+  {
     path: '/list',
     name: 'List',
     component: () => import('@/views/common/list.vue'),

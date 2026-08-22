@@ -204,7 +204,7 @@ const quicks = [
   { title: '我的购买', path: '/purchase', icon: iconBag },
   { title: '我的收藏', path: '/favorite', icon: iconStar },
   { title: '我的关注', path: '/follow', icon: iconHeart },
-  { title: '历史记录', path: '', icon: iconClock },
+  { title: '浏览记录', path: '/history', icon: iconClock },
 ]
 
 const menus = [

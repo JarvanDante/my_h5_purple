@@ -112,6 +112,7 @@ import {
 } from '@/api/comics'
 import { useUserStore } from '@/stores/user'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { pushBrowse } from '@/utils/browseHistory'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -150,6 +151,14 @@ const load = async () => {
   const [d, c] = await Promise.all([fetchComicsDetail(id), fetchComicsChapters(id)])
   item.value = d
   chapters.value = c.list || []
+  pushBrowse({
+    id: d.id,
+    kind: 'comic',
+    title: d.title,
+    cover: d.cover,
+    tag: d.is_vip ? 'VIP' : 'Free',
+    sub: d.chapter_count ? `共${d.chapter_count}话` : '',
+  })
   await loadFav()
 }
 

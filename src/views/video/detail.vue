@@ -107,6 +107,7 @@ import { useUserStore } from '@/stores/user'
 import type { CoverItem } from '@/data/mock'
 import { decodeId, videoPath } from '@/utils/idcrypt'
 import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
+import { pushBrowse } from '@/utils/browseHistory'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
@@ -295,6 +296,13 @@ const load = () => {
   fetchVideoDetail(id)
     .then((data) => {
       item.value = data
+      pushBrowse({
+        id: data.id,
+        kind: 'video',
+        title: data.title,
+        cover: data.cover_url,
+        tag: '视频',
+      })
       return loadMarks()
     })
     .catch(toastError)
