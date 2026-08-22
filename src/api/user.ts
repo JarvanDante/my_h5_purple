@@ -156,3 +156,13 @@ export function reportShare(type = 'link', channel = 'h5') {
 export function fetchShareLogs(page = 1, size = 20) {
   return request<{ list: ShareLog[]; total: number }>(`/user/share/logs?page=${page}&size=${size}`)
 }
+
+export type Invitee = {
+  nickname: string
+  invite_code: string
+  created_at: string
+}
+
+export function fetchInvitees(page = 1, size = 50) {
+  return request<{ list: Invitee[]; total: number }>(`/user/share/invitees?page=${page}&size=${size}`)
+}
