@@ -127,9 +127,8 @@ const load = () => {
   if (tab.value === FOLLOW_TAB) {
     extra.follow = 1
   } else {
-    const kind = cateKind.value[tab.value]
-    if (kind === 2) sort = 'hot'
-    else if (kind === 0) extra.category = tab.value
+    extra.category = tab.value
+    if (cateKind.value[tab.value] === 2) sort = 'hot'
   }
   fetchPostList(sort, 1, 20, undefined, extra)
     .then((data) => {
