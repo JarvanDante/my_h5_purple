@@ -1,4 +1,4 @@
-import { request } from '@/utils/request'
+import { request, uploadMedia } from '@/utils/request'
 
 export type UploadResult = { url: string; object_key: string }
 export type StoragePurpose = 'image' | 'video' | 'avatar' | 'cover' | 'ad' | 'post' | 'post_video'
@@ -20,12 +20,16 @@ function defaultName(purpose: StoragePurpose) {
   return 'image.jpg'
 }
 
-/** 前台帖子/图片/视频/广告/头像：走统一存储，写入桶 my-storage。 */
+/** 图片走服务端加密成 .bnc；视频预签名直传。都写入 my-storage。 */
 export async function uploadToStorage(
   file: File,
   purpose: StoragePurpose,
   onProgress?: (percent: number) => void,
 ): Promise<UploadResult> {
+  if (purpose !== 'video' && purpose !== 'post_video') {
+    const data = await uploadMedia(file, purpose === 'cover' || purpose === 'avatar' || purpose === 'ad' || purpose === 'post' ? purpose : 'image')
+    return { url: data.url, object_key: data.object_key }
+  }
   const init = await request<InitRes>('/media/storage/init', {
     method: 'POST',
     body: JSON.stringify({
