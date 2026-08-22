@@ -3,7 +3,7 @@
     <header class="me-top">
       <button type="button" class="icon-btn" aria-label="消息" @click="go('/message')">
         <span v-html="iconChat" />
-        <i class="dot" />
+        <i v-if="unread > 0" class="dot" />
       </button>
       <div class="top-right">
         <button type="button" class="icon-btn" aria-label="客服" @click="soon('在线客服')">
@@ -126,9 +126,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onActivated, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import { fetchUnreadCount } from '@/api/ops'
 import { bindInviteCode } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import EncryptedImage from '@/components/EncryptedImage.vue'
@@ -148,7 +149,18 @@ const showSettings = ref(false)
 const bindCode = ref('')
 const bindBusy = ref(false)
 const clock = ref({ h: '00', m: '00', s: '00' })
+const unread = ref(0)
 let timer = 0
+
+const loadUnread = async () => {
+  try {
+    if (!userStore.loggedIn) await userStore.ensureLogin()
+    const res = await fetchUnreadCount()
+    unread.value = res.count || 0
+  } catch {
+    unread.value = 0
+  }
+}
 
 const pad = (n: number) => String(n).padStart(2, '0')
 const tickClock = () => {
@@ -304,7 +316,10 @@ onMounted(() => {
   } else {
     userStore.refresh().catch(() => undefined)
   }
+  loadUnread()
 })
+
+onActivated(loadUnread)
 
 onUnmounted(() => {
   window.clearInterval(timer)
