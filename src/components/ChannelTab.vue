@@ -66,10 +66,15 @@ const uid = useId().replace(/\W/g, '')
   font-weight: 500;
   letter-spacing: 0.04em;
   line-height: 1;
-  padding: 0 6px 10px;
+  padding: 0 6px 12px;
   display: inline-flex;
   align-items: flex-end;
   white-space: nowrap;
+}
+
+.channel-text {
+  display: inline-block;
+  transform-origin: center bottom;
 }
 
 .channel-ring {
@@ -92,12 +97,12 @@ const uid = useId().replace(/\W/g, '')
 
 .channel-tab.active {
   color: #fff;
-  font-size: 18px;
   font-weight: 700;
 
   .channel-text {
     position: relative;
     z-index: 1;
+    transform: scale(1.2);
   }
 
   .channel-ring {
