@@ -1,20 +1,28 @@
 <template>
-  <div class="page-shell sub-page">
-    <PageHeader title="兑换码" />
-    <section class="soft-card box">
-      <input v-model="code" type="text" maxlength="32" placeholder="输入兑换码" />
-      <button type="button" :disabled="busy" @click="submit">立即兑换</button>
+  <div class="page-shell sub-page redeem-page">
+    <PageHeader title="兑换中心" fallback="/me" />
+
+    <section class="hero">
+      <p>输入兑换码领取福利</p>
+      <strong>兑换码</strong>
+      <div class="field">
+        <input v-model="code" type="text" maxlength="32" placeholder="请输入兑换码" />
+      </div>
+      <button type="button" class="submit" :disabled="busy || !code.trim()" @click="submit">
+        {{ busy ? '兑换中…' : '立即兑换' }}
+      </button>
     </section>
-    <section class="soft-card logs">
+
+    <section class="logs">
       <h3>兑换记录</h3>
-      <p v-if="!logs.length" class="empty">暂无记录，子后台「运营管理 → 兑换码」可发码</p>
-      <div v-for="item in logs" :key="item.code + (item.created_at || item.actived_at || '')" class="row">
+      <p v-if="!logs.length" class="empty">暂无兑换记录</p>
+      <article v-for="item in logs" :key="item.code + (item.created_at || item.actived_at || '')" class="row">
         <div>
           <b>{{ item.name || item.desc || item.code }}</b>
           <span>{{ item.created_at || item.actived_at }}</span>
         </div>
         <em>{{ item.add_num ? `+${item.add_num}` : item.code }}</em>
-      </div>
+      </article>
     </section>
   </div>
 </template>
@@ -70,59 +78,119 @@ onMounted(async () => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.box {
-  input {
-    width: 100%;
-    height: 40px;
-    border: 1.6px solid $ink;
-    border-radius: $radius-pill;
-    padding: 0 14px;
+.redeem-page {
+  background: #0d0d12;
+  color: #f5f5f8;
+  min-height: 100%;
+  padding: 0 16px 28px;
+}
+
+.hero {
+  margin-top: 12px;
+  padding: 20px 16px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2a0b1a 0%, #5a1238 58%, #ff3d7f 140%);
+  color: #fff;
+
+  p {
+    font-size: 13px;
+    opacity: 0.82;
   }
 
-  button {
-    width: 100%;
-    height: 40px;
-    margin-top: 12px;
-    border: 1.6px solid $ink;
-    border-radius: $radius-pill;
-    background: $accent-yellow;
-    color: $ink;
+  strong {
+    display: block;
+    margin: 6px 0 16px;
+    font-size: 26px;
     font-weight: 800;
   }
 }
 
+.field {
+  background: rgba(13, 13, 18, 0.45);
+  border-radius: 12px;
+  padding: 2px;
+}
+
+input {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: #191920;
+  color: #f5f5f8;
+  padding: 0 14px;
+  font-size: 15px;
+  letter-spacing: 1px;
+  outline: none;
+
+  &::placeholder {
+    color: #8c8c9c;
+    letter-spacing: 0;
+  }
+}
+
+.submit {
+  width: 100%;
+  height: 44px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 22px;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+
+  &:disabled {
+    opacity: 0.45;
+  }
+}
+
 .logs {
+  margin-top: 22px;
+
   h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 800;
+    margin-bottom: 12px;
   }
 }
 
 .empty {
-  color: #999;
+  padding: 36px 0;
+  text-align: center;
   font-size: 13px;
+  color: #8c8c9c;
 }
 
 .row {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
+  gap: 12px;
+  padding: 14px 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: #191920;
 
   b {
     display: block;
     font-size: 14px;
+    font-weight: 700;
   }
 
   span {
+    display: block;
+    margin-top: 4px;
     font-size: 11px;
-    color: #999;
+    color: #8c8c9c;
   }
 
   em {
+    flex-shrink: 0;
     font-style: normal;
-    color: $primary-color;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
+    color: #2ee59d;
   }
 }
 </style>

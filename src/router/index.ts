@@ -85,7 +85,7 @@ const routes: RouteRecordRaw[] = [
     path: '/redeem',
     name: 'Redeem',
     component: () => import('@/views/common/redeem.vue'),
-    meta: { title: '兑换码' },
+    meta: { title: '兑换中心' },
   },
   {
     path: '/coupon',
