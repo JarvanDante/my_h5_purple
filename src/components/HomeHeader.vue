@@ -325,8 +325,8 @@ defineEmits<{
       bottom: 0;
       height: 1px;
       pointer-events: none;
-      background: linear-gradient(90deg, transparent 8%, rgba(255, 92, 147, 0.5) 28%, rgba(255, 92, 147, 0.18) 62%, transparent 92%);
-      box-shadow: 0 0 12px rgba(255, 92, 147, 0.22);
+      background: rgba(255, 92, 147, 0.55);
+      box-shadow: 0 0 10px rgba(255, 92, 147, 0.28);
     }
   }
 
@@ -342,7 +342,7 @@ defineEmits<{
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.04em;
-    padding: 8px 4px;
+    padding: 8px 4px 10px;
     border-radius: 0;
     background: transparent;
 
@@ -361,44 +361,18 @@ defineEmits<{
         z-index: 1;
       }
 
-      &::before {
+      &::after {
         content: '';
         position: absolute;
         left: 50%;
-        top: 50%;
-        width: 3em;
-        height: 1.35em;
-        transform: translate(-50%, -50%) rotate(-14deg);
-        border: 1px solid rgba(255, 92, 147, 0.42);
-        border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.06) 55%, transparent 72%);
-        box-shadow: 0 0 16px rgba(255, 92, 147, 0.18);
-        pointer-events: none;
-      }
-
-      .channel-text::before,
-      .channel-text::after {
-        content: '';
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background: #fff;
-        clip-path: polygon(50% 0, 65% 35%, 100% 50%, 65% 65%, 50% 100%, 35% 65%, 0 50%, 35% 35%);
-        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.7));
-        pointer-events: none;
-      }
-
-      .channel-text::before {
-        top: -6px;
-        right: -7px;
-      }
-
-      .channel-text::after {
-        bottom: -4px;
-        left: -8px;
-        width: 3px;
+        bottom: 2px;
+        width: 18px;
         height: 3px;
-        opacity: 0.7;
+        transform: translateX(-50%);
+        border-radius: 999px;
+        background: #ff5c93;
+        box-shadow: 0 0 8px rgba(255, 92, 147, 0.55);
+        pointer-events: none;
       }
     }
   }
