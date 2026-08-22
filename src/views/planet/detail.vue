@@ -1,6 +1,6 @@
 <template>
-  <div class="page-shell planet-detail">
-    <PageHeader title="帖子详情" />
+  <div class="page-shell sub-page planet-detail">
+    <PageHeader title="帖子详情" fallback="/planet" />
     <PostCard
       v-if="post"
       :post="post"
@@ -15,16 +15,21 @@
       @share="onShare"
     />
     <section class="comments">
-      <h3>评论 {{ comments.length }}</h3>
-      <p v-if="!comments.length" class="empty">还没有评论</p>
+      <h3>评论 <em>{{ comments.length }}</em></h3>
+      <p v-if="!comments.length" class="empty">还没有评论，来说两句吧～</p>
       <article v-for="item in comments" :key="item.id" class="comment">
-        <strong>用户{{ item.user_id }}</strong>
-        <p>{{ item.content }}</p>
-        <span>{{ item.created_at }}</span>
+        <i class="avatar">{{ String(item.user_id).slice(-1) }}</i>
+        <div class="meta">
+          <strong>用户{{ item.user_id }}</strong>
+          <p>{{ item.content }}</p>
+          <span>{{ item.created_at }}</span>
+        </div>
       </article>
       <div class="reply">
         <input v-model="draft" type="text" maxlength="200" placeholder="请输入评论" @keyup.enter="submitComment" />
-        <button type="button" :disabled="busy" @click="submitComment">发送</button>
+        <button type="button" :disabled="busy || !draft.trim()" @click="submitComment">
+          {{ busy ? '发送中' : '发送' }}
+        </button>
       </div>
     </section>
   </div>
@@ -145,47 +150,79 @@ onMounted(load)
 @use '@/styles/variables.scss' as *;
 
 .planet-detail {
-  background: #f3f3f3;
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  background: #0d0d12;
+  color: #f5f5f8;
+  min-height: 100%;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
 }
 
 .comments {
   margin-top: 8px;
-  background: #fff;
-  padding: 14px 14px 80px;
+  padding: 16px 16px 24px;
 
   h3 {
     font-size: 15px;
-    color: #222;
-    margin-bottom: 10px;
+    font-weight: 800;
+    color: #f5f5f8;
+    margin-bottom: 12px;
+
+    em {
+      font-style: normal;
+      color: #ff3d7f;
+    }
   }
 }
 
 .empty {
-  color: #999;
+  padding: 36px 8px;
+  text-align: center;
+  color: #8c8c9c;
   font-size: 13px;
-  padding: 16px 0;
 }
 
 .comment {
-  padding: 10px 0;
-  border-bottom: 1px solid #f3f3f3;
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #22222b;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #331020;
+  color: #ff6699;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-style: normal;
+}
+
+.meta {
+  min-width: 0;
+  flex: 1;
 
   strong {
+    display: block;
     font-size: 13px;
-    color: #333;
+    color: #c8c8d0;
   }
 
   p {
     margin: 6px 0 4px;
     font-size: 14px;
-    color: #222;
-    line-height: 1.5;
+    color: #f5f5f8;
+    line-height: 1.55;
+    word-break: break-word;
   }
 
   span {
     font-size: 11px;
-    color: #aaa;
+    color: #8c8c9c;
   }
 }
 
@@ -194,30 +231,41 @@ onMounted(load)
   left: 0;
   right: 0;
   bottom: 0;
+  z-index: 20;
   display: flex;
   gap: 8px;
-  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
-  background: #fff;
-  border-top: 1px solid #eee;
+  padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: #0b0b0d;
+  border-top: 1px solid #22222b;
 
   input {
     flex: 1;
-    height: 36px;
+    height: 38px;
     border: 0;
-    border-radius: $radius-pill;
-    background: #f3f3f3;
+    border-radius: 19px;
+    background: #191920;
+    color: #f5f5f8;
     padding: 0 14px;
     font-size: 14px;
     outline: none;
+
+    &::placeholder {
+      color: #8c8c9c;
+    }
   }
 
   button {
+    height: 38px;
     border: 0;
-    background: #ffd400;
-    color: #222;
+    background: #ff3d7f;
+    color: #fff;
     font-weight: 700;
-    border-radius: $radius-pill;
-    padding: 0 14px;
+    border-radius: 19px;
+    padding: 0 16px;
+
+    &:disabled {
+      opacity: 0.45;
+    }
   }
 }
 
