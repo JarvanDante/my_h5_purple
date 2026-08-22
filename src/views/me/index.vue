@@ -180,11 +180,11 @@ const iconLink =
 const iconApp =
   '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.8 19 8v8l-7 4.2L5 16V8l7-4.2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
 const iconHead =
-  '<svg viewBox="0 0 24 24" fill="none"><path d="M5.5 13v-1a6.5 6.5 0 1 1 13 0v1M5.5 13.5v3.2A1.8 1.8 0 0 0 7.3 18.5h.6M18.5 13.5v3.2a1.8 1.8 0 0 1-1.8 1.8h-.6M10 19.2h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M5.6 12.4V11a6.4 6.4 0 0 1 12.8 0v1.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="4" y="11.6" width="3.6" height="6.4" rx="1.7" stroke="currentColor" stroke-width="1.8"/><rect x="16.4" y="11.6" width="3.6" height="6.4" rx="1.7" stroke="currentColor" stroke-width="1.8"/><path d="M20 15.6v2.2A2.2 2.2 0 0 1 17.8 20H16.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
 const iconChat =
-  '<svg viewBox="0 0 24 24" fill="none"><path d="M6 16.5 4.5 19l3-1.1A8 8 0 1 0 6 16.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M12.1 3.6c4.4 0 7.9 3.1 7.9 7 0 3.8-3.5 7-7.9 7-.9 0-1.8-.1-2.6-.4L5.2 19.4l1.4-3.3C5.2 14.8 4.2 13 4.2 10.6c0-3.9 3.5-7 7.9-7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="8.5" cy="10.6" r="1.05" fill="currentColor"/><circle cx="12.1" cy="10.6" r="1.05" fill="currentColor"/><circle cx="15.7" cy="10.6" r="1.05" fill="currentColor"/></svg>'
 const iconGear =
-  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><path d="m19 13.2-.9 1.6 1 1.6-1.6 1.6-1.6-1-1.6.9L13.2 19h-2.4L10.2 18l-1.6.9-1.6-1 1-1.6L6 13.2 5 12.6v-1.2L6 10.8l.9-1.6-1-1.6 1.6-1.6 1.6 1 1.6-.9L10.8 5h2.4L13.8 6l1.6-.9 1.6 1-1 1.6.9 1.6 1 .6v1.2l-1 .6Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>'
+  '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2.8 13.99 7.2 17.94 6.06 16.8 10.01 20.4 12 16.8 13.99 17.94 17.94 13.99 16.8 12 20.4 10.01 16.8 6.06 17.94 7.2 13.99 3.6 12 7.2 10.01 6.06 6.06 10.01 7.2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.35" stroke="currentColor" stroke-width="1.7"/></svg>'
 const iconDots =
   '<svg viewBox="0 0 24 24" fill="none"><circle cx="8.2" cy="8.2" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="15.8" cy="8.2" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="8.2" cy="15.8" r="2.1" stroke="currentColor" stroke-width="1.6"/><circle cx="15.8" cy="15.8" r="2.1" stroke="currentColor" stroke-width="1.6"/></svg>'
 const iconSmile =
@@ -329,7 +329,7 @@ onUnmounted(() => {
 
 .top-right {
   display: flex;
-  gap: 2px;
+  gap: 8px;
 }
 
 .icon-btn {
@@ -344,15 +344,15 @@ onUnmounted(() => {
   justify-content: center;
 
   :deep(svg) {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
   }
 }
 
 .dot {
   position: absolute;
-  top: 7px;
-  right: 7px;
+  top: 5px;
+  right: 5px;
   width: 7px;
   height: 7px;
   border-radius: 50%;
