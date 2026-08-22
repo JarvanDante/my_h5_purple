@@ -385,13 +385,13 @@ defineEmits<{
 
   .search-pill {
     height: 36px;
-    background: #17171c;
-    border-color: #2a2a32;
-    color: #7a7a84;
+    background: #4a353c;
+    border-color: transparent;
+    color: #c4b4b8;
   }
 
   .search-ico {
-    color: #7a7a84;
+    color: #d0c4c8;
   }
 
   .util-btn {
@@ -405,11 +405,11 @@ defineEmits<{
     font-weight: 600;
 
     &.vip {
-      background: #2a1c28;
+      background: #53405a;
     }
 
     &.checkin {
-      background: #2a2218;
+      background: #4e3a32;
     }
   }
 
