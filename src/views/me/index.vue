@@ -15,7 +15,7 @@
       <div v-else class="avatar" />
       <div class="meta">
         <h1>{{ user?.nickname || '未登录' }}</h1>
-        <button type="button" class="uid-box" @click="copyUid">编号: {{ uid }}</button>
+        <button type="button" class="uid-box" @click="copyUid">用户名: {{ uid }}</button>
       </div>
     </section>
 
@@ -155,18 +155,20 @@ const circles = [
   { title: 'AI定制', mark: 'AI', bg: '#e8f1ff', color: '#3b7cff', path: '/ai' },
 ]
 
-const tools = [
+const tools = computed(() => [
   { title: '兑换码', key: 'redeem', icon: iconGift },
   { title: '优惠券', key: 'coupon', icon: iconBag },
   { title: '抽奖', key: 'lottery', icon: iconStar },
   { title: '站内消息', key: 'message', icon: iconChat },
   { title: '账户凭证', key: 'credential', icon: iconBadge },
+  { title: user.value?.has_password ? '修改密码' : '设置密码', key: 'password', icon: iconGear },
+  { title: '账号登录', key: 'login', icon: iconHead },
   { title: '绑定邀请', key: 'bind', icon: iconLink },
   { title: '应用中心', key: 'app', icon: iconApp },
   { title: '在线客服', key: 'kefu', icon: iconHead },
   { title: '官方群聊', key: 'group', icon: iconChat },
   { title: '设置', key: 'setting', icon: iconGear },
-]
+])
 
 const go = (path: string) => {
   router.push(path)
@@ -187,7 +189,7 @@ const copyText = async (text: string, ok: string) => {
 
 const copyUid = () => {
   if (!uid.value || uid.value === '----') return
-  copyText(uid.value, '编号已复制')
+  copyText(uid.value, '用户名已复制')
 }
 
 const onQuick = (item: { title: string; path: string }) => {
@@ -226,8 +228,16 @@ const onTool = (item: { title: string; key: string }) => {
     showBind.value = true
     return
   }
+  if (item.key === 'password') {
+    go('/account/password')
+    return
+  }
+  if (item.key === 'login') {
+    go('/account/login')
+    return
+  }
   if (item.key === 'credential') {
-    copyText(uid.value, '编号已复制，完整凭证请到子后台查看')
+    copyText(uid.value, '用户名已复制，完整凭证请到子后台查看')
     return
   }
   soon(item.title)

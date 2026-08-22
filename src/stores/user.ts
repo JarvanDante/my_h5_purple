@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { fetchUserInfo, login, type UserInfo } from '@/api/user'
+import { fetchUserInfo, login, loginByAccount, type UserInfo } from '@/api/user'
 import { setToken } from '@/utils/request'
 
 const DEVICE_KEY = 'h5_device_id'
@@ -31,11 +31,25 @@ export const useUserStore = defineStore('user', () => {
     return data.user
   }
 
+  const loginAccount = async (username: string, password: string) => {
+    const data = await loginByAccount({
+      username,
+      password,
+      device_id: deviceId(),
+      device_type: 'h5',
+      device_version: '0.1.0',
+    })
+    setToken(data.token)
+    user.value = data.user
+    ready.value = true
+    return data.user
+  }
+
   const refresh = async () => {
     user.value = await fetchUserInfo()
     ready.value = true
     return user.value
   }
 
-  return { user, ready, loggedIn, ensureLogin, refresh, deviceId }
+  return { user, ready, loggedIn, ensureLogin, loginAccount, refresh, deviceId }
 })

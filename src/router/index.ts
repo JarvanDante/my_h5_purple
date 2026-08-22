@@ -124,6 +124,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '帖子详情' },
   },
   {
+    path: '/account/login',
+    name: 'AccountLogin',
+    component: () => import('@/views/me/account-login.vue'),
+    meta: { title: '账号登录' },
+  },
+  {
+    path: '/account/password',
+    name: 'AccountPassword',
+    component: () => import('@/views/me/account-password.vue'),
+    meta: { title: '设置密码' },
+  },
+  {
     path: '/favorite',
     name: 'Favorite',
     component: () => import('@/views/common/favorite.vue'),

@@ -14,6 +14,7 @@ export type UserInfo = {
   group_name: string
   fans: number
   follow: number
+  has_password?: boolean
   ext?: Record<string, unknown>
 }
 
@@ -34,6 +35,26 @@ export type RechargePackage = {
 
 export function login(body: { device_id: string; device_type: string; device_version: string }) {
   return request<{ token: string; user: UserInfo }>('/user/login', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export function loginByAccount(body: {
+  username: string
+  password: string
+  device_id: string
+  device_type: string
+  device_version: string
+}) {
+  return request<{ token: string; user: UserInfo }>('/user/account-login', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export function setPassword(body: { password: string; old_password?: string }) {
+  return request<Record<string, never>>('/user/password', {
     method: 'POST',
     body: JSON.stringify(body),
   })
