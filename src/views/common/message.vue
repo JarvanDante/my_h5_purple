@@ -1,20 +1,25 @@
 <template>
-  <div class="page-shell sub-page">
-    <PageHeader title="站内消息" />
-    <section class="soft-card box">
-      <div class="head">
-        <span>未读 {{ unread }}</span>
-        <button v-if="unread" type="button" @click="readAll">全部已读</button>
+  <div class="page-shell sub-page msg-page">
+    <PageHeader title="站内消息" fallback="/me">
+      <button v-if="unread" type="button" class="read-btn" @click="readAll">全部已读</button>
+    </PageHeader>
+
+    <p v-if="!list.length" class="empty">暂无消息</p>
+    <button
+      v-for="m in list"
+      :key="m.id"
+      type="button"
+      class="row"
+      :class="{ unread: !m.is_read }"
+      @click="open(m)"
+    >
+      <i v-if="!m.is_read" class="dot" />
+      <div class="meta">
+        <b>{{ m.title }}</b>
+        <p>{{ m.content }}</p>
+        <span>{{ m.created_at }}</span>
       </div>
-      <p v-if="!list.length" class="empty">暂无消息，子后台「用户管理 → 站内消息」可发送</p>
-      <button v-for="m in list" :key="m.id" type="button" class="row" :class="{ unread: !m.is_read }" @click="open(m)">
-        <div>
-          <b>{{ m.title }}</b>
-          <p>{{ m.content }}</p>
-          <span>{{ m.created_at }}</span>
-        </div>
-      </button>
-    </section>
+    </button>
   </div>
 </template>
 
@@ -63,48 +68,78 @@ onMounted(async () => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.head {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 13px;
+.msg-page {
+  background: #0d0d12;
+  color: #f5f5f8;
+  min-height: 100%;
+  padding: 8px 16px 24px;
+}
 
-  button {
-    border: 0;
-    background: none;
-    color: $primary-color-deep;
-    font-weight: 700;
-  }
+.read-btn {
+  border: 0;
+  background: transparent;
+  color: #ff3d7f;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 8px;
 }
 
 .empty {
-  color: #999;
+  padding: 64px 16px;
+  text-align: center;
   font-size: 13px;
+  color: #8c8c9c;
 }
 
 .row {
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   width: 100%;
   text-align: left;
-  border: 1.4px solid $ink;
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
+  border: 0;
+  background: #191920;
+  border-radius: 14px;
+  padding: 14px 12px;
+  margin-bottom: 10px;
+  color: inherit;
+}
 
-  &.unread b {
-    color: $primary-color-deep;
+.dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #ff3d7f;
+  flex-shrink: 0;
+}
+
+.meta {
+  min-width: 0;
+  flex: 1;
+
+  b {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
   }
 
   p {
-    margin: 4px 0;
-    color: #666;
+    margin: 6px 0 4px;
     font-size: 13px;
+    line-height: 1.5;
+    color: #c8c8d0;
+    white-space: pre-wrap;
+    word-break: break-word;
   }
 
   span {
     font-size: 11px;
-    color: #999;
+    color: #8c8c9c;
   }
+}
+
+.unread b {
+  color: #ff6699;
 }
 </style>

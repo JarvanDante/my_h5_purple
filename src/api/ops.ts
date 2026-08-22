@@ -202,6 +202,15 @@ export function fetchUnreadCount() {
   return request<{ count: number }>('/message/unread')
 }
 
+export type FeedbackItem = {
+  id: number
+  problem_type: number
+  content: string
+  status: number
+  reply?: string
+  created_at: string
+}
+
 export function addFeedback(body: {
   type?: number
   problem_type: number
@@ -212,6 +221,10 @@ export function addFeedback(body: {
     method: 'POST',
     body: JSON.stringify({ type: 1, pics: [], ...body }),
   })
+}
+
+export function fetchMyFeedback(page = 1, size = 20) {
+  return request<{ list: FeedbackItem[]; total: number }>(`/feedback/my?page=${page}&size=${size}`)
 }
 
 export function readMessage(id = 0, all = false) {
