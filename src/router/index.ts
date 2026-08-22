@@ -112,6 +112,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '意见反馈' },
   },
   {
+    path: '/invite',
+    name: 'Invite',
+    component: () => import('@/views/common/invite.vue'),
+    meta: { title: '分享邀请' },
+  },
+  {
+    path: '/invite/logs',
+    name: 'InviteLogs',
+    component: () => import('@/views/common/invite-logs.vue'),
+    meta: { title: '我的分享' },
+  },
+  {
     path: '/planet/compose',
     name: 'PlanetCompose',
     component: () => import('@/views/planet/compose.vue'),

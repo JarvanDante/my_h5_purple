@@ -127,3 +127,32 @@ export function fetchFollows(page = 1, size = 50) {
 export function fetchFans(page = 1, size = 50) {
   return request<{ list: PublicUser[]; total: number }>(`/user/fans?page=${page}&size=${size}`)
 }
+
+export type ShareInfo = {
+  share_code: string
+  share_url: string
+  share_num: number
+}
+
+export type ShareLog = {
+  id: number
+  type: string
+  target_id?: number
+  channel?: string
+  created_at: string
+}
+
+export function fetchShareInfo() {
+  return request<ShareInfo>('/user/share')
+}
+
+export function reportShare(type = 'link', channel = 'h5') {
+  return request<Record<string, never>>('/user/share/report', {
+    method: 'POST',
+    body: JSON.stringify({ type, channel }),
+  })
+}
+
+export function fetchShareLogs(page = 1, size = 20) {
+  return request<{ list: ShareLog[]; total: number }>(`/user/share/logs?page=${page}&size=${size}`)
+}

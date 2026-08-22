@@ -274,13 +274,10 @@ const onMenu = (item: { title: string; key: string }) => {
     redeem: '/redeem',
     create: '/creator',
     feedback: '/feedback',
+    invite: '/invite',
   }
   if (paths[item.key]) {
     go(paths[item.key])
-    return
-  }
-  if (item.key === 'invite') {
-    copyText(uid.value, `邀请码 ${uid.value} 已复制`)
     return
   }
   if (item.key === 'credential') {
