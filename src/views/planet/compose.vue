@@ -1,6 +1,6 @@
 <template>
   <div class="page-shell compose-page">
-    <PageHeader title="发布帖子" fallback="/planet" />
+    <PageHeader title="发布帖子" :fallback="fromCreator ? '/creator' : '/planet'" />
 
     <section class="form">
       <button type="button" class="row" @click="goTopics">
@@ -61,8 +61,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { showDialog, showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -72,8 +72,10 @@ import { formatFileSize, IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '@/utils/fileSi
 import { uploadPostMedia } from '@/utils/storage-upload'
 import { mediaUrl, toastError } from '@/utils/request'
 
+const route = useRoute()
 const router = useRouter()
 const draft = usePostDraftStore()
+const fromCreator = computed(() => route.query.from === 'creator')
 const busy = ref(false)
 const videoUploading = ref(false)
 const videoPercent = ref(0)
@@ -167,7 +169,7 @@ const submit = async () => {
     })
     draft.reset()
     showToast('已提交，审核通过后显示')
-    router.replace('/planet')
+    router.replace(fromCreator.value ? '/creator' : '/planet')
   } catch (err) {
     toastError(err)
   } finally {

@@ -261,7 +261,7 @@ const openBind = () => {
 const onMenu = (item: { title: string; key: string }) => {
   const paths: Record<string, string> = {
     redeem: '/redeem',
-    create: '/planet/compose',
+    create: '/creator',
     like: '/favorite',
   }
   if (paths[item.key]) {

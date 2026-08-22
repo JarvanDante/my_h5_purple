@@ -108,6 +108,8 @@ export type PostItem = {
   like_count: number
   comment_count: number
   view_count?: number
+  status?: number
+  reject_reason?: string
   created_at: string
 }
 
@@ -155,6 +157,10 @@ export function fetchPostList(
 
 export function fetchPostDetail(id: number) {
   return request<{ post: PostItem }>(`/post/detail?id=${id}`)
+}
+
+export function fetchMyPosts(page = 1, size = 50) {
+  return request<{ list: PostItem[]; total: number }>(`/post/my?page=${page}&size=${size}`)
 }
 
 export function createPost(body: {

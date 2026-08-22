@@ -106,6 +106,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '发布帖子' },
   },
   {
+    path: '/creator',
+    name: 'Creator',
+    component: () => import('@/views/planet/creator.vue'),
+    meta: { title: '我的帖子' },
+  },
+  {
     path: '/planet/topics',
     name: 'PlanetTopics',
     component: () => import('@/views/planet/topics.vue'),
