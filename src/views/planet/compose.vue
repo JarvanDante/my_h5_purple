@@ -69,8 +69,8 @@ import PageHeader from '@/components/PageHeader.vue'
 import { createPost } from '@/api/ops'
 import { usePostDraftStore } from '@/stores/postDraft'
 import { formatFileSize, IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '@/utils/fileSize'
-import { uploadVideoResumable } from '@/utils/multipart-upload'
-import { mediaUrl, toastError, uploadMedia } from '@/utils/request'
+import { uploadPostMedia } from '@/utils/storage-upload'
+import { mediaUrl, toastError } from '@/utils/request'
 
 const router = useRouter()
 const draft = usePostDraftStore()
@@ -98,7 +98,7 @@ const onPickImage = async (e: Event) => {
     return
   }
   try {
-    const data = await uploadMedia(file, 'image')
+    const data = await uploadPostMedia(file, 'image')
     draft.pics.push(data.url)
   } catch (err) {
     toastError(err)
@@ -117,7 +117,7 @@ const onPickVideo = async (e: Event) => {
   videoUploading.value = true
   videoPercent.value = 0
   try {
-    const data = await uploadVideoResumable(file, (percent) => {
+    const data = await uploadPostMedia(file, 'video', (percent) => {
       videoPercent.value = percent
     })
     draft.videoUrl = data.url

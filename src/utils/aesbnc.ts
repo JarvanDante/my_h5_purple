@@ -138,7 +138,8 @@ function looksLikePlainImage(url?: string) {
 function isMinioObjectUrl(url: string) {
   return /:19000\//.test(url) ||
     url.includes('host.docker.internal') ||
-    url.includes('/my-media/')
+    url.includes('/my-media/') ||
+    url.includes('/my-storage/')
 }
 
 export function fetchMediaUrl(url: string) {
