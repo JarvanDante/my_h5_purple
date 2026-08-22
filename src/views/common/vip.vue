@@ -169,7 +169,7 @@ onUnmounted(() => {
 .record {
   border: 0;
   background: transparent;
-  color: #d8c08a;
+  color: #ff6699;
   font-size: 13px;
   padding: 0 4px;
 }
@@ -180,7 +180,7 @@ onUnmounted(() => {
   gap: 12px;
   margin: 12px 16px 0;
   padding: 14px;
-  background: linear-gradient(135deg, #241c18, #16141c);
+  background: linear-gradient(135deg, #2a1c28, #16141c);
   border-radius: 13px;
 }
 
@@ -249,8 +249,8 @@ onUnmounted(() => {
   box-shadow: inset 0 0 0 1px #2a2a34;
 
   &.active {
-    background: linear-gradient(180deg, #2c2218, #16110e);
-    box-shadow: inset 0 0 0 1px #c9a227;
+    background: linear-gradient(180deg, #2a1c28, #16141c);
+    box-shadow: inset 0 0 0 1px #ff3d7f;
   }
 
   h3 {
@@ -271,7 +271,7 @@ onUnmounted(() => {
 
 .price {
   margin-top: 8px;
-  color: #b0b0bd;
+  color: #ff6699;
   font-size: 12px;
 
   em {
@@ -316,7 +316,7 @@ onUnmounted(() => {
   h3 {
     font-size: 16px;
     font-weight: 700;
-    color: #e8c36a;
+    color: #ff6699;
     letter-spacing: 0.04em;
   }
 }
@@ -338,8 +338,8 @@ onUnmounted(() => {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #2a2218;
-  color: #e8c36a;
+  background: #331020;
+  color: #ff6699;
   font-size: 11px;
   display: flex;
   align-items: center;
@@ -375,8 +375,8 @@ onUnmounted(() => {
   height: 46px;
   border: 0;
   border-radius: 23px;
-  background: linear-gradient(90deg, #e8c36a, #f6e7b8 48%, #d4a84a);
-  color: #3a2a10;
+  background: #ff3d7f;
+  color: #fff;
   font-size: 16px;
   font-weight: 800;
 

@@ -123,8 +123,8 @@ onMounted(async () => {
   margin: 12px 16px 0;
   padding: 18px 16px;
   border-radius: 14px;
-  background: linear-gradient(90deg, #f0a03a, #ffc24d 55%, #ffd27a);
-  color: #3a2a10;
+  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
+  color: #fff;
 }
 
 .hero-copy p {
@@ -153,7 +153,7 @@ onMounted(async () => {
   border: 0;
   border-radius: 8px;
   background: #fff;
-  color: #e07a2f;
+  color: #ff3d7f;
   font-size: 12px;
   font-weight: 700;
 }
@@ -188,8 +188,8 @@ onMounted(async () => {
   overflow: hidden;
 
   &.active {
-    box-shadow: inset 0 0 0 2px #f0a03a;
-    background: #241c14;
+    box-shadow: inset 0 0 0 2px #ff3d7f;
+    background: #331020;
   }
 
   b {
@@ -276,8 +276,8 @@ onMounted(async () => {
   height: 46px;
   border: 0;
   border-radius: 23px;
-  background: linear-gradient(90deg, #e8c36a, #f6e7b8 48%, #d4a84a);
-  color: #3a2a10;
+  background: #ff3d7f;
+  color: #fff;
   font-size: 16px;
   font-weight: 800;
 
