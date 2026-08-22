@@ -13,35 +13,56 @@
           :class="{ active: channel === item }"
           @click="$emit('selectChannel', item)"
         >
-          <svg v-if="dark && channel === item" class="channel-ring" viewBox="0 0 90 40" aria-hidden="true">
+          <svg v-if="dark && channel === item" class="channel-ring channel-ring--back" viewBox="0 0 96 44" aria-hidden="true">
             <defs>
-              <linearGradient id="channel-ring-stroke" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ffe0ec" />
-                <stop offset="38%" stop-color="#ff9fbf" />
-                <stop offset="100%" stop-color="#c43a6e" />
+              <linearGradient id="channel-orbit" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
+                <stop offset="0%" stop-color="#fff5f8" />
+                <stop offset="40%" stop-color="#ff9fbf" />
+                <stop offset="100%" stop-color="#c2185b" />
               </linearGradient>
-              <linearGradient id="channel-ring-fill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#ffb6d0" stop-opacity="0.22" />
-                <stop offset="100%" stop-color="#8a2048" stop-opacity="0.18" />
-              </linearGradient>
-              <filter id="channel-ring-glow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" result="blur" />
+              <filter id="channel-orbit-glow" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
                 <feMerge>
                   <feMergeNode in="blur" />
                   <feMergeNode in="SourceGraphic" />
                 </feMerge>
               </filter>
+              <clipPath id="channel-orbit-back">
+                <rect x="0" y="0" width="96" height="22" />
+              </clipPath>
+              <clipPath id="channel-orbit-front">
+                <rect x="0" y="22" width="96" height="22" />
+              </clipPath>
             </defs>
-            <path
-              filter="url(#channel-ring-glow)"
-              fill="url(#channel-ring-fill)"
-              stroke="url(#channel-ring-stroke)"
-              stroke-width="1.7"
-              stroke-linejoin="round"
-              d="M11 21 C13 8.5 28 5.5 46 6.5 C67 7.8 80 12 81 21 C82 30.5 66 34.5 45 33.5 C25 32.4 9 29.5 11 21 Z"
-            />
+            <g filter="url(#channel-orbit-glow)" clip-path="url(#channel-orbit-back)">
+              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit)" stroke-width="1.8" />
+            </g>
           </svg>
           <span class="channel-text">{{ item }}</span>
+          <svg v-if="dark && channel === item" class="channel-ring channel-ring--front" viewBox="0 0 96 44" aria-hidden="true">
+            <defs>
+              <linearGradient id="channel-orbit-front" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
+                <stop offset="0%" stop-color="#fff5f8" />
+                <stop offset="40%" stop-color="#ff9fbf" />
+                <stop offset="100%" stop-color="#c2185b" />
+              </linearGradient>
+              <filter id="channel-orbit-glow-front" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <clipPath id="channel-orbit-front-clip">
+                <rect x="0" y="22" width="96" height="22" />
+              </clipPath>
+            </defs>
+            <g filter="url(#channel-orbit-glow-front)" clip-path="url(#channel-orbit-front-clip)">
+              <ellipse cx="48" cy="22" rx="36" ry="11" transform="rotate(-18 48 22)" fill="none" stroke="url(#channel-orbit-front)" stroke-width="1.8" />
+            </g>
+            <path class="spark" d="M78 10.5l1.15 2.55 2.55 1.15-2.55 1.15L78 17.9l-1.15-2.55-2.55-1.15 2.55-1.15z" />
+            <path class="spark" d="M18 30.2l0.85 1.9 1.9 0.85-1.9 0.85L18 35.7l-0.85-1.9-1.9-0.85 1.9-0.85z" />
+          </svg>
         </button>
       </div>
       <button v-if="!dark" type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
@@ -341,8 +362,8 @@ defineEmits<{
   padding: calc(env(safe-area-inset-top, 0px) + 12px) 12px 12px;
 
   .channel-row {
-    height: 54px;
-    min-height: 54px;
+    height: 58px;
+    min-height: 58px;
     overflow: visible;
 
     &::after {
@@ -378,11 +399,24 @@ defineEmits<{
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 78px;
-      height: 36px;
-      transform: translate(-50%, -54%) rotate(-8deg);
+      width: 86px;
+      height: 40px;
+      transform: translate(-50%, -50%);
       overflow: visible;
       pointer-events: none;
+    }
+
+    .channel-ring--back {
+      z-index: 0;
+    }
+
+    .channel-ring--front {
+      z-index: 2;
+    }
+
+    .spark {
+      fill: #fff6ea;
+      filter: drop-shadow(0 0 2px rgba(255, 240, 220, 0.9));
     }
 
     &.active {
@@ -391,23 +425,10 @@ defineEmits<{
       font-weight: 700;
       letter-spacing: 0.04em;
       background: transparent;
-      text-shadow: 0 0 10px rgba(255, 92, 147, 0.35);
 
       .channel-text {
         position: relative;
         z-index: 1;
-      }
-
-      .channel-text::after {
-        content: '';
-        position: absolute;
-        top: -8px;
-        right: -10px;
-        width: 6px;
-        height: 6px;
-        background: #fff;
-        clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.9));
       }
 
       &::before {
@@ -415,12 +436,13 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 70px;
-        height: 36px;
+        width: 64px;
+        height: 34px;
         transform: translate(-50%, -50%);
         border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.28) 0%, rgba(255, 92, 147, 0.1) 46%, transparent 72%);
+        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.14) 46%, transparent 72%);
         pointer-events: none;
+        z-index: 0;
       }
     }
   }
