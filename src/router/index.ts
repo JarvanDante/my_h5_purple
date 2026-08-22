@@ -125,6 +125,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '我的分享' },
   },
   {
+    path: '/community',
+    name: 'Community',
+    component: () => import('@/views/common/community.vue'),
+    meta: { title: '官方社群' },
+  },
+  {
+    path: '/apps',
+    name: 'WelfareApps',
+    component: () => import('@/views/common/apps.vue'),
+    meta: { title: '福利应用' },
+  },
+  {
     path: '/planet/compose',
     name: 'PlanetCompose',
     component: () => import('@/views/planet/compose.vue'),

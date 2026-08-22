@@ -275,6 +275,8 @@ const onMenu = (item: { title: string; key: string }) => {
     create: '/creator',
     feedback: '/feedback',
     invite: '/invite',
+    group: '/community',
+    app: '/apps',
   }
   if (paths[item.key]) {
     go(paths[item.key])

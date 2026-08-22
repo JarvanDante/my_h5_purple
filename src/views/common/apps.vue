@@ -1,0 +1,168 @@
+<template>
+  <div class="page-shell sub-page apps-page">
+    <PageHeader title="福利应用" fallback="/me" />
+
+    <section class="hero">
+      <p>精选合作应用</p>
+      <strong>安装即可领取额外福利</strong>
+    </section>
+
+    <p v-if="loading" class="empty">加载中…</p>
+    <p v-else-if="!list.length" class="empty">当前页面暂无内容～</p>
+    <article v-for="item in list" :key="item.id" class="card" @click="open(item)">
+      <div class="icon">
+        <EncryptedImage v-if="item.avatar" :src="mediaUrl(item.avatar)" alt="" />
+        <span v-else>{{ (item.name || '应').slice(0, 1) }}</span>
+      </div>
+      <div class="meta">
+        <b>{{ item.name }}</b>
+        <p>{{ item.desc || '点击获取应用' }}</p>
+      </div>
+      <button type="button">获取</button>
+    </article>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { showToast } from 'vant'
+import EncryptedImage from '@/components/EncryptedImage.vue'
+import PageHeader from '@/components/PageHeader.vue'
+import { fetchWelfareApps, reportAppClick, type WelfareApp } from '@/api/welfare'
+import { mediaUrl, toastError } from '@/utils/request'
+
+const list = ref<WelfareApp[]>([])
+const loading = ref(false)
+
+const pickUrl = (item: WelfareApp) => {
+  const ua = navigator.userAgent
+  if (/iPhone|iPad|iPod/i.test(ua) && item.iosUrl) return item.iosUrl
+  if (/Android/i.test(ua) && item.androidUrl) return item.androidUrl
+  return item.download_url || item.iosUrl || item.androidUrl
+}
+
+const open = async (item: WelfareApp) => {
+  const url = pickUrl(item)
+  if (!url) {
+    showToast('暂未配置下载地址')
+    return
+  }
+  reportAppClick(item.id).catch(() => undefined)
+  window.open(url, '_blank', 'noopener')
+}
+
+onMounted(async () => {
+  loading.value = true
+  try {
+    const res = await fetchWelfareApps()
+    list.value = res.list || []
+  } catch (err) {
+    toastError(err)
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
+<style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
+.apps-page {
+  background: #0d0d12;
+  color: #f5f5f8;
+  min-height: 100%;
+  padding-bottom: 28px;
+}
+
+.hero {
+  margin: 12px 16px 8px;
+  padding: 20px 16px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
+  color: #fff;
+
+  p {
+    font-size: 13px;
+    opacity: 0.8;
+  }
+
+  strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 16px 0;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: #191920;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 61, 127, 0.16);
+  color: #ff3d7f;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 800;
+  flex-shrink: 0;
+
+  :deep(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.meta {
+  min-width: 0;
+  flex: 1;
+
+  b {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  p {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #8c8c9c;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.card button {
+  flex-shrink: 0;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 16px;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.empty {
+  padding: 80px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #8c8c9c;
+}
+</style>
