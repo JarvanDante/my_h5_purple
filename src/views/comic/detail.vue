@@ -231,7 +231,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f4f0f2;
+  background: #0d0d12;
+  color: #f5f5f8;
 }
 
 .hero {
@@ -243,7 +244,7 @@ onMounted(() => {
   box-sizing: border-box;
   overflow: hidden;
   color: #fff;
-  background: #1a1618;
+  background: #0d0d12;
 }
 
 .hero-visual {
@@ -286,7 +287,7 @@ onMounted(() => {
   width: 375px;
   max-width: 100%;
   padding: 12px 16px 14px;
-  background: #fff;
+  background: #0d0d12;
 }
 
 .nav,
@@ -299,7 +300,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   height: 40px;
-  margin-top: 10px;
+  margin-top: var(--app-header-top);
   align-items: center;
 }
 
@@ -374,8 +375,8 @@ h1 {
 
 .cate {
   flex-shrink: 0;
-  background: #6d5cff;
-  color: #fff;
+  background: #331020;
+  color: #ff6699;
   font-size: 10px;
   line-height: 1;
   padding: 3px 7px;
@@ -414,16 +415,16 @@ h1 {
   padding: 0 18px;
   border: 0;
   border-radius: 15px;
-  background: #ffd84d;
-  color: #1a1a1f;
+  background: #ff3d7f;
+  color: #fff;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 3px 10px rgba(255, 196, 0, 0.28);
+  box-shadow: 0 3px 10px rgba(255, 61, 127, 0.28);
 
   &.on {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+    background: #331020;
+    color: #ff6699;
+    box-shadow: none;
   }
 }
 
@@ -434,7 +435,7 @@ h1 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #fff;
+  background: #0d0d12;
 }
 
 .tab-row {
@@ -443,20 +444,20 @@ h1 {
   gap: 22px;
   flex-shrink: 0;
   padding: 10px 16px 0;
-  border-bottom: 1px solid #f4f0f2;
+  border-bottom: 1px solid #22222b;
 }
 
 .tab {
   border: 0;
   background: transparent;
-  color: #9a8a90;
+  color: #8c8c9c;
   font-size: 15px;
   font-weight: 600;
   padding: 6px 0 10px;
   position: relative;
 
   &.active {
-    color: #1a1a1f;
+    color: #f5f5f8;
     font-weight: 800;
 
     &::after {
@@ -467,7 +468,7 @@ h1 {
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ffd84d;
+      background: #ff3d7f;
       transform: translateX(-50%);
     }
   }
@@ -478,14 +479,14 @@ h1 {
   min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  background: #fff;
+  background: #0d0d12;
 }
 
 .comment-hold {
   padding: 48px 16px;
   text-align: center;
   font-size: 13px;
-  color: #c4a4ad;
+  color: #8c8c9c;
 }
 
 .tag-row {
@@ -497,8 +498,8 @@ h1 {
 
   span {
     font-size: 12px;
-    color: #e07a2f;
-    background: #fff1e4;
+    color: #ff6699;
+    background: #331020;
     border-radius: 999px;
     padding: 4px 10px;
   }
@@ -507,7 +508,7 @@ h1 {
 .intro {
   margin: 10px 0 0;
   font-size: 13px;
-  color: #1a1a1f;
+  color: #b0b0bd;
   line-height: 1.55;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -518,7 +519,7 @@ h1 {
 .reason {
   margin: 8px 0 0;
   font-size: 12px;
-  color: #c2410c;
+  color: #ff8fb3;
 }
 
 .catalog {
@@ -530,17 +531,17 @@ h1 {
   align-items: center;
   justify-content: space-between;
   padding: 8px 14px;
-  background: #fff1e4;
+  background: #191920;
 
   h3 {
     font-size: 14px;
     font-weight: 700;
-    color: #e07a2f;
+    color: #f5f5f8;
   }
 
   span {
     font-size: 12px;
-    color: #e07a2f;
+    color: #ff6699;
   }
 }
 
@@ -552,8 +553,8 @@ h1 {
   height: 64px;
   padding: 0 14px;
   border: 0;
-  border-bottom: 1px solid #f4f0f2;
-  background: #fff;
+  border-bottom: 1px solid #22222b;
+  background: #0d0d12;
   text-align: left;
 }
 
@@ -562,7 +563,7 @@ h1 {
   height: 44px;
   border-radius: 6px;
   overflow: hidden;
-  background: #f4f4f6;
+  background: #24242e;
   flex-shrink: 0;
 
   :deep(img) {
@@ -577,12 +578,12 @@ h1 {
   flex: 1;
   min-width: 0;
   font-size: 14px;
-  color: #1a1a1f;
+  color: #f5f5f8;
   font-weight: 500;
 }
 
 .chapter.lock .ch-name {
-  color: #bbb;
+  color: #4e4e5a;
 }
 
 .watch {
@@ -590,8 +591,8 @@ h1 {
   height: 26px;
   padding: 0 12px;
   border-radius: 13px;
-  border: 1px solid #e07a2f;
-  color: #e07a2f;
+  border: 1px solid #ff6699;
+  color: #ff6699;
   font-size: 12px;
   line-height: 24px;
 }
@@ -599,14 +600,14 @@ h1 {
 .ch-lock {
   flex-shrink: 0;
   font-size: 11px;
-  color: #c4a4ad;
+  color: #8c8c9c;
 }
 
 .bottom-bar {
   flex-shrink: 0;
   padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
-  background: #fff;
-  box-shadow: 0 -4px 16px rgba(44, 27, 34, 0.06);
+  background: #0d0d12;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.28);
 }
 
 .read-btn {
@@ -614,8 +615,8 @@ h1 {
   height: 44px;
   border: 0;
   border-radius: 22px;
-  background: #ffd84d;
-  color: #1a1a1f;
+  background: #ff3d7f;
+  color: #fff;
   font-size: 16px;
   font-weight: 800;
 }
