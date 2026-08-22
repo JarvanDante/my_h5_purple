@@ -1,26 +1,39 @@
 <template>
-  <div class="page-shell sub-page">
+  <div class="page-shell sub-page wallet-page">
     <PageHeader title="金币钱包" />
+
     <section class="hero">
-      <p>可用金币</p>
-      <strong>{{ wallet?.balance ?? userStore.user?.balance ?? 0 }}</strong>
-      <span>累计入账 {{ wallet?.total_in ?? 0 }} · 支出 {{ wallet?.total_out ?? 0 }}</span>
+      <div class="hero-copy">
+        <p>当前余额</p>
+        <strong>{{ wallet?.balance ?? userStore.user?.balance ?? 0 }}<i>币</i></strong>
+      </div>
+      <button type="button" class="detail-btn" @click="showWaters = !showWaters">余额明细</button>
     </section>
-    <section v-if="packs.length" class="soft-card packs">
-      <h3>充值套餐</h3>
-      <button
-        v-for="p in packs"
-        :key="p.id"
-        type="button"
-        :disabled="paying"
-        @click="buy(p)"
-      >
-        {{ p.name }} · {{ p.coin }}+{{ p.bonus }} 金币 / {{ p.amount }}
-      </button>
+
+    <section v-if="packs.length" class="packs">
+      <h3>选择充值金额</h3>
+      <div class="grid">
+        <button
+          v-for="p in packs"
+          :key="p.id"
+          type="button"
+          class="pack"
+          :class="{ active: current === p.id }"
+          @click="current = p.id"
+        >
+          <b>{{ p.coin }}</b>
+          <span>{{ p.amount }}元</span>
+          <em v-if="p.bonus">送{{ p.bonus }}金币</em>
+        </button>
+      </div>
     </section>
-    <section class="soft-card waters">
-      <h3>流水</h3>
-      <p v-if="!waters.length" class="empty">暂无流水，点套餐 mock 支付后会出现</p>
+    <p v-else class="empty">暂无充值套餐</p>
+
+    <p class="hint">到账可能略有延迟，以钱包余额为准。<br />如未到账请稍后刷新或联系客服。</p>
+
+    <section v-if="showWaters" class="waters">
+      <h3>余额明细</h3>
+      <p v-if="!waters.length" class="empty">暂无流水</p>
       <div v-for="w in waters" :key="w.id" class="row">
         <div>
           <b>{{ w.remark || w.scene }}</b>
@@ -29,11 +42,18 @@
         <em :class="{ out: w.direction === 2 }">{{ w.direction === 2 ? '-' : '+' }}{{ w.amount }}</em>
       </div>
     </section>
+
+    <div class="pay-bar">
+      <button type="button" class="pay-btn" :disabled="!picked || paying" @click="buy">
+        {{ paying ? '支付中…' : '购买金币' }}
+      </button>
+      <p>支付中如有问题反馈，请联系 <em @click="soon">客服中心</em></p>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
 import { createRecharge, fetchRechargePackages, mockPayRecharge, type RechargePackage } from '@/api/user'
@@ -45,7 +65,12 @@ const userStore = useUserStore()
 const wallet = ref<WalletBalance | null>(null)
 const waters = ref<WaterItem[]>([])
 const packs = ref<RechargePackage[]>([])
+const current = ref(0)
 const paying = ref(false)
+const showWaters = ref(false)
+const picked = computed(() => packs.value.find((p) => p.id === current.value))
+
+const soon = () => showToast('客服中心稍后接入')
 
 const loadWallet = async () => {
   const [b, w] = await Promise.all([fetchWalletBalance(), fetchWalletWaters(1, 20)])
@@ -53,8 +78,9 @@ const loadWallet = async () => {
   waters.value = w.list || []
 }
 
-const buy = async (p: RechargePackage) => {
-  if (paying.value) return
+const buy = async () => {
+  const p = picked.value
+  if (!p || paying.value) return
   paying.value = true
   try {
     await userStore.ensureLogin()
@@ -73,6 +99,7 @@ onMounted(async () => {
   try {
     const r = await fetchRechargePackages()
     packs.value = r.list || []
+    if (packs.value.length) current.value = packs.value[0].id
     await loadWallet()
   } catch (err) {
     toastError(err)
@@ -83,53 +110,125 @@ onMounted(async () => {
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
+.wallet-page {
+  background: #0d0d12;
+  color: #f5f5f8;
+  padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+}
+
 .hero {
-  margin: 16px 12px;
-  padding: 20px 16px;
-  border-radius: 16px;
-  background: $primary-color;
-  color: $ink;
-  border: 1.6px solid $ink;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 16px 0;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f0a03a, #ffc24d 55%, #ffd27a);
+  color: #3a2a10;
+}
 
-  p {
-    font-size: 13px;
-    opacity: 0.8;
-  }
+.hero-copy p {
+  font-size: 13px;
+  opacity: 0.8;
+}
 
-  strong {
-    display: block;
-    margin: 8px 0 6px;
-    font-size: 32px;
-  }
+.hero-copy strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
 
-  span {
-    font-size: 12px;
-    opacity: 0.75;
+  i {
+    margin-left: 4px;
+    font-style: normal;
+    font-size: 14px;
+    font-weight: 600;
   }
+}
+
+.detail-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #e07a2f;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .packs,
 .waters {
+  padding: 18px 16px 0;
+
   h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #f5f5f8;
+    margin-bottom: 12px;
   }
 }
 
-.packs button {
-  display: block;
-  width: 100%;
-  text-align: left;
-  border: 1.4px solid $ink;
-  background: #fff;
-  border-radius: 8px;
-  padding: 10px 12px;
-  margin-bottom: 8px;
-  font-size: 13px;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pack {
+  position: relative;
+  min-height: 88px;
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 8px 22px;
+  background: #191920;
+  color: #f5f5f8;
+  box-shadow: inset 0 0 0 1px #2a2a34;
+  overflow: hidden;
+
+  &.active {
+    box-shadow: inset 0 0 0 2px #f0a03a;
+    background: #241c14;
+  }
+
+  b {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #8c8c9c;
+  }
+
+  em {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-style: normal;
+    font-size: 10px;
+    color: #fff;
+    background: #e23b3b;
+    border-radius: 0 8px 0 0;
+    padding: 2px 7px;
+  }
+}
+
+.hint {
+  margin: 16px 20px 0;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #8c8c9c;
 }
 
 .empty {
-  color: #999;
+  padding: 16px 0;
+  color: #8c8c9c;
   font-size: 13px;
 }
 
@@ -137,27 +236,74 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
+  padding: 12px 0;
+  border-bottom: 1px solid #22222b;
 
   b {
     display: block;
     font-size: 14px;
+    color: #f5f5f8;
   }
 
   span {
     font-size: 11px;
-    color: #999;
+    color: #8c8c9c;
   }
 
   em {
     font-style: normal;
-    color: #16a34a;
+    color: #2ee59d;
     font-weight: 700;
 
     &.out {
-      color: #dc2626;
+      color: #ff5a5a;
     }
+  }
+}
+
+.pay-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent, #0d0d12 18%);
+}
+
+.pay-btn {
+  width: 100%;
+  height: 46px;
+  border: 0;
+  border-radius: 23px;
+  background: linear-gradient(90deg, #e8c36a, #f6e7b8 48%, #d4a84a);
+  color: #3a2a10;
+  font-size: 16px;
+  font-weight: 800;
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+.pay-bar p {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: #8c8c9c;
+
+  em {
+    font-style: normal;
+    color: #e23b3b;
+  }
+}
+
+@media (min-width: $desktop-preview-min) {
+  .pay-bar {
+    left: 50%;
+    right: auto;
+    width: $phone-max-width;
+    transform: translateX(-50%);
   }
 }
 </style>
