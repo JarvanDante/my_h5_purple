@@ -67,7 +67,7 @@ const onScroll = () => {
   position: relative;
   flex: 0 0 100%;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 160px;
   border: 0;
   padding: 0;
   background: #1a1a20;
