@@ -446,10 +446,11 @@ const playVideo = () => {
 
   span {
     font-size: 12px;
-    color: #ff7a1a;
-    background: #fff6ec;
+    color: #ff6699;
+    background: #331020;
     border-radius: $radius-pill;
-    padding: 3px 10px;
+    padding: 4px 10px;
+    line-height: 1.2;
   }
 }
 
