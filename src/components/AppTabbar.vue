@@ -122,21 +122,24 @@ const go = (path: string) => {
     &::before {
       content: '';
       position: absolute;
-      top: 0;
+      top: -2px;
       left: 50%;
       transform: translateX(-50%);
-      width: 36px;
-      height: 36px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       pointer-events: none;
-      background: radial-gradient(circle, rgba(255, 92, 147, 0.5) 0%, rgba(255, 92, 147, 0.16) 46%, transparent 72%);
+      background:
+        radial-gradient(circle, rgba(255, 150, 190, 0.35) 0%, rgba(255, 92, 147, 0.16) 38%, transparent 70%);
     }
 
     .tab-icon {
       color: $primary-color;
       width: 24px;
       height: 24px;
-      filter: drop-shadow(0 0 8px rgba(255, 92, 147, 0.55));
+      filter:
+        drop-shadow(0 0 4px rgba(255, 180, 210, 0.55))
+        drop-shadow(0 0 10px rgba(255, 92, 147, 0.35));
     }
 
     .tab-label {
