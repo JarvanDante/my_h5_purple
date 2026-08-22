@@ -69,14 +69,15 @@ onMounted(() => {
 @use '@/styles/variables.scss' as *;
 
 .topics-page {
-  background: #fff;
+  background: #0d0d12;
+  color: #f5f5f8;
   min-height: 100%;
 }
 
 .done {
   border: 0;
   background: transparent;
-  color: $primary-color;
+  color: #ff3d7f;
   font-size: 14px;
   font-weight: 700;
   padding: 0 4px;
@@ -85,7 +86,7 @@ onMounted(() => {
 .empty {
   padding: 48px 16px;
   text-align: center;
-  color: #999;
+  color: #8c8c9c;
   font-size: 13px;
 }
 
@@ -98,16 +99,16 @@ onMounted(() => {
 
 .pill {
   border: 0;
-  background: #f3f3f3;
-  color: #555;
+  background: #191920;
+  color: #b0b0bd;
   font-size: 13px;
   border-radius: $radius-pill;
   padding: 8px 14px;
   line-height: 1.2;
 
   &.on {
-    background: #fff4d4;
-    color: #c48a12;
+    background: #331020;
+    color: #ff6699;
     font-weight: 700;
   }
 }

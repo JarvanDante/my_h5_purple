@@ -180,33 +180,43 @@ const submit = async () => {
 @use '@/styles/variables.scss' as *;
 
 .compose-page {
-  background: #fff;
+  background: #0d0d12;
+  color: #f5f5f8;
   min-height: 100%;
   padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .form {
-  padding: 8px 16px 24px;
+  padding: 12px 16px 24px;
 }
 
 .row {
   width: 100%;
-  min-height: 48px;
+  min-height: 50px;
   border: 0;
-  border-bottom: 1px solid #f2f2f2;
-  background: #fff;
+  border-bottom: 1px solid #22222b;
+  background: #191920;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0;
+  padding: 0 14px;
   text-align: left;
+}
+
+.form > .row:first-child {
+  border-radius: 13px 13px 0 0;
+}
+
+.form > label.row {
+  border-bottom: 0;
+  border-radius: 0 0 13px 13px;
 }
 
 .label {
   width: 72px;
   flex-shrink: 0;
   font-size: 15px;
-  color: #222;
+  color: #f5f5f8;
 }
 
 .value,
@@ -217,18 +227,18 @@ const submit = async () => {
   outline: none;
   background: transparent;
   font-size: 14px;
-  color: #222;
+  color: #f5f5f8;
 }
 
 .value.ph,
 .row input::placeholder {
-  color: #c8c8c8;
+  color: #8c8c9c;
 }
 
 .pick {
   flex-shrink: 0;
   font-size: 13px;
-  color: #888;
+  color: #ff6699;
 }
 
 textarea {
@@ -239,17 +249,32 @@ textarea {
   resize: none;
   font-size: 14px;
   line-height: 1.6;
-  color: #222;
+  color: #f5f5f8;
+  background: #191920;
+  border-radius: 13px;
+  padding: 14px;
   min-height: 140px;
 }
 
+textarea::placeholder {
+  color: #8c8c9c;
+}
+
+.row input:focus,
+textarea:focus {
+  box-shadow: inset 0 0 0 1px #d91259;
+}
+
 .block {
-  margin-top: 18px;
+  margin-top: 12px;
+  background: #191920;
+  border-radius: 13px;
+  padding: 14px;
 }
 
 .block-title {
   font-size: 15px;
-  color: #222;
+  color: #f5f5f8;
   font-weight: 600;
 
   em {
@@ -257,7 +282,7 @@ textarea {
     font-style: normal;
     font-weight: 400;
     font-size: 12px;
-    color: #b0b0b0;
+    color: #8c8c9c;
   }
 }
 
@@ -272,10 +297,10 @@ textarea {
 .add {
   width: 92px;
   height: 92px;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
-  background: #f3f3f3;
+  background: #24242e;
 }
 
 .thumb :deep(img),
@@ -290,8 +315,8 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2b2b2b;
-  color: #fff;
+  background: #331020;
+  color: #ff8fb3;
   font-size: 12px;
   text-align: center;
   padding: 8px;
@@ -305,15 +330,15 @@ textarea {
   height: 18px;
   border: 0;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.55);
-  color: #fff;
+  background: rgba(13, 13, 18, 0.72);
+  color: #f5f5f8;
   font-size: 14px;
   line-height: 1;
 }
 
 .add {
-  border: 0;
-  color: #9a9a9a;
+  border: 1px dashed #4e4e5a;
+  color: #8c8c9c;
   font-size: 12px;
   display: flex;
   align-items: center;
@@ -328,11 +353,15 @@ textarea {
   bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   height: 44px;
   border: 0;
-  border-radius: 8px;
-  background: #ffd400;
-  color: #222;
+  border-radius: 14px;
+  background: #ff3d7f;
+  color: #1a0a12;
   font-size: 16px;
   font-weight: 700;
+
+  &:disabled {
+    opacity: 0.45;
+  }
 }
 
 @media (min-width: $desktop-preview-min) {
