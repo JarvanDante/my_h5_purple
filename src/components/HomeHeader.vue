@@ -348,17 +348,16 @@ defineEmits<{
 
     &.active {
       color: #fff;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       background: transparent;
-      text-shadow:
-        0 0 8px rgba(255, 92, 147, 0.5),
-        0 0 18px rgba(255, 92, 147, 0.22);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
 
       .channel-text {
         position: relative;
         z-index: 1;
+        padding: 5px 14px;
       }
 
       &::before {
@@ -366,11 +365,14 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 3.15em;
-        height: 1.35em;
-        transform: translate(-50%, -52%) rotate(-16deg);
-        border-radius: 50%;
-        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.28) 0%, rgba(255, 92, 147, 0.08) 52%, transparent 72%);
+        width: calc(100% + 18px);
+        height: 28px;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 130, 170, 0.42) 0%, rgba(255, 92, 147, 0.22) 100%);
+        box-shadow:
+          0 0 16px rgba(255, 92, 147, 0.28),
+          inset 0 1px 0 rgba(255, 255, 255, 0.28);
         pointer-events: none;
       }
 
@@ -379,42 +381,12 @@ defineEmits<{
         position: absolute;
         left: 50%;
         top: 50%;
-        width: 3.2em;
-        height: 1.38em;
-        transform: translate(-50%, -52%) rotate(-16deg);
-        border-radius: 50%;
-        border: 1.5px solid transparent;
-        border-top-color: rgba(255, 255, 255, 0.75);
-        border-right-color: rgba(255, 92, 147, 0.85);
-        border-bottom-color: rgba(255, 92, 147, 0.15);
-        border-left-color: rgba(255, 92, 147, 0.35);
-        box-shadow: 0 0 10px rgba(255, 92, 147, 0.2);
+        width: 120%;
+        height: 36px;
+        transform: translate(-50%, -50%);
+        border-radius: 999px;
+        background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.2) 0%, transparent 70%);
         pointer-events: none;
-      }
-
-      .channel-text::before,
-      .channel-text::after {
-        content: '';
-        position: absolute;
-        background: #fff;
-        clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
-        filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
-        pointer-events: none;
-      }
-
-      .channel-text::before {
-        top: -7px;
-        right: -8px;
-        width: 5px;
-        height: 5px;
-      }
-
-      .channel-text::after {
-        bottom: -5px;
-        left: -9px;
-        width: 3px;
-        height: 3px;
-        opacity: 0.7;
       }
     }
   }
