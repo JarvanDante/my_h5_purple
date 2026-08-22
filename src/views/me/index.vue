@@ -277,13 +277,10 @@ const onMenu = (item: { title: string; key: string }) => {
     invite: '/invite',
     group: '/community',
     app: '/apps',
+    credential: '/credential',
   }
   if (paths[item.key]) {
     go(paths[item.key])
-    return
-  }
-  if (item.key === 'credential') {
-    copyText(uid.value, '用户名已复制，完整凭证请到子后台查看')
     return
   }
   soon(item.title)

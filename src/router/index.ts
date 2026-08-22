@@ -179,6 +179,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '设置密码' },
   },
   {
+    path: '/credential',
+    name: 'Credential',
+    component: () => import('@/views/me/credential.vue'),
+    meta: { title: '账号凭证' },
+  },
+  {
     path: '/favorite',
     name: 'Favorite',
     component: () => import('@/views/common/favorite.vue'),

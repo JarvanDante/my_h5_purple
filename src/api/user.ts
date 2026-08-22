@@ -166,3 +166,7 @@ export type Invitee = {
 export function fetchInvitees(page = 1, size = 50) {
   return request<{ list: Invitee[]; total: number }>(`/user/share/invitees?page=${page}&size=${size}`)
 }
+
+export function fetchCustomerUrl() {
+  return request<{ url: string }>('/user/customer-url')
+}
