@@ -202,6 +202,18 @@ export function fetchUnreadCount() {
   return request<{ count: number }>('/message/unread')
 }
 
+export function addFeedback(body: {
+  type?: number
+  problem_type: number
+  content: string
+  sys_info?: string
+}) {
+  return request<{ id: number }>('/feedback/add', {
+    method: 'POST',
+    body: JSON.stringify({ type: 1, pics: [], ...body }),
+  })
+}
+
 export function readMessage(id = 0, all = false) {
   return request<Record<string, never>>('/message/read', {
     method: 'POST',

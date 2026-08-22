@@ -263,6 +263,7 @@ const onMenu = (item: { title: string; key: string }) => {
     redeem: '/redeem',
     create: '/creator',
     like: '/favorite',
+    feedback: '/feedback',
   }
   if (paths[item.key]) {
     go(paths[item.key])

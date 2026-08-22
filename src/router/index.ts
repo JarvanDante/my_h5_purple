@@ -106,6 +106,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '站内消息' },
   },
   {
+    path: '/feedback',
+    name: 'Feedback',
+    component: () => import('@/views/common/feedback.vue'),
+    meta: { title: '意见反馈' },
+  },
+  {
     path: '/planet/compose',
     name: 'PlanetCompose',
     component: () => import('@/views/planet/compose.vue'),
