@@ -1,5 +1,8 @@
 <template>
-  <header class="home-header home-header--pack" :class="{ 'home-header--single': !subTabs.length }">
+  <header
+    class="home-header home-header--pack"
+    :class="{ 'home-header--single': !subTabs.length, 'home-header--dark': dark }"
+  >
     <div class="channel-row">
       <div class="channel-tabs">
         <button
@@ -13,7 +16,7 @@
           {{ item }}
         </button>
       </div>
-      <button type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
+      <button v-if="!dark" type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
     </div>
 
     <div v-if="subTabs.length" class="sub-row">
@@ -32,10 +35,17 @@
     <div class="search-row">
       <div class="search-pill" @click="$emit('search')">
         <span class="search-ico"><LineIcon name="search" /></span>
-        <span>搜索更多{{ channel }}</span>
+        <span>{{ searchText || `搜索更多${channel}` }}</span>
       </div>
-      <button type="button" class="qbtn" @click="$emit('vip')">VIP</button>
-      <button type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
+      <button type="button" class="util-btn vip" @click="$emit('vip')">
+        <LineIcon name="vip" />
+        <span>{{ dark ? 'VIP充值' : 'VIP' }}</span>
+      </button>
+      <button v-if="dark" type="button" class="util-btn checkin" @click="$emit('checkin')">
+        <LineIcon name="daily" />
+        <span>签到</span>
+      </button>
+      <button v-else type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
     </div>
   </header>
 </template>
@@ -49,8 +59,10 @@ withDefaults(
     channel: string
     subTabs?: string[]
     subTab?: string
+    dark?: boolean
+    searchText?: string
   }>(),
-  { subTabs: () => [], subTab: '' },
+  { subTabs: () => [], subTab: '', dark: false, searchText: '' },
 )
 
 defineEmits<{
@@ -102,7 +114,7 @@ defineEmits<{
 
   .sub-row {
     margin-top: 0;
-    padding: 0 0 0;
+    padding: 0;
     height: 32px;
     gap: 20px;
   }
@@ -157,7 +169,8 @@ defineEmits<{
 .channel-item,
 .sub-item,
 .checkin-btn,
-.qbtn {
+.qbtn,
+.util-btn {
   appearance: none;
   -webkit-appearance: none;
   margin: 0;
@@ -261,5 +274,70 @@ defineEmits<{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.util-btn {
+  height: 34px;
+  border: 0;
+  border-radius: 9px;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+
+  :deep(.line-icon) {
+    width: 13px;
+    height: 13px;
+  }
+
+  &.vip {
+    background: $primary-color;
+  }
+
+  &.checkin {
+    background: #ff8a3d;
+  }
+}
+
+.home-header--dark {
+  background: #0b0b0d;
+  padding-bottom: 10px;
+
+  .channel-item {
+    color: #8d8d96;
+    font-size: 15px;
+    padding: 4px 10px;
+    border-radius: $radius-pill;
+
+    &.active {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      background: $primary-color;
+    }
+  }
+
+  .search-pill {
+    height: 36px;
+    background: #17171c;
+    border-color: #2a2a32;
+    color: #7a7a84;
+  }
+
+  .search-ico {
+    color: #7a7a84;
+  }
+
+  .util-btn {
+    min-width: 44px;
+    height: 36px;
+    font-size: 9px;
+  }
 }
 </style>

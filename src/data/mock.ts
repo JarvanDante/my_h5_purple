@@ -9,6 +9,9 @@ export type CoverItem = {
   labels?: string[]
   badge?: string
   mosaic?: boolean
+  isAd?: boolean
+  mark?: 'new' | 'hot'
+  statusTone?: 'chapter' | 'end'
   tone: number
 }
 

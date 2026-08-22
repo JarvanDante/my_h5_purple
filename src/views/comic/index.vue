@@ -1,36 +1,43 @@
 <template>
   <div class="page-shell comic-page">
     <HomeHeader
+      dark
       :channels="channels"
       :channel="channel"
-      :sub-tabs="subTabs"
-      :sub-tab="subTab"
+      search-text="输入你想搜索的关键字"
       @select-channel="selectChannel"
-      @select-sub="selectSub"
       @checkin="go('/checkin')"
       @search="go('/search')"
       @vip="go('/vip')"
-      @favorite="go('/favorite')"
     />
 
-    <section class="ad-rail-wrap">
-      <AdSwipe :items="banners" />
-    </section>
+    <HomeHero :items="banners" @select="open" />
 
     <div class="inner-slide">
       <transition :name="innerName">
-        <div :key="channel + '-' + subTab" class="inner-pane">
-          <section class="quick-strip">
-            <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
-              <span class="quick-icon">{{ item.emoji }}</span>
+        <div :key="channel" class="floor-pane">
+          <section v-if="ready" class="quick-strip">
+            <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
+              <span class="quick-icon" :class="item.tone">
+                <LineIcon :name="item.icon" />
+              </span>
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
 
-          <SectionPanel :title="sectionTitle" more @more="go(morePath)">
-            <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
-            <MediaGrid v-else :items="covers" :cols="isCartoon ? 'cols-2' : 'cols-3'" :poster="isCartoon" @select="open" />
-          </SectionPanel>
+          <template v-if="ready">
+            <FloorBlock title="竖图横滑" sub="NEW ARRIVALS" more @more="go(railMore)">
+              <p v-if="!railItems.length" class="page-empty">{{ emptyText }}</p>
+              <PosterRail v-else :items="railItems" @select="open" />
+            </FloorBlock>
+
+            <FloorBlock title="竖图九宫格" sub="NEW ARRIVALS" more @more="go(gridMore)">
+              <p v-if="!gridItems.length" class="page-empty">{{ emptyText }}</p>
+              <PosterGrid v-else :items="gridItems" @select="open" />
+            </FloorBlock>
+          </template>
+
+          <p v-else class="page-empty">{{ emptyText }}</p>
         </div>
       </transition>
     </div>
@@ -40,102 +47,102 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import AdSwipe from '@/components/AdSwipe.vue'
+import FloorBlock from '@/components/home/FloorBlock.vue'
+import HomeHero from '@/components/home/HomeHero.vue'
+import PosterGrid from '@/components/home/PosterGrid.vue'
+import PosterRail from '@/components/home/PosterRail.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import MediaGrid from '@/components/MediaGrid.vue'
-import SectionPanel from '@/components/SectionPanel.vue'
-import { cartoonCategories, fetchCartoonCategories, fetchCartoonList, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsCategories, fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
+import LineIcon from '@/components/LineIcon.vue'
+import { fetchCartoonList, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { videoPath } from '@/utils/idcrypt'
+import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Comic' })
 
-const comicFallback = ['新更', '推荐', '漫画榜', '韩漫', '日漫', '同人', '国漫']
-const cartoonFallback = ['最新', '推荐', '动漫榜', '番剧', '剧场版']
 const router = useRouter()
 const channels = ['漫画', '动漫', '小说', '短剧']
-const subTabs = ref([...comicFallback])
-const cateKind = ref<Record<string, number>>({})
 const channelSlide = useTabSlide(channels)
-const subSlide = useTabSlide(subTabs.value, comicFallback[0])
 const channel = computed(() => channelSlide.current.value)
-const subTab = computed(() => subSlide.current.value)
 const innerName = ref('tab-left')
 const isCartoon = computed(() => channel.value === '动漫')
 const isComic = computed(() => channel.value === '漫画')
+const ready = computed(() => isComic.value || isCartoon.value)
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
 }
 
-const selectSub = (item: string) => {
-  subSlide.select(item)
-  innerName.value = subSlide.name.value
-}
-
 const comicQuicks = [
-  { emoji: '📍', label: '专题', path: '/list?media=comic&type=topic' },
-  { emoji: '🔥', label: '热门', path: '/list?media=comic&type=hot' },
-  { emoji: '📅', label: '每日', path: '/list?media=comic&type=daily' },
-  { emoji: '🏆', label: '榜单', path: '/list?media=comic&type=rank' },
+  { icon: 'topic', label: '专题', path: '/list?media=comic&type=topic', tone: 'purple' },
+  { icon: 'hot', label: '热门', path: '/list?media=comic&type=hot', tone: 'red' },
+  { icon: 'daily', label: '每日', path: '/list?media=comic&type=daily', tone: 'blue' },
+  { icon: 'rank', label: '榜单', path: '/list?media=comic&type=rank', tone: 'gold' },
 ]
 const cartoonQuicks = [
-  { emoji: '📍', label: '专题', path: '/list?media=cartoon&type=topic' },
-  { emoji: '🔥', label: '热门', path: '/list?media=cartoon&type=hot' },
-  { emoji: '📅', label: '每日', path: '/list?media=cartoon&type=daily' },
-  { emoji: '🏆', label: '榜单', path: '/list?media=cartoon&type=rank' },
+  { icon: 'topic', label: '专题', path: '/list?media=cartoon&type=topic', tone: 'purple' },
+  { icon: 'hot', label: '热门', path: '/list?media=cartoon&type=hot', tone: 'red' },
+  { icon: 'daily', label: '每日', path: '/list?media=cartoon&type=daily', tone: 'blue' },
+  { icon: 'rank', label: '榜单', path: '/list?media=cartoon&type=rank', tone: 'gold' },
 ]
 const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
 
-const comicList = ref<ComicsItem[]>([])
-const cartoonList = ref<CartoonItem[]>([])
-const banners = ref<CoverItem[]>([])
+const comicLatest = ref<ComicsItem[]>([])
+const comicHot = ref<ComicsItem[]>([])
+const cartoonLatest = ref<CartoonItem[]>([])
+const cartoonHot = ref<CartoonItem[]>([])
 
-const pad = (n: number) => String(n).padStart(2, '0')
-const formatDuration = (sec: number) => {
-  if (!sec) return ''
-  const h = Math.floor(sec / 3600)
-  const m = Math.floor((sec % 3600) / 60)
-  const s = sec % 60
-  return h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`
+const toComicCover = (c: ComicsItem, mark?: CoverItem['mark']): CoverItem => {
+  const ended = c.update_status === 2
+  return {
+    id: String(c.id),
+    title: c.title,
+    cover: mediaUrl(c.cover),
+    views: formatViews(c.view_count),
+    badge: ended ? '已完结' : `共${c.chapter_count || 0}话`,
+    statusTone: ended ? 'end' : 'chapter',
+    mark: mark || (isRecent(c.created_at) ? 'new' : c.view_count >= 1000 ? 'hot' : undefined),
+    tone: c.id % 6,
+  }
 }
 
-const covers = computed<CoverItem[]>(() => {
-  if (isCartoon.value) {
-    return cartoonList.value.map((c) => {
-      const cate = cartoonCategories(c)[0] || ''
-      return {
-        id: String(c.id),
-        title: c.title,
-        tag: 'Free',
-        cover: mediaUrl(c.cover_url),
-        duration: formatDuration(c.duration),
-        badge: cate || undefined,
-        tone: c.id % 6,
-      }
-    })
-  }
-  return comicList.value.map((c) => {
-    const cate = comicCategories(c)[0] || ''
-    return {
-      id: String(c.id),
-      title: c.title,
-      tag: c.is_vip ? 'VIP' : 'Free',
-      cover: mediaUrl(c.cover),
-      badge: `共${c.chapter_count || 0}话${cate ? `·${cate}` : ''}`,
-      mosaic: true,
-      tone: c.id % 6,
-    }
-  })
+const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => ({
+  id: String(c.id),
+  title: c.title,
+  cover: mediaUrl(c.cover_url),
+  duration: formatDuration(c.duration),
+  badge: (c.categories?.[0] || c.category || '').split(/[,，]/)[0] || undefined,
+  statusTone: 'chapter',
+  mark: mark || (isRecent(c.created_at) ? 'new' : undefined),
+  tone: c.id % 6,
 })
 
-watch(covers, (rows) => {
-  banners.value = rows.slice(0, 6)
+const railItems = computed<CoverItem[]>(() => {
+  if (isCartoon.value) return cartoonLatest.value.slice(0, 10).map((c, i) => toCartoonCover(c, i < 2 ? 'new' : undefined))
+  if (isComic.value) return comicLatest.value.slice(0, 10).map((c, i) => toComicCover(c, i < 2 ? 'new' : undefined))
+  return []
 })
+
+const gridItems = computed<CoverItem[]>(() => {
+  if (isCartoon.value) return cartoonHot.value.slice(0, 9).map((c, i) => toCartoonCover(c, i < 2 ? 'hot' : undefined))
+  if (isComic.value) return comicHot.value.slice(0, 9).map((c, i) => toComicCover(c, i < 2 ? 'hot' : undefined))
+  return []
+})
+
+const banners = computed<CoverItem[]>(() => railItems.value.slice(0, 5))
+
+const emptyText = computed(() => {
+  if (!ready.value) return `${channel.value}即将上线`
+  return isCartoon.value ? '暂无动漫，子后台「动漫管理」上架后显示' : '暂无漫画，子后台「漫画管理」上架后显示'
+})
+
+const media = computed(() => (isCartoon.value ? 'cartoon' : 'comic'))
+const railMore = computed(() => `/list?media=${media.value}&type=daily`)
+const gridMore = computed(() => `/list?media=${media.value}&type=recommend`)
 
 const go = (path: string) => {
   router.push(path)
@@ -149,152 +156,147 @@ const open = (item: CoverItem) => {
   router.push(`/comic/${item.id}`)
 }
 
-const currentKind = computed(() => cateKind.value[subTab.value])
-
-const sectionTitle = computed(() => {
-  const kind = currentKind.value
-  if (isCartoon.value) {
-    if (kind === 2 || subTab.value === '推荐') return '精选推荐'
-    if (kind === 3 || subTab.value === '动漫榜') return '动漫榜'
-    if (kind === 0) return subTab.value || '今日上新'
-    return '今日上新'
-  }
-  if (kind === 2 || subTab.value === '推荐') return '精选推荐'
-  if (kind === 3 || subTab.value === '漫画榜') return '漫画榜'
-  if (kind === 0) return subTab.value || '今日上新'
-  return '今日上新'
-})
-
-const emptyText = computed(() => {
-  if (!isComic.value && !isCartoon.value) return `${channel.value}即将上线`
-  const noun = isCartoon.value ? '动漫' : '漫画'
-  const kind = currentKind.value
-  if (kind === 2 || subTab.value === '推荐') return `暂无推荐${noun}`
-  if (kind === 3 || subTab.value.includes('榜')) return `暂无${noun}榜`
-  if (kind === 0) return `暂无「${subTab.value}」${noun}，上架并选择该分类后显示`
-  return `暂无${noun}，子后台「${noun}管理」上架后显示`
-})
-
-const morePath = computed(() => {
-  const kind = currentKind.value
-  const name = subTab.value
-  const media = isCartoon.value ? 'cartoon' : 'comic'
-  if (kind === 3 || name.includes('榜')) return `/list?media=${media}&type=rank`
-  if (kind === 2 || name === '推荐') return `/list?media=${media}&type=recommend`
-  if (kind === 1 || name === '新更' || name === '最新') return `/list?media=${media}&type=daily`
-  return `/list?media=${media}&type=category&category=${encodeURIComponent(name)}`
-})
-
-const applyCategories = (rows: { name: string; kind: number }[], fallback: string[]) => {
-  const names = rows.length ? rows.map((r) => r.name) : fallback
-  const kinds: Record<string, number> = {}
-  rows.forEach((r) => {
-    kinds[r.name] = r.kind
-  })
-  cateKind.value = kinds
-  subTabs.value = names
-  if (names.length && !names.includes(subTab.value)) {
-    subSlide.select(names[0])
-  }
-}
-
-const loadComicList = () => {
-  const kind = cateKind.value[subTab.value]
-  let category = ''
-  let sort = 2
-  let recommend = 0
-  if (kind === 1) {
-    sort = 2
-  } else if (kind === 2) {
-    sort = 0
-    recommend = 1
-  } else if (kind === 3) {
-    sort = 1
-  } else if (kind === 0 || kind === undefined) {
-    const name = subTab.value
-    if (name === '新更' || name === '最新') sort = 2
-    else if (name === '推荐') {
-      sort = 0
-      recommend = 1
-    } else if (name === '漫画榜') sort = 1
-    else {
-      category = name
-      sort = 2
-    }
-  }
-  fetchComicsList(1, 21, '', category, sort, recommend)
-    .then((data) => {
-      comicList.value = data.list || []
+const loadComicFloors = () => {
+  Promise.all([
+    fetchComicsList(1, 10, '', '', 2),
+    fetchComicsList(1, 9, '', '', 0, 1),
+  ])
+    .then(([latest, hot]) => {
+      comicLatest.value = latest.list || []
+      const rec = hot.list || []
+      comicHot.value = rec.length ? rec : (latest.list || []).slice(0, 9)
     })
     .catch(toastError)
 }
 
-const loadCartoonList = () => {
-  const kind = cateKind.value[subTab.value]
-  let category = ''
-  let sort = 1
-  if (kind === 1) {
-    sort = 1
-  } else if (kind === 2) {
-    sort = 0
-  } else if (kind === 3) {
-    sort = 0
-  } else if (kind === 0 || kind === undefined) {
-    const name = subTab.value
-    if (name === '最新' || name === '新更') sort = 1
-    else if (name === '推荐' || name === '动漫榜') sort = 0
-    else {
-      category = name
-      sort = 1
-    }
-  }
-  fetchCartoonList(1, 21, '', category, sort)
-    .then((data) => {
-      cartoonList.value = data.list || []
+const loadCartoonFloors = () => {
+  Promise.all([
+    fetchCartoonList(1, 10, '', '', 1),
+    fetchCartoonList(1, 9, '', '', 0),
+  ])
+    .then(([latest, hot]) => {
+      cartoonLatest.value = latest.list || []
+      const rec = hot.list || []
+      cartoonHot.value = rec.length ? rec : (latest.list || []).slice(0, 9)
     })
     .catch(toastError)
 }
 
-const loadList = () => {
+const loadFloors = () => {
   if (isCartoon.value) {
-    loadCartoonList()
+    loadCartoonFloors()
     return
   }
   if (isComic.value) {
-    loadComicList()
+    loadComicFloors()
     return
   }
-  comicList.value = []
-  cartoonList.value = []
 }
 
-const loadCategories = () => {
-  if (isCartoon.value) {
-    return fetchCartoonCategories()
-      .then((data) => applyCategories(data.list || [], cartoonFallback))
-      .catch(() => applyCategories([], cartoonFallback))
-      .finally(loadList)
-  }
-  if (isComic.value) {
-    return fetchComicsCategories()
-      .then((data) => applyCategories(data.list || [], comicFallback))
-      .catch(() => applyCategories([], comicFallback))
-      .finally(loadList)
-  }
-  applyCategories([], [])
-  comicList.value = []
-  cartoonList.value = []
-}
-
-onMounted(loadCategories)
-watch(channel, loadCategories)
-watch(subTab, loadList)
+onMounted(loadFloors)
+watch(channel, loadFloors)
 </script>
 
 <style scoped lang="scss">
+.comic-page {
+  background: #0b0b0d;
+  color: #f2f2f5;
+}
+
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
+  background: #0b0b0d;
+}
+
+.floor-pane {
+  padding: 4px 0 20px;
+  min-height: 60vh;
+  background: #0b0b0d;
+}
+
+.quick-strip {
+  margin: 0 12px 16px;
+  padding: 4px 0 2px;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  justify-content: space-around;
+}
+
+.quick-item {
+  border: 0;
+  background: transparent;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.quick-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :deep(.line-icon) {
+    width: 22px;
+    height: 22px;
+  }
+
+  &.purple {
+    background: #7b5cff;
+  }
+
+  &.red {
+    background: #ff4d6a;
+  }
+
+  &.blue {
+    background: #3d8bff;
+  }
+
+  &.gold {
+    background: #f0a202;
+  }
+}
+
+.quick-label {
+  color: #c8c8d0;
+  font-size: 11px;
+}
+
+.page-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: #6f6f78;
+  font-size: 13px;
+}
+</style>
+
+<style lang="scss">
+.page-shell.comic-page {
+  background: #0b0b0d;
+}
+
+.comic-page .inner-slide,
+.comic-page .floor-pane {
+  background: #0b0b0d;
+}
+
+.comic-page .quick-strip {
+  background: transparent;
+  box-shadow: none;
+}
+
+.comic-page .quick-strip .quick-label {
+  color: #c8c8d0;
+  background: transparent;
 }
 </style>
