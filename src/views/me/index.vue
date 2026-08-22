@@ -9,7 +9,7 @@
         <button type="button" class="icon-btn" aria-label="客服" @click="soon('在线客服')">
           <span v-html="iconHead" />
         </button>
-        <button type="button" class="icon-btn" aria-label="设置" @click="showSettings = true">
+        <button type="button" class="icon-btn" aria-label="设置" @click="go('/settings')">
           <span v-html="iconGear" />
         </button>
       </div>
@@ -100,28 +100,6 @@
       </button>
     </section>
 
-    <div v-if="showSettings" class="sheet-mask" @click.self="showSettings = false">
-      <div class="sheet">
-        <button type="button" @click="go('/account/password'); showSettings = false">
-          {{ user?.has_password ? '修改密码' : '设置密码' }}
-        </button>
-        <button type="button" @click="go('/account/login'); showSettings = false">账号登录</button>
-        <button type="button" @click="openBind">绑定邀请</button>
-        <button type="button" class="cancel" @click="showSettings = false">取消</button>
-      </div>
-    </div>
-
-    <div v-if="showBind" class="bind-mask" @click.self="showBind = false">
-      <div class="bind-card">
-        <h3>绑定邀请</h3>
-        <p>请输入好友编号</p>
-        <input v-model="bindCode" type="text" maxlength="64" placeholder="粘贴好友邀请码" />
-        <div class="bind-actions">
-          <button type="button" @click="showBind = false">取消</button>
-          <button type="button" class="ok" :disabled="bindBusy" @click="submitBind">确定</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -130,10 +108,9 @@ import { computed, onActivated, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { fetchUnreadCount } from '@/api/ops'
-import { bindInviteCode } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import EncryptedImage from '@/components/EncryptedImage.vue'
-import { mediaUrl, toastError } from '@/utils/request'
+import { mediaUrl } from '@/utils/request'
 import { publicUid } from '@/utils/userid'
 
 defineOptions({ name: 'Me' })
@@ -144,10 +121,6 @@ const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
 const isVip = computed(() => Boolean(user.value?.group_name && user.value.group_name !== '普通用户'))
-const showBind = ref(false)
-const showSettings = ref(false)
-const bindCode = ref('')
-const bindBusy = ref(false)
 const clock = ref({ h: '00', m: '00', s: '00' })
 const unread = ref(0)
 let timer = 0
@@ -248,11 +221,11 @@ const copyText = async (text: string, ok: string) => {
 
 const copyUid = () => {
   if (!uid.value || uid.value === '----') return
-  copyText(uid.value, '用户名已复制')
+  copyText(uid.value, '编号已复制')
 }
 
 const onAvatar = () => {
-  if (!userStore.loggedIn) go('/account/login')
+  go(userStore.loggedIn ? '/settings/avatar' : '/account/login')
 }
 
 const onQuick = (item: { title: string; path: string }) => {
@@ -261,12 +234,6 @@ const onQuick = (item: { title: string; path: string }) => {
     return
   }
   soon(item.title)
-}
-
-const openBind = () => {
-  showSettings.value = false
-  bindCode.value = ''
-  showBind.value = true
 }
 
 const onMenu = (item: { title: string; key: string }) => {
@@ -284,24 +251,6 @@ const onMenu = (item: { title: string; key: string }) => {
     return
   }
   soon(item.title)
-}
-
-const submitBind = async () => {
-  const code = bindCode.value.trim()
-  if (!code) {
-    showToast('请输入好友编号')
-    return
-  }
-  bindBusy.value = true
-  try {
-    await bindInviteCode(code)
-    showBind.value = false
-    showToast('绑定成功')
-  } catch (err) {
-    toastError(err)
-  } finally {
-    bindBusy.value = false
-  }
 }
 
 onMounted(() => {
@@ -672,100 +621,5 @@ onUnmounted(() => {
   color: #6a6a74;
   font-style: normal;
   font-size: 18px;
-}
-
-.sheet-mask,
-.bind-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.bind-mask {
-  align-items: center;
-  padding: 24px;
-}
-
-.sheet {
-  width: 100%;
-  max-width: 480px;
-  padding: 8px 12px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: #1c1c22;
-  border-radius: 16px 16px 0 0;
-
-  button {
-    width: 100%;
-    height: 48px;
-    border: 0;
-    border-bottom: 1px solid #2a2a32;
-    background: transparent;
-    color: #f2f2f5;
-    font-size: 15px;
-  }
-
-  .cancel {
-    margin-top: 8px;
-    border: 0;
-    border-radius: 10px;
-    background: #121214;
-    color: #8d8d96;
-  }
-}
-
-.bind-card {
-  width: 100%;
-  max-width: 300px;
-  background: #1c1c22;
-  border-radius: 16px;
-  padding: 18px 16px 12px;
-  color: #f2f2f5;
-
-  h3 {
-    text-align: center;
-    font-size: 16px;
-  }
-
-  p {
-    margin: 8px 0 12px;
-    text-align: center;
-    font-size: 13px;
-    color: #8d8d96;
-  }
-
-  input {
-    width: 100%;
-    height: 40px;
-    border: 1px solid #2a2a32;
-    border-radius: 8px;
-    padding: 0 12px;
-    font-size: 15px;
-    background: #121214;
-    color: #fff;
-  }
-}
-
-.bind-actions {
-  display: flex;
-  margin-top: 12px;
-  border-top: 1px solid #2a2a32;
-
-  button {
-    flex: 1;
-    height: 42px;
-    border: 0;
-    background: transparent;
-    font-size: 15px;
-    color: #8d8d96;
-  }
-
-  .ok {
-    color: #ff5c93;
-    font-weight: 800;
-    border-left: 1px solid #2a2a32;
-  }
 }
 </style>

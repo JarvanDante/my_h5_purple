@@ -1,8 +1,8 @@
 <template>
-  <div class="page-shell sub-page">
-    <PageHeader :title="hasPassword ? '修改密码' : '设置密码'" />
-    <section class="soft-card box">
-      <p class="hint">用户名是「我的」页上的编号，设好密码后可在其他设备用编号+密码登录。</p>
+  <div class="page-shell sub-page edit-page">
+    <PageHeader :title="hasPassword ? '修改密码' : '设置密码'" fallback="/settings" />
+    <section class="box">
+      <p class="hint">设好密码后，换机或清缓存请用「我的」页编号 + 密码登录，不要用设备号。</p>
       <input v-if="hasPassword" v-model="oldPwd" type="password" maxlength="32" placeholder="旧密码" />
       <input v-model="pwd" type="password" maxlength="32" placeholder="新密码（6-32位）" />
       <input v-model="pwd2" type="password" maxlength="32" placeholder="再输入一次新密码" />
@@ -67,34 +67,47 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables.scss' as *;
+.edit-page {
+  background: #0d0d12;
+  min-height: 100%;
+}
 
 .box {
-  .hint {
-    margin-bottom: 12px;
-    font-size: 12px;
-    color: #888;
-    line-height: 1.5;
-  }
+  margin: 16px;
+}
 
-  input {
-    width: 100%;
-    height: 40px;
-    border: 1.6px solid $ink;
-    border-radius: $radius-pill;
-    padding: 0 14px;
-    margin-top: 10px;
-  }
+.hint {
+  margin-bottom: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #8c8c9c;
+}
 
-  button {
-    width: 100%;
-    height: 40px;
-    margin-top: 12px;
-    border: 1.6px solid $ink;
-    border-radius: $radius-pill;
-    background: $accent-yellow;
-    color: $ink;
-    font-weight: 800;
+input {
+  width: 100%;
+  height: 46px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 14px;
+  margin-top: 10px;
+  background: #191920;
+  color: #f5f5f8;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  height: 46px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 23px;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+
+  &:disabled {
+    opacity: 0.45;
   }
 }
 </style>

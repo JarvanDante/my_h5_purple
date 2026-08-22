@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { bindInviteCode, fetchUserInfo, login, loginByAccount, type UserInfo } from '@/api/user'
+import { bindInviteCode, fetchUserInfo, login, loginByAccount, logout as logoutApi, type UserInfo } from '@/api/user'
 import { peekInviteCode, takeInviteCode } from '@/utils/invite'
 import { setToken } from '@/utils/request'
 
@@ -65,5 +65,16 @@ export const useUserStore = defineStore('user', () => {
     return user.value
   }
 
-  return { user, ready, loggedIn, ensureLogin, loginAccount, refresh, deviceId }
+  const logout = async () => {
+    try {
+      await logoutApi()
+    } catch {
+      // 本地清会话即可
+    }
+    setToken('')
+    user.value = null
+    ready.value = false
+  }
+
+  return { user, ready, loggedIn, ensureLogin, loginAccount, refresh, logout, deviceId }
 })

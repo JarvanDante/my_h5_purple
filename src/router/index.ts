@@ -35,6 +35,30 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '我的', tabbar: true },
   },
   {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('@/views/me/settings.vue'),
+    meta: { title: '设置' },
+  },
+  {
+    path: '/settings/nickname',
+    name: 'SettingsNickname',
+    component: () => import('@/views/me/settings-nickname.vue'),
+    meta: { title: '昵称设置' },
+  },
+  {
+    path: '/settings/sex',
+    name: 'SettingsSex',
+    component: () => import('@/views/me/settings-sex.vue'),
+    meta: { title: '性别设置' },
+  },
+  {
+    path: '/settings/avatar',
+    name: 'SettingsAvatar',
+    component: () => import('@/views/me/settings-avatar.vue'),
+    meta: { title: '头像设置' },
+  },
+  {
     path: '/comic/:id',
     name: 'ComicDetail',
     component: () => import('@/views/comic/detail.vue'),

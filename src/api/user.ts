@@ -64,6 +64,21 @@ export function fetchUserInfo() {
   return request<UserInfo>('/user/info')
 }
 
+export function logout() {
+  return request<Record<string, never>>('/user/logout', { method: 'POST', body: '{}' })
+}
+
+export function updateProfile(body: { nickname?: string; img?: string; sex?: number }) {
+  return request<Record<string, never>>('/user/update', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export function fetchAvatars() {
+  return request<{ list: string[] }>('/user/avatars')
+}
+
 export function fetchVipPackages() {
   return request<{ list: VipPackage[] }>('/user/vip')
 }
