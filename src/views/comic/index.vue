@@ -237,9 +237,11 @@ watch(channel, loadFloors)
 }
 
 .quick-icon {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
+  background: transparent;
+  border-radius: 0;
   mix-blend-mode: lighten;
 }
 
@@ -269,6 +271,10 @@ watch(channel, loadFloors)
 .comic-page .quick-strip {
   background: #1c1c22;
   box-shadow: none;
+}
+
+.comic-page .quick-strip .quick-icon {
+  background: transparent;
 }
 
 .comic-page .quick-strip .quick-label {
