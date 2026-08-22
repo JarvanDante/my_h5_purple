@@ -1,10 +1,10 @@
 <template>
   <button type="button" class="channel-tab" :class="{ active }" @click="$emit('select')">
-    <svg v-if="active" class="channel-ring channel-ring--back" viewBox="0 0 96 44" aria-hidden="true">
+    <span class="channel-text">{{ label }}</span>
+    <svg v-if="active" class="channel-ring" viewBox="0 0 96 44" aria-hidden="true">
       <defs>
-        <linearGradient :id="`${uid}-orbit`" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
-          <stop offset="0%" stop-color="#c2185b" />
-          <stop offset="60%" stop-color="#ff9fbf" />
+        <linearGradient :id="`${uid}-orbit`" gradientUnits="userSpaceOnUse" x1="48" y1="22" x2="48" y2="40">
+          <stop offset="0%" stop-color="#ff8fb3" />
           <stop offset="100%" stop-color="#fff5f8" />
         </linearGradient>
         <filter :id="`${uid}-glow`" x="-60%" y="-60%" width="220%" height="220%">
@@ -14,11 +14,11 @@
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <clipPath :id="`${uid}-back`">
-          <rect x="0" y="0" width="96" height="22" />
+        <clipPath :id="`${uid}-bottom`">
+          <rect x="0" y="22" width="96" height="22" />
         </clipPath>
       </defs>
-      <g :filter="`url(#${uid}-glow)`" :clip-path="`url(#${uid}-back)`">
+      <g :filter="`url(#${uid}-glow)`" :clip-path="`url(#${uid}-bottom)`">
         <ellipse
           cx="48"
           cy="22"
@@ -30,40 +30,8 @@
           stroke-width="1.8"
         />
       </g>
-      <path class="spark" d="M78 10.5l1.15 2.55 2.55 1.15-2.55 1.15L78 17.9l-1.15-2.55-2.55-1.15 2.55-1.15z" />
-      <path class="spark" d="M18 11.2l0.85 1.9 1.9 0.85-1.9 0.85L18 16.7l-0.85-1.9-1.9-0.85 1.9-0.85z" />
-    </svg>
-    <span class="channel-text">{{ label }}</span>
-    <svg v-if="active" class="channel-ring channel-ring--front" viewBox="0 0 96 44" aria-hidden="true">
-      <defs>
-        <linearGradient :id="`${uid}-orbit-f`" gradientUnits="userSpaceOnUse" x1="48" y1="4" x2="48" y2="40">
-          <stop offset="0%" stop-color="#c2185b" />
-          <stop offset="60%" stop-color="#ff9fbf" />
-          <stop offset="100%" stop-color="#fff5f8" />
-        </linearGradient>
-        <filter :id="`${uid}-glow-f`" x="-60%" y="-60%" width="220%" height="220%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <clipPath :id="`${uid}-front`">
-          <rect x="0" y="22" width="96" height="22" />
-        </clipPath>
-      </defs>
-      <g :filter="`url(#${uid}-glow-f)`" :clip-path="`url(#${uid}-front)`">
-        <ellipse
-          cx="48"
-          cy="22"
-          rx="36"
-          ry="11"
-          transform="rotate(-18 48 22)"
-          fill="none"
-          :stroke="`url(#${uid}-orbit-f)`"
-          stroke-width="1.8"
-        />
-      </g>
+      <path class="spark" d="M76 29.6l1.15 2.55 2.55 1.15-2.55 1.15L76 37l-1.15-2.55-2.55-1.15 2.55-1.15z" />
+      <path class="spark" d="M20 28.8l0.85 1.9 1.9 0.85-1.9 0.85L20 34.3l-0.85-1.9-1.9-0.85 1.9-0.85z" />
     </svg>
   </button>
 </template>
@@ -105,17 +73,10 @@ const uid = useId().replace(/\W/g, '')
   top: 50%;
   width: 86px;
   height: 40px;
-  transform: translate(-50%, -50%) rotate(180deg);
+  transform: translate(-50%, -50%);
   overflow: visible;
   pointer-events: none;
-}
-
-.channel-ring--back {
   z-index: 2;
-}
-
-.channel-ring--front {
-  z-index: 0;
 }
 
 .spark {
@@ -137,12 +98,12 @@ const uid = useId().replace(/\W/g, '')
     content: '';
     position: absolute;
     left: 50%;
-    top: 50%;
-    width: 64px;
-    height: 34px;
+    top: 58%;
+    width: 56px;
+    height: 22px;
     transform: translate(-50%, -50%);
     border-radius: 50%;
-    background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.14) 46%, transparent 72%);
+    background: radial-gradient(ellipse at center, rgba(255, 92, 147, 0.32) 0%, rgba(255, 92, 147, 0.1) 50%, transparent 72%);
     pointer-events: none;
     z-index: 0;
   }
