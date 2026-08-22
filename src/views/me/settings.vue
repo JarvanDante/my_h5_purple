@@ -36,7 +36,7 @@
       </button>
     </section>
 
-    <p class="hint">本机默认用设备自动登录。设好密码后，换设备请用上方登录账号 + 密码，不要用设备号。</p>
+    <p class="hint">未退出时本机用设备自动登录。退出后需用上方登录账号 + 密码重新进入，不要用设备号。</p>
 
     <button type="button" class="logout" @click="onLogout">退出登录</button>
 
@@ -116,7 +116,7 @@ const onLogout = async () => {
   try {
     await showConfirmDialog({
       title: '退出登录',
-      message: '退出后本机仍可用设备自动回到当前号。换号请用登录账号+密码。',
+      message: '退出后本机不会自动登录。重新进入或换号请用登录账号+密码。',
       confirmButtonText: '退出',
       confirmButtonColor: '#ff3d7f',
     })

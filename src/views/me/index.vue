@@ -22,7 +22,7 @@
       </button>
       <div class="meta">
         <div class="name-row">
-          <h1>{{ user?.nickname || '未登录' }}</h1>
+          <h1 @click="onName">{{ user?.nickname || '未登录' }}</h1>
           <span class="vip-gem" :class="{ dim: !isVip }" v-html="iconGem" />
         </div>
         <button type="button" class="uid-line" @click="copyUid">
@@ -222,6 +222,10 @@ const copyText = async (text: string, ok: string) => {
 const copyUid = () => {
   if (!uid.value || uid.value === '----') return
   copyText(uid.value, '编号已复制')
+}
+
+const onName = () => {
+  if (!userStore.loggedIn) go('/account/login')
 }
 
 const onAvatar = () => {

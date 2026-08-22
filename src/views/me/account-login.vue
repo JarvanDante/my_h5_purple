@@ -1,11 +1,12 @@
 <template>
   <div class="page-shell sub-page edit-page">
-    <PageHeader title="账号登录" fallback="/settings" />
+    <PageHeader title="账号登录" fallback="/me" />
     <section class="box">
-      <p class="hint">用「我的」页上的编号（例如 W0NdUQ）和密码登录，不要用设备号。成功后本机切换到该账号。</p>
+      <p class="hint">用「我的」页上的编号和密码登录，不要用设备号。退出后不会自动进号。</p>
       <input v-model="username" type="text" maxlength="64" placeholder="用户编号" />
       <input v-model="password" type="password" maxlength="32" placeholder="密码" @keyup.enter="submit" />
       <button type="button" :disabled="busy" @click="submit">登录</button>
+      <button v-if="userStore.sessionOff" type="button" class="ghost" :disabled="busy" @click="resume">使用本机账号</button>
     </section>
   </div>
 </template>
@@ -39,6 +40,19 @@ const submit = async () => {
   try {
     await userStore.loginAccount(name, pwd)
     showToast('登录成功')
+    router.replace('/me')
+  } catch (err) {
+    toastError(err)
+  } finally {
+    busy.value = false
+  }
+}
+
+const resume = async () => {
+  busy.value = true
+  try {
+    await userStore.resumeDevice()
+    showToast('已进入本机账号')
     router.replace('/me')
   } catch (err) {
     toastError(err)
@@ -91,5 +105,12 @@ button {
   &:disabled {
     opacity: 0.45;
   }
+}
+
+.ghost {
+  margin-top: 10px;
+  border: 1.5px solid #ff3d7f;
+  background: transparent;
+  color: #ff3d7f;
 }
 </style>

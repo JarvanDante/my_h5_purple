@@ -5,6 +5,7 @@ import { peekInviteCode, takeInviteCode } from '@/utils/invite'
 import { setToken } from '@/utils/request'
 
 const DEVICE_KEY = 'h5_device_id'
+const SESSION_OFF_KEY = 'h5_session_off'
 
 function deviceId() {
   let id = localStorage.getItem(DEVICE_KEY)
@@ -15,10 +16,21 @@ function deviceId() {
   return id
 }
 
+function readSessionOff() {
+  return localStorage.getItem(SESSION_OFF_KEY) === '1'
+}
+
 export const useUserStore = defineStore('user', () => {
   const user = ref<UserInfo | null>(null)
   const ready = ref(false)
+  const sessionOff = ref(readSessionOff())
   const loggedIn = computed(() => Boolean(user.value?.id))
+
+  const setSessionOff = (off: boolean) => {
+    sessionOff.value = off
+    if (off) localStorage.setItem(SESSION_OFF_KEY, '1')
+    else localStorage.removeItem(SESSION_OFF_KEY)
+  }
 
   const applyInvite = async () => {
     const code = peekInviteCode()
@@ -32,6 +44,10 @@ export const useUserStore = defineStore('user', () => {
   }
 
   const ensureLogin = async () => {
+    if (sessionOff.value) {
+      ready.value = true
+      return user.value
+    }
     const data = await login({
       device_id: deviceId(),
       device_type: 'h5',
@@ -52,11 +68,17 @@ export const useUserStore = defineStore('user', () => {
       device_type: 'h5',
       device_version: '0.1.0',
     })
+    setSessionOff(false)
     setToken(data.token)
     user.value = data.user
     ready.value = true
     await applyInvite()
     return data.user
+  }
+
+  const resumeDevice = async () => {
+    setSessionOff(false)
+    return ensureLogin()
   }
 
   const refresh = async () => {
@@ -73,8 +95,20 @@ export const useUserStore = defineStore('user', () => {
     }
     setToken('')
     user.value = null
-    ready.value = false
+    ready.value = true
+    setSessionOff(true)
   }
 
-  return { user, ready, loggedIn, ensureLogin, loginAccount, refresh, logout, deviceId }
+  return {
+    user,
+    ready,
+    loggedIn,
+    sessionOff,
+    ensureLogin,
+    loginAccount,
+    resumeDevice,
+    refresh,
+    logout,
+    deviceId,
+  }
 })
