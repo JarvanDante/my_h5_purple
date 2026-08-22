@@ -84,8 +84,8 @@ const go = (path: string) => {
     height: 100%;
     pointer-events: none;
     background:
-      radial-gradient(120% 80% at 50% 118%, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.1) 42%, transparent 70%),
-      linear-gradient(0deg, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.06) 38%, transparent 78%);
+      radial-gradient(120% 80% at 50% -18%, rgba(255, 92, 147, 0.42) 0%, rgba(255, 92, 147, 0.1) 42%, transparent 70%),
+      linear-gradient(180deg, rgba(255, 92, 147, 0.22) 0%, rgba(255, 92, 147, 0.06) 38%, transparent 78%);
   }
 }
 
