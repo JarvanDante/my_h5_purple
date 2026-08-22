@@ -15,6 +15,7 @@ export type UserInfo = {
   fans: number
   follow: number
   has_password?: boolean
+  has_parent?: boolean
   ext?: Record<string, unknown>
 }
 

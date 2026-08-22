@@ -22,13 +22,13 @@
         <span>登录账号</span>
         <em class="code">{{ account }}</em>
       </button>
-      <button type="button" class="accent" @click="go('/account/password')">
-        <span>{{ user?.has_password ? '修改密码' : '设置密码' }}</span>
-        <i>›</i>
+      <button type="button" @click="go('/account/password')">
+        <span>设置密码</span>
+        <em>{{ user?.has_password ? '已设置' : '未设置' }}<i>›</i></em>
       </button>
-      <button type="button" class="accent" @click="openBind">
+      <button type="button" @click="openBind">
         <span>绑定邀请</span>
-        <i>›</i>
+        <em>{{ user?.has_parent ? '已绑定' : '未绑定' }}<i>›</i></em>
       </button>
     </section>
 
@@ -86,6 +86,10 @@ const copyAccount = async () => {
 }
 
 const openBind = () => {
+  if (user.value?.has_parent) {
+    showToast('已绑定推荐人, 不可修改')
+    return
+  }
   bindCode.value = ''
   showBind.value = true
 }
@@ -99,6 +103,7 @@ const submitBind = async () => {
   bindBusy.value = true
   try {
     await bindInviteCode(code)
+    await userStore.refresh()
     showBind.value = false
     showToast('绑定成功')
   } catch (err) {
@@ -185,11 +190,6 @@ onMounted(async () => {
 
   .code {
     color: #ffb3cc;
-    font-weight: 700;
-  }
-
-  .accent {
-    color: #ff3d7f;
     font-weight: 700;
   }
 }
