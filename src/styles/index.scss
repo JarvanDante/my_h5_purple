@@ -2,7 +2,7 @@
 @use './theme.scss';
 
 :root {
-  --app-header-top: calc(env(safe-area-inset-top, 0px) + 2px);
+  --app-header-top: calc(env(safe-area-inset-top, 0px) + 5px);
   --van-primary-color: #{$primary-color};
   --van-danger-color: #{$danger-color};
   --color-primary: #{$primary-color};
