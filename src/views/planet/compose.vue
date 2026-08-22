@@ -42,8 +42,8 @@
         </p>
         <div class="media-grid">
           <div v-if="draft.videoUrl" class="thumb video">
-            <video :src="mediaUrl(draft.videoUrl)" muted />
-            <button type="button" class="del" @click="draft.videoUrl = ''">×</button>
+            <video :src="videoPreview || mediaUrl(draft.videoUrl)" muted />
+            <button type="button" class="del" @click="clearVideo">×</button>
           </div>
           <div v-else-if="videoUploading" class="thumb video uploading">
             <span>上传中 {{ videoPercent }}%</span>
@@ -77,6 +77,13 @@ const draft = usePostDraftStore()
 const busy = ref(false)
 const videoUploading = ref(false)
 const videoPercent = ref(0)
+const videoPreview = ref('')
+
+const clearVideo = () => {
+  if (videoPreview.value.startsWith('blob:')) URL.revokeObjectURL(videoPreview.value)
+  videoPreview.value = ''
+  draft.videoUrl = ''
+}
 
 const goTopics = () => router.push('/planet/topics')
 
@@ -120,6 +127,8 @@ const onPickVideo = async (e: Event) => {
     const data = await uploadPostMedia(file, 'video', (percent) => {
       videoPercent.value = percent
     })
+    if (videoPreview.value.startsWith('blob:')) URL.revokeObjectURL(videoPreview.value)
+    videoPreview.value = URL.createObjectURL(file)
     draft.videoUrl = data.url
   } catch (err) {
     toastError(err)
