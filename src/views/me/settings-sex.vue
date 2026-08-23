@@ -101,18 +101,14 @@ onMounted(async () => {
   border: 0;
   border-radius: 50%;
   color: #fff;
+  background: #5c5c68;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
 
-  &.male {
+  &.male.on {
     background: #3d8cff;
   }
 
-  &.female {
-    background: #5c5c68;
-  }
-
-  &.female.on,
-  &.female:focus-visible {
+  &.female.on {
     background: #ff3d7f;
   }
 
