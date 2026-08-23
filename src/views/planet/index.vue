@@ -11,7 +11,7 @@
             @select="select(item)"
           />
         </div>
-        <button type="button" class="search-btn" aria-label="搜索" @click="go('/search')">
+        <button type="button" class="search-btn" aria-label="搜索" @click="go(searchPath('planet'))">
           <LineIcon name="search" />
         </button>
       </div>
@@ -68,6 +68,7 @@ import { fetchFollows, toggleFollow } from '@/api/user'
 import { slideByIndex } from '@/stores/nav'
 import { useUserStore } from '@/stores/user'
 import { postPath, userPath } from '@/utils/idcrypt'
+import { searchPath } from '@/utils/searchScope'
 import { getToken, toastError } from '@/utils/request'
 
 defineOptions({ name: 'Planet' })

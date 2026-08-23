@@ -51,6 +51,9 @@
       <path d="M14.2 7.2 20 4.8v6.2" />
       <path d="M19.4 8.2A8 8 0 1 1 9.6 5.8" />
     </g>
+    <g v-else-if="name === 'trash'" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 7h14M9.2 7V5.4h5.6V7M8.2 7l.7 12h6.2l.7-12" />
+    </g>
     <g v-else-if="name === 'pin'" fill="currentColor" stroke="none">
       <path d="M14.8 3.4 9.1 7.6l-2.2-.8-1.3 1.3 3.7 2.7-2.6 4.6 1.4.8 2.6-4.6 3.6 2.7 1.3-1.3-.7-2.3 5.7-4.2-5.8-3.1Z" />
     </g>

@@ -4,10 +4,9 @@
       dark
       :channels="channels"
       :channel="channel"
-      search-text="输入你想搜索的关键字"
       @select-channel="selectChannel"
       @checkin="go('/checkin')"
-      @search="go('/search')"
+      @search="go(searchPath(channel))"
       @vip="go('/vip')"
     />
 
@@ -59,6 +58,7 @@ import { fetchComicsList, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
+import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 

@@ -4,10 +4,10 @@
       dark
       :channels="channels"
       :channel="channel"
-      search-text="输入你想搜索的关键字"
+      :search-text="searchHint"
       @select-channel="selectChannel"
       @checkin="go('/checkin')"
-      @search="go('/search')"
+      @search="go(searchPath('video'))"
       @vip="go('/vip')"
     />
 
@@ -55,6 +55,7 @@ import { useTabSlide } from '@/composables/useTabSlide'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
 import { videoPath } from '@/utils/idcrypt'
+import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
 
@@ -132,6 +133,8 @@ const quicks = [
   { emoji: '📍', label: '专题', path: '/list?media=video&type=topic' },
   { emoji: '💰', label: '金币专区', path: '/wallet' },
 ]
+
+const searchHint = computed(() => videoSearchHint('video'))
 
 const go = (path: string) => router.push(path)
 const open = (item: CoverItem) => {
