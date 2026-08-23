@@ -45,22 +45,25 @@
         </div>
       </section>
 
-      <section class="block">
+      <section class="block hot-block">
         <div class="block-head">
-          <h3>
-            <span class="hot-ico"><LineIcon name="hot" /></span>
-            热门标签
-          </h3>
+          <h3 class="hot-title">热门搜索</h3>
         </div>
         <div class="rank-grid">
           <button
             v-for="(word, idx) in hotTags"
-            :key="word"
+            :key="`${idx}-${word}`"
             type="button"
             class="rank-item"
             @click="doSearch(word)"
           >
-            <i :class="`n n-${idx + 1}`">{{ idx + 1 }}</i>
+            <span v-if="idx < 3" class="crown" :class="`crown-${idx + 1}`" aria-hidden="true">
+              <svg viewBox="0 0 28 22">
+                <path d="M3.2 9.2 8 11.2 14 3.2 20 11.2 24.8 9.2 22.4 19.4H5.6Z" />
+              </svg>
+              <b>{{ idx + 1 }}</b>
+            </span>
+            <i v-else class="rank-no">{{ idx + 1 }}</i>
             <span>{{ word }}</span>
           </button>
         </div>
@@ -102,9 +105,10 @@ import { useRoute, useRouter } from 'vue-router'
 import { showConfirmDialog } from 'vant'
 import LineIcon from '@/components/LineIcon.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
-import { fetchCartoonCategories, fetchCartoonList, cartoonCategories, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsCategories, fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
-import { fetchVideoCategories, fetchVideoList, type VideoItem } from '@/api/video'
+import { fetchCartoonList, cartoonCategories, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
+import { fetchHotSearch } from '@/api/ranks'
+import { fetchVideoList, type VideoItem } from '@/api/video'
 import { hotWords, type CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews } from '@/utils/format'
@@ -246,24 +250,17 @@ const openLibrary = async () => {
 const loadHot = async () => {
   const fallback = FALLBACK_TAGS[scope.value] || hotWords
   try {
-    if (scope.value === 'cartoon') {
-      const data = await fetchCartoonCategories()
-      const names = (data.list || []).filter((x) => x.kind === 0).map((x) => x.name)
-      hotTags.value = (names.length ? names : fallback).slice(0, 10)
-      return
+    const data = await fetchHotSearch(scope.value)
+    const words = (data.list || []).map((x) => x.keyword).filter(Boolean)
+    const seen = new Set(words)
+    for (const w of fallback) {
+      if (words.length >= 10) break
+      if (seen.has(w)) continue
+      words.push(w)
+      seen.add(w)
     }
-    if (scope.value === 'video' || scope.value === 'short') {
-      const data = await fetchVideoCategories()
-      const names = (data.list || []).filter((x) => x.kind === 0).map((x) => x.name)
-      hotTags.value = (names.length ? names : fallback).slice(0, 10)
-      return
-    }
-    if (scope.value === 'comic') {
-      const data = await fetchComicsCategories()
-      const names = (data.list || []).filter((x) => x.kind === 0).map((x) => x.name)
-      hotTags.value = (names.length ? names : fallback).slice(0, 10)
-      return
-    }
+    hotTags.value = words.slice(0, 10)
+    return
   } catch {
     /* use fallback */
   }
@@ -447,11 +444,18 @@ onMounted(() => {
   }
 }
 
-.hot-ico {
-  width: 15px;
-  height: 15px;
-  color: $primary-color;
-  display: flex;
+.hot-title {
+  &::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    border-radius: 2px;
+    background: #9b6bff;
+  }
+}
+
+.hot-block {
+  padding-bottom: 16px;
 }
 
 .clear-btn {
@@ -487,7 +491,7 @@ onMounted(() => {
 .rank-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4px 16px;
+  gap: 2px 18px;
 }
 
 .rank-item {
@@ -495,14 +499,14 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   min-width: 0;
-  height: 36px;
+  height: 38px;
   border: 0;
   background: transparent;
   color: $text-color;
   text-align: left;
   font-size: 14px;
 
-  span {
+  > span:last-child {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -510,33 +514,53 @@ onMounted(() => {
   }
 }
 
-.n {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
+.crown {
+  position: relative;
+  width: 22px;
+  height: 18px;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  color: #9a9aa4;
-  background: #2a2a32;
+
+  svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  b {
+    position: relative;
+    z-index: 1;
+    margin-top: 5px;
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1;
+    color: #1a1208;
+  }
+}
+
+.crown-1 svg {
+  fill: #f5c542;
+}
+
+.crown-2 svg {
+  fill: #c5d4e0;
+}
+
+.crown-3 svg {
+  fill: #e8a07a;
+}
+
+.rank-no {
+  width: 22px;
   flex-shrink: 0;
-}
-
-.n-1 {
-  color: #fff;
-  background: #ff4d6d;
-}
-
-.n-2 {
-  color: #fff;
-  background: #ff8a3d;
-}
-
-.n-3 {
-  color: #1a1208;
-  background: #ffc53d;
+  color: #d4b46a;
+  font-size: 14px;
+  font-weight: 700;
+  font-style: normal;
+  text-align: center;
 }
 
 .result-block {
