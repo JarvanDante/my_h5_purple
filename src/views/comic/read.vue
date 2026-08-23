@@ -253,6 +253,10 @@ const openChapter = (ch: ChapterItem) => {
 
 const back = () => {
   stopAuto()
+  if (window.history.state?.back) {
+    router.back()
+    return
+  }
   router.replace(comicPath(routeId(route.params.id)))
 }
 
