@@ -87,14 +87,22 @@
       <div v-if="ready" class="filters">
         <div class="filter-row">
           <button
-            v-for="item in typeChips"
-            :key="item.key"
             type="button"
             class="filter-chip"
-            :class="{ on: filterType === item.key }"
-            @click="filterType = item.key"
+            :class="{ on: !filterCategory }"
+            @click="selectCategory('', 0)"
           >
-            {{ item.label }}
+            全部类型
+          </button>
+          <button
+            v-for="item in categoryChips"
+            :key="`cate-${item.id}`"
+            type="button"
+            class="filter-chip"
+            :class="{ on: filterCategory === item.name }"
+            @click="selectCategory(item.name, item.kind)"
+          >
+            {{ item.name }}
           </button>
         </div>
         <div class="filter-row">
@@ -102,19 +110,19 @@
             type="button"
             class="filter-chip"
             :class="{ on: !filterTag }"
-            @click="selectTag('', 'category')"
+            @click="filterTag = ''"
           >
             全部标签
           </button>
           <button
-            v-for="item in tagChips"
-            :key="`${item.via}-${item.name}`"
+            v-for="name in tagChips"
+            :key="`tag-${name}`"
             type="button"
             class="filter-chip"
-            :class="{ on: filterTag === item.name }"
-            @click="selectTag(item.name, item.via)"
+            :class="{ on: filterTag === name }"
+            @click="filterTag = name"
           >
-            {{ item.name }}
+            {{ name }}
           </button>
         </div>
         <div class="filter-row">
@@ -165,16 +173,7 @@ import { mediaUrl, toastError } from '@/utils/request'
 import { clearSearchHistory, listSearchHistory, pushSearchHistory } from '@/utils/searchHistory'
 import { parseScope, searchHint, scopeLabel, type SearchScope } from '@/utils/searchScope'
 
-type PayType = '' | 'vip' | 'pay' | 'free'
-type TagVia = 'category' | 'tag'
-type TagChip = { name: string; via: TagVia }
-
-const TYPE_CHIPS: { key: PayType; label: string }[] = [
-  { key: '', label: '全部类型' },
-  { key: 'vip', label: 'VIP' },
-  { key: 'pay', label: '付费解锁' },
-  { key: 'free', label: '免费' },
-]
+type CategoryChip = { id: number; name: string; kind: number }
 
 const SORT_CHIPS = [
   { key: 0, label: '综合排序' },
@@ -191,16 +190,6 @@ const REPO_TAG_TYPE: Partial<Record<SearchScope, number>> = {
   video: 1,
 }
 
-const FALLBACK_TAGS: Record<SearchScope, string[]> = {
-  comic: ['韩漫', '日漫', '校园', '恋爱', '完结', '都市', '玄幻', '热血', '后宫', '穿越'],
-  cartoon: ['热血', '异世界', '校园', '恋爱', '奇幻', '日常', '战斗', '搞笑', '冒险', '完结'],
-  novel: ['都市', '玄幻', '言情', '穿越', '重生', '校园', '修真', '脑洞', '完结', '短篇'],
-  short: ['短剧', '甜宠', '逆袭', '复仇', '豪门', '穿越', '重生', '都市', '古装', '完结'],
-  video: ['电影', '短剧', '综艺', '热播', '最新', '推荐', '动作', '爱情', '喜剧', '悬疑'],
-  planet: ['推荐', '日常', '活动', '求推荐', '完结', '韩漫', '日漫', '同人', '吐槽', '安利'],
-  ai: ['绘画', '换脸', '对话', '小说', '封面', '分镜', '角色', '上色', '风格', '提示词'],
-}
-
 const route = useRoute()
 const router = useRouter()
 const inputEl = ref<HTMLInputElement | null>(null)
@@ -212,12 +201,12 @@ const results = ref<CoverItem[]>([])
 const library = ref<CoverItem[]>([])
 const history = ref(listSearchHistory())
 const hotTags = ref<string[]>([])
-const filterType = ref<PayType>('')
+const filterCategory = ref('')
+const filterCategoryKind = ref(0)
 const filterTag = ref('')
-const filterTagVia = ref<TagVia>('category')
 const filterSort = ref(0)
-const tagChips = ref<TagChip[]>([])
-const typeChips = TYPE_CHIPS
+const categoryChips = ref<CategoryChip[]>([])
+const tagChips = ref<string[]>([])
 const sortChips = SORT_CHIPS
 
 const scope = computed(() => parseScope(route.query.scope))
@@ -270,30 +259,14 @@ const toVideoCover = (v: VideoItem): CoverItem => ({
   tone: v.id % 6,
 })
 
-const payTypeNum = (pay: PayType) => {
-  if (pay === 'vip') return 1
-  if (pay === 'pay') return 2
-  if (pay === 'free') return 3
-  return 0
-}
-
-const matchPayType = (item: ComicsItem, pay: PayType) => {
-  const vip = item.is_vip === 1
-  const paid = Number(item.price) > 0
-  if (pay === 'vip') return vip
-  if (pay === 'pay') return !vip && paid
-  if (pay === 'free') return !vip && !paid
-  return true
-}
-
 const mediaSort = (sort: number) => {
   if (sort === 2) return 1
   return 0
 }
 
-const selectTag = (name: string, via: TagVia) => {
-  filterTag.value = name
-  filterTagVia.value = name ? via : 'category'
+const selectCategory = (name: string, kind: number) => {
+  filterCategory.value = name
+  filterCategoryKind.value = name ? kind : 0
 }
 
 const fetchByScope = async (word = '') => {
@@ -349,61 +322,53 @@ const doSearch = async (word?: string) => {
   }
 }
 
-const loadTagChips = async () => {
-  const names = new Map<string, TagVia>()
-  const add = (name: string, via: TagVia) => {
-    const n = name.trim()
-    if (!n || names.has(n)) return
-    names.set(n, via)
-  }
+const loadFilterChips = async () => {
+  categoryChips.value = []
+  tagChips.value = []
   try {
+    let list: CategoryChip[] = []
     if (scope.value === 'comic') {
-      const data = await fetchComicsCategories()
-      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+      list = (await fetchComicsCategories()).list || []
     } else if (scope.value === 'cartoon') {
-      const data = await fetchCartoonCategories()
-      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+      list = (await fetchCartoonCategories()).list || []
     } else if (scope.value === 'video' || scope.value === 'short') {
-      const data = await fetchVideoCategories()
-      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+      list = (await fetchVideoCategories()).list || []
     }
+    categoryChips.value = list.filter((x) => x.name)
   } catch {
-    /* fallback below */
+    categoryChips.value = []
   }
   const repoType = REPO_TAG_TYPE[scope.value]
-  if (repoType) {
-    try {
-      const data = await fetchRepoTags(repoType)
-      ;(data.list || []).forEach((x) => add(x.name, 'tag'))
-    } catch {
-      /* ignore */
-    }
+  if (!repoType) return
+  try {
+    const data = await fetchRepoTags(repoType, 50)
+    tagChips.value = (data.list || []).map((x) => x.name).filter(Boolean)
+  } catch {
+    tagChips.value = []
   }
-  if (!names.size) {
-    const via: TagVia = scope.value === 'comic' ? 'tag' : 'category'
-    ;(FALLBACK_TAGS[scope.value] || []).forEach((name) => add(name, via))
-  }
-  tagChips.value = [...names.entries()].map(([name, via]) => ({ name, via }))
 }
 
 const fetchLibraryList = async () => {
+  const cate = filterCategory.value
+  const kind = filterCategoryKind.value
   const tag = filterTag.value
   const sort = filterSort.value
-  const pay = filterType.value
   if (scope.value === 'cartoon') {
-    const data = await fetchCartoonList(1, 36, '', tag, mediaSort(sort))
+    const data = await fetchCartoonList(1, 36, '', kind === 0 ? cate : '', mediaSort(sort))
     return (data.list || []).map(toCartoonCover)
   }
   if (scope.value === 'video' || scope.value === 'short') {
-    const cate = tag || (scope.value === 'short' ? '短剧' : '')
-    const data = await fetchVideoList(1, 36, '', mediaSort(sort), cate)
+    const name = kind === 0 ? cate : ''
+    const fallback = scope.value === 'short' && !name ? '短剧' : name
+    const data = await fetchVideoList(1, 36, '', mediaSort(sort), fallback)
     return (data.list || []).map(toVideoCover)
   }
   if (scope.value === 'comic') {
-    const category = tag && filterTagVia.value === 'category' ? tag : ''
-    const tagParam = tag && filterTagVia.value === 'tag' ? tag : ''
-    const data = await fetchComicsList(1, 36, '', category, sort, 0, tagParam, payTypeNum(pay))
-    return (data.list || []).filter((item) => matchPayType(item, pay)).map(toComicCover)
+    const recommend = kind === 2 && cate ? 1 : 0
+    const category = recommend || kind === 1 ? '' : cate
+    const listSort = kind === 1 && cate && sort === 0 ? 2 : sort
+    const data = await fetchComicsList(1, 36, '', category, listSort, recommend, tag)
+    return (data.list || []).map(toComicCover)
   }
   return []
 }
@@ -426,7 +391,7 @@ const loadLibrary = async () => {
 
 const openLibrary = async () => {
   pane.value = 'library'
-  if (!tagChips.value.length) await loadTagChips()
+  if (!categoryChips.value.length && !tagChips.value.length) await loadFilterChips()
   await loadLibrary()
 }
 
@@ -457,10 +422,11 @@ const open = (item: CoverItem) => {
 }
 
 const resetFilters = () => {
-  filterType.value = ''
+  filterCategory.value = ''
+  filterCategoryKind.value = 0
   filterTag.value = ''
-  filterTagVia.value = 'category'
   filterSort.value = 0
+  categoryChips.value = []
   tagChips.value = []
 }
 
@@ -478,7 +444,7 @@ watch(() => route.query.scope, resetIdle)
 watch(keyword, (value) => {
   if (pane.value === 'search' && !value.trim()) showIdleSearch()
 })
-watch([filterType, filterTag, filterSort], () => {
+watch([filterCategory, filterTag, filterSort], () => {
   if (pane.value === 'library') loadLibrary()
 })
 
