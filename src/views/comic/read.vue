@@ -253,7 +253,8 @@ const openChapter = (ch: ChapterItem) => {
 
 const back = () => {
   stopAuto()
-  if (window.history.state?.back) {
+  const prev = typeof window.history.state?.back === 'string' ? window.history.state.back : ''
+  if (prev && prev !== route.fullPath) {
     router.back()
     return
   }

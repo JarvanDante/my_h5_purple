@@ -188,12 +188,23 @@ const startFirst = () => {
   if (first) openChapter(first)
 }
 
-const back = () => {
-  if (window.history.state?.back) {
-    router.back()
-    return
+const isStuckOnThisComic = (now: { fullPath: string; name?: string | symbol | null }) => {
+  if (now.fullPath === route.fullPath) return true
+  return now.name === 'ComicRead'
+}
+
+const back = async () => {
+  for (let i = 0; i < 4; i++) {
+    const prev = window.history.state?.back
+    if (!prev) {
+      await router.replace('/comic')
+      return
+    }
+    await router.back()
+    const now = router.currentRoute.value
+    if (!isStuckOnThisComic(now)) return
   }
-  router.replace('/comic')
+  await router.replace('/comic')
 }
 
 const share = async () => {
