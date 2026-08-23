@@ -83,18 +83,66 @@
       />
     </section>
 
-    <section v-else class="result-block">
-      <p v-if="!ready" class="page-empty">{{ `${scopeName}即将上线` }}</p>
-      <p v-else-if="loading" class="page-empty">加载中…</p>
-      <p v-else-if="!library.length" class="page-empty">{{ emptyText }}</p>
-      <MediaGrid
-        v-else
-        :items="library"
-        :cols="gridCols"
-        :wide="scope === 'video' || scope === 'short'"
-        :poster="scope === 'cartoon'"
-        @select="open"
-      />
+    <section v-else class="library-pane">
+      <div v-if="ready" class="filters">
+        <div class="filter-row">
+          <button
+            v-for="item in typeChips"
+            :key="item.key"
+            type="button"
+            class="filter-chip"
+            :class="{ on: filterType === item.key }"
+            @click="filterType = item.key"
+          >
+            {{ item.label }}
+          </button>
+        </div>
+        <div class="filter-row">
+          <button
+            type="button"
+            class="filter-chip"
+            :class="{ on: !filterTag }"
+            @click="selectTag('', 'category')"
+          >
+            全部标签
+          </button>
+          <button
+            v-for="item in tagChips"
+            :key="`${item.via}-${item.name}`"
+            type="button"
+            class="filter-chip"
+            :class="{ on: filterTag === item.name }"
+            @click="selectTag(item.name, item.via)"
+          >
+            {{ item.name }}
+          </button>
+        </div>
+        <div class="filter-row">
+          <button
+            v-for="item in sortChips"
+            :key="item.key"
+            type="button"
+            class="filter-chip"
+            :class="{ on: filterSort === item.key }"
+            @click="filterSort = item.key"
+          >
+            {{ item.label }}
+          </button>
+        </div>
+      </div>
+      <div class="result-block">
+        <p v-if="!ready" class="page-empty">{{ `${scopeName}即将上线` }}</p>
+        <p v-else-if="loading && !library.length" class="page-empty">加载中…</p>
+        <p v-else-if="!library.length" class="page-empty">{{ emptyText }}</p>
+        <MediaGrid
+          v-else
+          :items="library"
+          :cols="gridCols"
+          :wide="scope === 'video' || scope === 'short'"
+          :poster="scope === 'cartoon'"
+          @select="open"
+        />
+      </div>
     </section>
   </div>
 </template>
@@ -105,16 +153,43 @@ import { useRoute, useRouter } from 'vue-router'
 import { showConfirmDialog } from 'vant'
 import LineIcon from '@/components/LineIcon.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
-import { fetchCartoonList, cartoonCategories, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
+import { fetchCartoonList, fetchCartoonCategories, cartoonCategories, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsList, fetchComicsCategories, comicCategories, type ComicsItem } from '@/api/comics'
+import { fetchRepoTags } from '@/api/ops'
 import { fetchHotSearch } from '@/api/ranks'
-import { fetchVideoList, type VideoItem } from '@/api/video'
+import { fetchVideoList, fetchVideoCategories, type VideoItem } from '@/api/video'
 import { hotWords, type CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 import { clearSearchHistory, listSearchHistory, pushSearchHistory } from '@/utils/searchHistory'
 import { parseScope, searchHint, scopeLabel, type SearchScope } from '@/utils/searchScope'
+
+type PayType = '' | 'vip' | 'pay' | 'free'
+type TagVia = 'category' | 'tag'
+type TagChip = { name: string; via: TagVia }
+
+const TYPE_CHIPS: { key: PayType; label: string }[] = [
+  { key: '', label: '全部类型' },
+  { key: 'vip', label: 'VIP' },
+  { key: 'pay', label: '付费解锁' },
+  { key: 'free', label: '免费' },
+]
+
+const SORT_CHIPS = [
+  { key: 0, label: '综合排序' },
+  { key: 1, label: '播放最多' },
+  { key: 2, label: '最新上架' },
+  { key: 3, label: '收藏最多' },
+]
+
+const REPO_TAG_TYPE: Partial<Record<SearchScope, number>> = {
+  comic: 4,
+  cartoon: 3,
+  novel: 7,
+  short: 1,
+  video: 1,
+}
 
 const FALLBACK_TAGS: Record<SearchScope, string[]> = {
   comic: ['韩漫', '日漫', '校园', '恋爱', '完结', '都市', '玄幻', '热血', '后宫', '穿越'],
@@ -137,6 +212,13 @@ const results = ref<CoverItem[]>([])
 const library = ref<CoverItem[]>([])
 const history = ref(listSearchHistory())
 const hotTags = ref<string[]>([])
+const filterType = ref<PayType>('')
+const filterTag = ref('')
+const filterTagVia = ref<TagVia>('category')
+const filterSort = ref(0)
+const tagChips = ref<TagChip[]>([])
+const typeChips = TYPE_CHIPS
+const sortChips = SORT_CHIPS
 
 const scope = computed(() => parseScope(route.query.scope))
 const scopeName = computed(() => scopeLabel(scope.value))
@@ -161,7 +243,7 @@ const toComicCover = (c: ComicsItem): CoverItem => {
   return {
     id: String(c.id),
     title: c.title,
-    tag: c.is_vip ? 'VIP' : 'Free',
+    tag: c.is_vip ? 'VIP' : Number(c.price) > 0 ? '付费' : 'Free',
     cover: mediaUrl(c.cover),
     views: formatViews(c.view_count),
     badge: `共${c.chapter_count || 0}话${cate ? `·${cate}` : ''}`,
@@ -187,6 +269,32 @@ const toVideoCover = (v: VideoItem): CoverItem => ({
   cover: mediaUrl(v.cover_url),
   tone: v.id % 6,
 })
+
+const payTypeNum = (pay: PayType) => {
+  if (pay === 'vip') return 1
+  if (pay === 'pay') return 2
+  if (pay === 'free') return 3
+  return 0
+}
+
+const matchPayType = (item: ComicsItem, pay: PayType) => {
+  const vip = item.is_vip === 1
+  const paid = Number(item.price) > 0
+  if (pay === 'vip') return vip
+  if (pay === 'pay') return !vip && paid
+  if (pay === 'free') return !vip && !paid
+  return true
+}
+
+const mediaSort = (sort: number) => {
+  if (sort === 2) return 1
+  return 0
+}
+
+const selectTag = (name: string, via: TagVia) => {
+  filterTag.value = name
+  filterTagVia.value = name ? via : 'category'
+}
 
 const fetchByScope = async (word = '') => {
   if (scope.value === 'cartoon') {
@@ -229,22 +337,85 @@ const doSearch = async (word?: string) => {
   }
 }
 
-const openLibrary = async () => {
-  pane.value = 'library'
+const loadTagChips = async () => {
+  const names = new Map<string, TagVia>()
+  const add = (name: string, via: TagVia) => {
+    const n = name.trim()
+    if (!n || names.has(n)) return
+    names.set(n, via)
+  }
+  try {
+    if (scope.value === 'comic') {
+      const data = await fetchComicsCategories()
+      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+    } else if (scope.value === 'cartoon') {
+      const data = await fetchCartoonCategories()
+      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+    } else if (scope.value === 'video' || scope.value === 'short') {
+      const data = await fetchVideoCategories()
+      ;(data.list || []).filter((x) => x.kind === 0 && x.name).forEach((x) => add(x.name, 'category'))
+    }
+  } catch {
+    /* fallback below */
+  }
+  const repoType = REPO_TAG_TYPE[scope.value]
+  if (repoType) {
+    try {
+      const data = await fetchRepoTags(repoType)
+      ;(data.list || []).forEach((x) => add(x.name, 'tag'))
+    } catch {
+      /* ignore */
+    }
+  }
+  if (!names.size) {
+    const via: TagVia = scope.value === 'comic' ? 'tag' : 'category'
+    ;(FALLBACK_TAGS[scope.value] || []).forEach((name) => add(name, via))
+  }
+  tagChips.value = [...names.entries()].map(([name, via]) => ({ name, via }))
+}
+
+const fetchLibraryList = async () => {
+  const tag = filterTag.value
+  const sort = filterSort.value
+  const pay = filterType.value
+  if (scope.value === 'cartoon') {
+    const data = await fetchCartoonList(1, 36, '', tag, mediaSort(sort))
+    return (data.list || []).map(toCartoonCover)
+  }
+  if (scope.value === 'video' || scope.value === 'short') {
+    const cate = tag || (scope.value === 'short' ? '短剧' : '')
+    const data = await fetchVideoList(1, 36, '', mediaSort(sort), cate)
+    return (data.list || []).map(toVideoCover)
+  }
+  if (scope.value === 'comic') {
+    const category = tag && filterTagVia.value === 'category' ? tag : ''
+    const tagParam = tag && filterTagVia.value === 'tag' ? tag : ''
+    const data = await fetchComicsList(1, 36, '', category, sort, 0, tagParam, payTypeNum(pay))
+    return (data.list || []).filter((item) => matchPayType(item, pay)).map(toComicCover)
+  }
+  return []
+}
+
+const loadLibrary = async () => {
   if (!ready.value) {
     library.value = []
     return
   }
-  if (library.value.length) return
   loading.value = true
   try {
-    library.value = await fetchByScope('')
+    library.value = await fetchLibraryList()
   } catch (err) {
     toastError(err)
     library.value = []
   } finally {
     loading.value = false
   }
+}
+
+const openLibrary = async () => {
+  pane.value = 'library'
+  if (!tagChips.value.length) await loadTagChips()
+  await loadLibrary()
 }
 
 const loadHot = async () => {
@@ -284,16 +455,28 @@ const open = (item: CoverItem) => {
   router.push(comicPath(item.id))
 }
 
+const resetFilters = () => {
+  filterType.value = ''
+  filterTag.value = ''
+  filterTagVia.value = 'category'
+  filterSort.value = 0
+  tagChips.value = []
+}
+
 const resetIdle = () => {
   keyword.value = ''
   searched.value = false
   results.value = []
   library.value = []
   pane.value = 'search'
+  resetFilters()
   loadHot()
 }
 
 watch(() => route.query.scope, resetIdle)
+watch([filterType, filterTag, filterSort], () => {
+  if (pane.value === 'library') loadLibrary()
+})
 
 onMounted(() => {
   loadHot()
@@ -561,6 +744,48 @@ onMounted(() => {
   font-weight: 700;
   font-style: normal;
   text-align: center;
+}
+
+.library-pane {
+  padding-bottom: 8px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0 4px;
+}
+
+.filter-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 0 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.filter-chip {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: $background-surface2;
+  color: $text-color-secondary;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.on {
+    background: $primary-color;
+    color: $on-accent;
+  }
 }
 
 .result-block {

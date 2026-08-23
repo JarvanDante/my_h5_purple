@@ -179,11 +179,15 @@ export function createPost(body: {
 
 export type RepoTag = { id: number; name: string }
 
-export function fetchPostTopics() {
+export function fetchRepoTags(type: number, size = 40) {
   return request<{ list: RepoTag[] }>('/tag/repo/list', {
     method: 'POST',
-    body: JSON.stringify({ type: 6, page: 1, size: 50 }),
+    body: JSON.stringify({ type, page: 1, size }),
   })
+}
+
+export function fetchPostTopics() {
+  return fetchRepoTags(6, 50)
 }
 
 export type MessageItem = {

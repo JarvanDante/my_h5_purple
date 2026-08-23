@@ -53,12 +53,16 @@ export function fetchComicsList(
   category = '',
   sort?: number,
   recommend?: number,
+  tag = '',
+  payType?: number,
 ) {
   const q = new URLSearchParams({ page: String(page), size: String(size) })
   if (keyword) q.set('keyword', keyword)
   if (category) q.set('category', category)
+  if (tag) q.set('tag', tag)
   if (sort !== undefined) q.set('sort', String(sort))
   if (recommend) q.set('recommend', String(recommend))
+  if (payType) q.set('pay_type', String(payType))
   return request<{ list: ComicsItem[]; total: number }>(`/comics/list?${q}`)
 }
 
