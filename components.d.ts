@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AdSwipe: typeof import('./src/components/AdSwipe.vue')['default']
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
+    ChannelTab: typeof import('./src/components/ChannelTab.vue')['default']
     CoverMosaic: typeof import('./src/components/CoverMosaic.vue')['default']
     EncryptedImage: typeof import('./src/components/EncryptedImage.vue')['default']
     FloorBlock: typeof import('./src/components/home/FloorBlock.vue')['default']
