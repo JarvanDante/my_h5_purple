@@ -7,7 +7,7 @@
         </svg>
       </button>
       <div class="head-tabs">
-        <button type="button" class="head-tab" :class="{ active: pane === 'search' }" @click="pane = 'search'">
+        <button type="button" class="head-tab" :class="{ active: pane === 'search' }" @click="backToSearch">
           搜一搜
         </button>
         <button type="button" class="head-tab" :class="{ active: pane === 'library' }" @click="openLibrary">
@@ -45,7 +45,7 @@
         </div>
       </section>
 
-      <section class="block hot-block">
+      <section v-if="hotTags.length" class="block hot-block">
         <div class="block-head">
           <h3 class="hot-title">热门搜索</h3>
         </div>
@@ -158,7 +158,7 @@ import { fetchComicsList, fetchComicsCategories, comicCategories, type ComicsIte
 import { fetchRepoTags } from '@/api/ops'
 import { fetchHotSearch } from '@/api/ranks'
 import { fetchVideoList, fetchVideoCategories, type VideoItem } from '@/api/video'
-import { hotWords, type CoverItem } from '@/data/mock'
+import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -313,15 +313,27 @@ const fetchByScope = async (word = '') => {
   return []
 }
 
+const showIdleSearch = () => {
+  searched.value = false
+  results.value = []
+}
+
+const backToSearch = () => {
+  pane.value = 'search'
+  if (!keyword.value.trim()) showIdleSearch()
+}
+
 const doSearch = async (word?: string) => {
   if (word) keyword.value = word
   const q = keyword.value.trim()
   pane.value = 'search'
-  searched.value = true
-  if (q) {
-    pushSearchHistory(q)
-    history.value = listSearchHistory()
+  if (!q) {
+    showIdleSearch()
+    return
   }
+  searched.value = true
+  pushSearchHistory(q)
+  history.value = listSearchHistory()
   if (!ready.value) {
     results.value = []
     return
@@ -419,23 +431,12 @@ const openLibrary = async () => {
 }
 
 const loadHot = async () => {
-  const fallback = FALLBACK_TAGS[scope.value] || hotWords
   try {
     const data = await fetchHotSearch(scope.value)
-    const words = (data.list || []).map((x) => x.keyword).filter(Boolean)
-    const seen = new Set(words)
-    for (const w of fallback) {
-      if (words.length >= 10) break
-      if (seen.has(w)) continue
-      words.push(w)
-      seen.add(w)
-    }
-    hotTags.value = words.slice(0, 10)
-    return
+    hotTags.value = (data.list || []).map((x) => x.keyword).filter(Boolean)
   } catch {
-    /* use fallback */
+    hotTags.value = []
   }
-  hotTags.value = fallback.slice(0, 10)
 }
 
 const clearHistory = () => {
@@ -474,6 +475,9 @@ const resetIdle = () => {
 }
 
 watch(() => route.query.scope, resetIdle)
+watch(keyword, (value) => {
+  if (pane.value === 'search' && !value.trim()) showIdleSearch()
+})
 watch([filterType, filterTag, filterSort], () => {
   if (pane.value === 'library') loadLibrary()
 })
