@@ -76,13 +76,13 @@ const onTouchEnd = (e: TouchEvent) => {
 #app {
   width: 100%;
   height: 100%;
-  background: #0b0b0d;
+  background: $background-page;
 }
 
 .app-container {
   width: 100%;
   height: 100%;
-  background: #0b0b0d;
+  background: $background-page;
   position: relative;
   overflow: hidden;
 }

@@ -35,8 +35,8 @@ const back = () => {
   top: 0;
   z-index: 20;
   height: calc(42px + var(--app-header-top));
-  background: #0b0b0d;
-  color: #f2f2f5;
+  background: $background-page;
+  color: $text-color;
   display: flex;
   align-items: center;
   padding: var(--app-header-top) 8px 0;
@@ -48,7 +48,7 @@ const back = () => {
   height: 36px;
   border: 0;
   background: transparent;
-  color: #f2f2f5;
+  color: $text-color;
   display: flex;
   align-items: center;
   justify-content: center;

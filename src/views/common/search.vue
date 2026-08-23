@@ -53,18 +53,23 @@ const open = (item: CoverItem) => {
   input {
     flex: 1;
     height: 36px;
-    border: 1.6px solid $ink;
+    border: 1px solid $line;
     border-radius: $radius-pill;
-    background: #fff;
+    background: $background-surface2;
+    color: $text-color;
     padding: 0 14px;
     font-size: 14px;
     outline: none;
+
+    &::placeholder {
+      color: $text-color-muted;
+    }
   }
 
   button {
-    border: 1.6px solid $ink;
+    border: 0;
     background: $accent-yellow;
-    color: $ink;
+    color: $on-accent;
     border-radius: $radius-pill;
     padding: 0 14px;
     font-size: 13px;
@@ -83,9 +88,9 @@ const open = (item: CoverItem) => {
   gap: 8px;
 
   button {
-    border: 1.4px solid $ink;
-    background: $background-surface2;
-    color: $ink;
+    border: 1px solid $line;
+    background: #16161c;
+    color: $text-color;
     border-radius: $radius-pill;
     padding: 6px 12px;
     font-size: 12px;

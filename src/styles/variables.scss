@@ -1,31 +1,31 @@
-// 全粉铺底：对齐对比稿当前方案
+// 深色铺底 + 粉色强调：与运行时 .page-shell 对齐
 $primary-color: #ff5c93;
 $primary-color-deep: #f0568f;
-$primary-soft: #ffd9e5;
-$secondary-color: #ffe4ee;
+$primary-soft: rgba(255, 92, 147, 0.16);
+$secondary-color: #2a2230;
 $secondary-dark: #f0568f;
 $danger-color: #e31c5f;
 $on-accent: #ffffff;
 
-$text-color: #f0568f;
-$text-color-secondary: #d28ca6;
-$text-color-muted: #e0a8bc;
+$text-color: #f2f2f5;
+$text-color-secondary: #8a8a94;
+$text-color-muted: #6e6e78;
 $text-color-light: #ffffff;
 
-$background-color: #ffffff;
-$background-page: #fff0f4;
-$background-surface2: #ffe4ee;
-$background-dark: #141418;
-$background-topbar: #ffe9f0;
-$background-tabbar: #fff6f9;
+$background-color: #1c1c22;
+$background-page: #0b0b0d;
+$background-surface2: #1c1c22;
+$background-dark: #08080a;
+$background-topbar: #0b0b0d;
+$background-tabbar: #101014;
 
 $accent-yellow: #ff5c93;
-$ink: #f0568f;
-$line: #ffe0ea;
-$tab-idle: #f090b4;
-$search-border: #ffb8d0;
-$search-text: #f58ab0;
-$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+$ink: #ff5c93;
+$line: #2e2e36;
+$tab-idle: #8a8a94;
+$search-border: #3a2a32;
+$search-text: #c4b4b8;
+$shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
 $radius-card: 14px;
 $radius-thumb: 10px;
 $radius-pill: 999px;

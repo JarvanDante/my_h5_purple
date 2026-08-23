@@ -69,9 +69,9 @@ onMounted(async () => {
   padding: 20px 16px;
   border-radius: 16px;
   background: $primary-color;
-  color: $ink;
+  color: $on-accent;
   text-align: center;
-  border: 1.6px solid $ink;
+  border: 0;
 
   strong {
     display: block;
@@ -89,10 +89,10 @@ onMounted(async () => {
     margin-top: 14px;
     width: 160px;
     height: 40px;
-    border: 1.6px solid $ink;
+    border: 0;
     border-radius: 20px;
-    background: $accent-yellow;
-    color: $ink;
+    background: $on-accent;
+    color: $primary-color-deep;
     font-weight: 800;
   }
 }

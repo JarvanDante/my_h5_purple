@@ -78,9 +78,9 @@ onMounted(async () => {
   padding: 24px 16px;
   border-radius: 16px;
   background: $primary-color;
-  color: $ink;
+  color: $on-accent;
   text-align: center;
-  border: 1.6px solid $ink;
+  border: 0;
 
   p {
     font-size: 13px;
@@ -96,10 +96,10 @@ onMounted(async () => {
   button {
     width: 160px;
     height: 40px;
-    border: 1.6px solid $ink;
+    border: 0;
     border-radius: 20px;
-    background: $accent-yellow;
-    color: $ink;
+    background: $on-accent;
+    color: $primary-color-deep;
     font-weight: 800;
 
     &:disabled {
@@ -115,12 +115,12 @@ onMounted(async () => {
 }
 
 .day {
-  background: #fff;
-  border: 1.4px solid $ink;
+  background: $background-surface2;
+  border: 1px solid $line;
   border-radius: 8px;
   padding: 10px 6px;
   text-align: center;
-  color: #999;
+  color: $text-color-secondary;
 
   span {
     display: block;
@@ -135,7 +135,7 @@ onMounted(async () => {
 
   &.on {
     background: $primary-color;
-    color: $ink;
+    color: $on-accent;
     font-weight: 700;
   }
 }

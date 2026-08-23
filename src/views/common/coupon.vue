@@ -82,8 +82,9 @@ onMounted(async () => {
     align-items: center;
     width: 100%;
     text-align: left;
-    border: 1.4px solid $ink;
-    background: #fff;
+    border: 1px solid $line;
+    background: $background-surface2;
+    color: $text-color;
     border-radius: 8px;
     padding: 10px 12px;
     margin-bottom: 8px;
@@ -100,9 +101,9 @@ onMounted(async () => {
 
     em {
       font-style: normal;
-      color: $ink;
+      color: $on-accent;
       background: $accent-yellow;
-      border: 1.2px solid $ink;
+      border: 0;
       border-radius: 12px;
       padding: 2px 8px;
       font-size: 12px;

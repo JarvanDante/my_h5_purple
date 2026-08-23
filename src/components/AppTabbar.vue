@@ -69,7 +69,7 @@ const go = (path: string) => {
   width: 100%;
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 2px 4px env(safe-area-inset-bottom, 0px);
-  background: #101014;
+  background: $background-tabbar;
   border-top: 0;
   display: flex;
   align-items: flex-start;
@@ -91,7 +91,7 @@ const go = (path: string) => {
   justify-content: flex-end;
   gap: 1px;
   padding-bottom: 4px;
-  color: #8a8a94;
+  color: $tab-idle;
   cursor: pointer;
 
   &.active {
@@ -112,12 +112,12 @@ const go = (path: string) => {
 
     .cut,
     .dot {
-      fill: #101014;
+      fill: $background-tabbar;
       stroke: none;
     }
 
     .cut-line {
-      stroke: #101014;
+      stroke: $background-tabbar;
     }
 
     .ring {
@@ -134,7 +134,7 @@ const go = (path: string) => {
   width: 28px;
   height: 28px;
   display: flex;
-  color: #8a8a94;
+  color: $tab-idle;
 
   svg {
     width: 100%;

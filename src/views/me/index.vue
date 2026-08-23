@@ -280,7 +280,7 @@ onUnmounted(() => {
 .me-page {
   position: relative;
   padding: 0 16px calc(#{$tabbar-height} + 28px + env(safe-area-inset-bottom, 0px));
-  background: #0b0b0d;
+  background: $background-page;
 }
 
 .me-top {

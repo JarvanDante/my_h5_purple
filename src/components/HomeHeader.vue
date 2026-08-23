@@ -320,7 +320,7 @@ defineEmits<{
 }
 
 .home-header--dark {
-  background: #0b0b0d;
+  background: $background-page;
   padding: var(--app-header-top) 12px 8px;
 
   .channel-row {
