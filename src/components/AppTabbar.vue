@@ -76,28 +76,6 @@ const go = (path: string) => {
   justify-content: space-around;
   z-index: 1000;
   overflow: visible;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 22px;
-    pointer-events: none;
-    background: linear-gradient(180deg, rgba(255, 92, 147, 0.1) 0%, rgba(255, 92, 147, 0.03) 55%, transparent 100%);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    left: 16%;
-    right: 16%;
-    top: 0;
-    height: 1px;
-    pointer-events: none;
-    background: linear-gradient(90deg, transparent, rgba(255, 92, 147, 0.35), transparent);
-  }
 }
 
 .tab-item {
@@ -119,27 +97,8 @@ const go = (path: string) => {
   &.active {
     color: $primary-color;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      pointer-events: none;
-      background:
-        radial-gradient(circle, rgba(255, 150, 190, 0.35) 0%, rgba(255, 92, 147, 0.16) 38%, transparent 70%);
-    }
-
     .tab-icon {
       color: $primary-color;
-      width: 24px;
-      height: 24px;
-      filter:
-        drop-shadow(0 0 4px rgba(255, 180, 210, 0.55))
-        drop-shadow(0 0 10px rgba(255, 92, 147, 0.35));
     }
 
     .tab-label {
@@ -172,8 +131,8 @@ const go = (path: string) => {
 }
 
 .tab-icon {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   display: flex;
   color: #8a8a94;
 
