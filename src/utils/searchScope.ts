@@ -6,7 +6,7 @@ const SCOPE_LABEL: Record<SearchScope, string> = {
   novel: '小说',
   short: '短剧',
   video: '视频',
-  planet: '星球',
+  planet: '社区',
   ai: 'AI',
 }
 
@@ -23,6 +23,8 @@ const ALIAS: Record<string, SearchScope> = {
   视频: 'video',
   planet: 'planet',
   星球: 'planet',
+  社区: 'planet',
+  community: 'planet',
   ai: 'ai',
   AI: 'ai',
 }
