@@ -5,8 +5,7 @@
     </PageHeader>
 
     <section class="profile">
-      <EncryptedImage v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
-      <div v-else class="avatar" />
+      <UserAvatar :src="avatarSrc" :sex="userStore.user?.sex" :size="52" />
       <div class="meta">
         <div class="name-row">
           <strong>{{ userStore.user?.nickname || '未登录' }}</strong>
@@ -61,7 +60,7 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { buyVip, fetchVipPackages, type VipPackage } from '@/api/user'
 import { useUserStore } from '@/stores/user'
@@ -186,11 +185,6 @@ onUnmounted(() => {
 
 .avatar,
 :deep(.avatar) {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #24242e;
   flex-shrink: 0;
 }
 

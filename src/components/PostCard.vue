@@ -1,10 +1,14 @@
 <template>
   <article class="post-card" :class="{ detail, compact: hideUser }">
     <div v-if="!hideUser" class="user-row">
-      <div class="avatar" :class="`tone-${post.user_id % 6}`" @click.stop="onProfile">
-        <EncryptedImage v-if="avatarSrc" :src="avatarSrc" alt="" />
-        <span v-else>{{ name.slice(0, 1) }}</span>
-      </div>
+      <UserAvatar
+        class="avatar"
+        :src="avatarSrc"
+        :sex="post.sex"
+        :size="40"
+        :fallback="name"
+        @click.stop="onProfile"
+      />
       <div class="user-meta" @click.stop="onProfile">
         <strong>{{ name }}</strong>
         <span>发布时间 {{ formatTime(post.created_at) }}</span>
@@ -94,6 +98,7 @@
 import { computed, ref } from 'vue'
 import { showImagePreview } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import type { PostItem } from '@/api/ops'
 import { resolveMediaSrc } from '@/utils/aesbnc'
@@ -204,23 +209,7 @@ const playVideo = () => {
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
   flex-shrink: 0;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  :deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 }
 
 .user-meta {

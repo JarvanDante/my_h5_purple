@@ -17,8 +17,7 @@
 
     <section class="profile">
       <button type="button" class="avatar-wrap" @click="onAvatar">
-        <EncryptedImage v-if="avatarSrc" class="avatar" :src="avatarSrc" alt="" />
-        <span v-else class="avatar" />
+        <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="58" />
       </button>
       <div class="meta">
         <div class="name-row">
@@ -109,7 +108,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { fetchUnreadCount } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
-import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import { mediaUrl } from '@/utils/request'
 import { publicUid } from '@/utils/userid'
 
@@ -343,11 +342,6 @@ onUnmounted(() => {
 .avatar,
 :deep(.avatar) {
   display: block;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #2a2a32;
 }
 
 .meta {

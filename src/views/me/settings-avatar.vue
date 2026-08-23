@@ -2,8 +2,7 @@
   <div class="page-shell sub-page edit-page">
     <PageHeader title="头像设置" fallback="/settings" />
     <section class="current">
-      <EncryptedImage v-if="preview" :src="mediaUrl(preview)" alt="" />
-      <span v-else>未设置</span>
+      <UserAvatar :src="preview ? mediaUrl(preview) : ''" :sex="userStore.user?.sex" :size="88" fallback="未" />
     </section>
     <p class="tip">请从默认头像中选择</p>
     <div class="grid">
@@ -26,6 +25,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { fetchAvatars, updateProfile } from '@/api/user'
 import { useUserStore } from '@/stores/user'
@@ -78,21 +78,7 @@ onMounted(async () => {
 
 .current {
   width: 88px;
-  height: 88px;
   margin: 16px auto 0;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #191920;
-  display: grid;
-  place-items: center;
-  color: #8c8c9c;
-  font-size: 12px;
-
-  :deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 }
 
 .tip {

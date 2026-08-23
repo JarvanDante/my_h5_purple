@@ -27,8 +27,7 @@
             class="row"
             @click="goUser(u.id)"
           >
-            <EncryptedImage v-if="u.img" class="avatar" :src="mediaUrl(u.img)" alt="" />
-            <span v-else class="avatar">{{ (u.nickname || '用').slice(0, 1) }}</span>
+            <UserAvatar :src="mediaUrl(u.img)" :sex="u.sex" :size="44" :fallback="u.nickname || '用'" />
             <strong>{{ u.nickname || `用户${encodeId(u.id)}` }}</strong>
             <span
               class="act"
@@ -49,7 +48,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { fetchFans, fetchFollows, toggleFollow, type PublicUser } from '@/api/user'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -191,17 +190,7 @@ onMounted(load)
 
 .avatar,
 :deep(.avatar) {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #24242e;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
 }
 
 .row strong {

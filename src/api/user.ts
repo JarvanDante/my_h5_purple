@@ -120,6 +120,7 @@ export type PublicUser = {
   id: number
   nickname: string
   img: string
+  sex?: number
   fans?: number
   follow?: number
   signature?: string

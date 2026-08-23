@@ -100,6 +100,7 @@ export type PostItem = {
   user_id: number
   nickname?: string
   img?: string
+  sex?: number
   title: string
   content: string
   pics: string[]

@@ -3,10 +3,7 @@
     <PageHeader :title="name || '用户主页'" fallback="/planet" />
 
     <section v-if="user" class="head">
-      <div class="avatar" :class="`tone-${user.id % 6}`">
-        <EncryptedImage v-if="avatarSrc" :src="avatarSrc" alt="" />
-        <span v-else>{{ name.slice(0, 1) }}</span>
-      </div>
+      <UserAvatar :src="avatarSrc" :sex="user.sex" :size="52" :fallback="name" />
       <div class="meta">
         <strong>{{ name }}</strong>
         <p>粉丝 {{ user.fans ?? 0 }}　关注 {{ user.follow ?? 0 }}</p>
@@ -45,7 +42,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import EncryptedImage from '@/components/EncryptedImage.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PostCard from '@/components/PostCard.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
@@ -134,7 +131,6 @@ onMounted(load)
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
 
 .user-home {
   background: #0d0d12;
@@ -152,23 +148,7 @@ onMounted(load)
 }
 
 .avatar {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  overflow: hidden;
   flex-shrink: 0;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  :deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
 }
 
 .meta {
@@ -218,6 +198,4 @@ onMounted(load)
   color: #8c8c9c;
   font-size: 13px;
 }
-
-@include media-tones;
 </style>
