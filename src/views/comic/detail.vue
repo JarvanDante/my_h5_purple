@@ -188,21 +188,22 @@ const startFirst = () => {
   if (first) openChapter(first)
 }
 
-const isStuckOnThisComic = (now: { fullPath: string; name?: string | symbol | null }) => {
-  if (now.fullPath === route.fullPath) return true
-  return now.name === 'ComicRead'
-}
-
 const back = async () => {
-  for (let i = 0; i < 4; i++) {
-    const prev = window.history.state?.back
-    if (!prev) {
-      await router.replace('/comic')
-      return
-    }
-    await router.back()
+  const here = route.fullPath.split('?')[0]
+  const enc = String(route.params.id || '')
+  const prev = typeof window.history.state?.back === 'string' ? window.history.state.back.split('?')[0] : ''
+  const prevIsDup = Boolean(prev) && (prev === here || (enc && prev.startsWith(`/comic/${enc}/read/`)))
+  if (prevIsDup) {
+    await router.go(-2)
     const now = router.currentRoute.value
-    if (!isStuckOnThisComic(now)) return
+    if (now.fullPath.split('?')[0] === here || now.name === 'ComicRead') {
+      await router.replace('/comic')
+    }
+    return
+  }
+  if (prev) {
+    await router.back()
+    return
   }
   await router.replace('/comic')
 }
