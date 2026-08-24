@@ -29,6 +29,24 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'AI', tabbar: true },
   },
   {
+    path: '/ai/faceswap',
+    name: 'AiFaceSwap',
+    component: () => import('@/views/ai/faceswap.vue'),
+    meta: { title: 'AI图片换脸' },
+  },
+  {
+    path: '/ai/faceswap/make',
+    name: 'AiFaceSwapMake',
+    component: () => import('@/views/ai/faceswap-make.vue'),
+    meta: { title: 'AI图片换脸' },
+  },
+  {
+    path: '/ai/works',
+    name: 'AiWorks',
+    component: () => import('@/views/ai/works.vue'),
+    meta: { title: '我的作品' },
+  },
+  {
     path: '/me',
     name: 'Me',
     component: () => import('@/views/me/index.vue'),

@@ -127,7 +127,8 @@ function decryptBlock(input: Uint8Array, out: Uint8Array, pos: number) {
 export function isEncryptedMedia(url?: string) {
   if (!url) return false
   const path = url.split(/[?#]/)[0].toLowerCase()
-  return path.endsWith('.bnc') || path.endsWith('.ceb')
+  // 统一存储会把「照片.bnc」洗成对象名 bnc（没有点），也要当密文解。
+  return path.endsWith('.bnc') || path.endsWith('.ceb') || /(?:^|\/)(?:bnc|ceb)$/.test(path)
 }
 
 function looksLikePlainImage(url?: string) {

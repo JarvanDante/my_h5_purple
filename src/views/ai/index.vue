@@ -1,31 +1,28 @@
 <template>
-  <div class="page-shell">
-    <header class="home-header">
-      <div class="channel-row">
-        <h1 class="site-name">AI</h1>
+  <div class="page-shell ai-home">
+    <header class="hero">
+      <div class="hero-copy">
+        <h1>AI智能创作</h1>
+        <button type="button" class="works-link" @click="router.push('/ai/works')">查看我的AI作品 ›</button>
       </div>
-      <p class="ai-desc">创作工具演示页，后续接真实能力</p>
     </header>
-    <section class="soft-card tools">
+
+    <section class="grid">
       <button
         v-for="tool in aiTools"
         :key="tool.key"
         type="button"
-        class="tool"
-        :class="`tool--${tool.key}`"
-        @click="open(tool.title)"
+        class="card"
+        :class="`card--${tool.key}`"
+        @click="open(tool)"
       >
-        <div class="icon">{{ marks[tool.key] }}</div>
-        <div class="copy">
+        <div class="card-top">
           <h3>{{ tool.title }}</h3>
-          <p>{{ tool.desc }}</p>
+          <span class="go" aria-hidden="true">›</span>
         </div>
-        <span class="arrow" aria-hidden="true">›</span>
+        <div class="visual">{{ marks[tool.key] }}</div>
+        <p>{{ tool.desc }}</p>
       </button>
-    </section>
-    <section class="soft-card recent">
-      <h3 class="section-title">最近生成</h3>
-      <MediaGrid :items="comics.slice(0, 3)" cols="cols-3" @select="openItem" />
     </section>
   </div>
 </template>
@@ -33,125 +30,150 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import MediaGrid from '@/components/MediaGrid.vue'
-import { aiTools, comics, type CoverItem } from '@/data/mock'
-import { comicPath } from '@/utils/idcrypt'
+import { aiTools } from '@/data/mock'
 
 defineOptions({ name: 'Ai' })
 
 const router = useRouter()
 const marks: Record<string, string> = {
-  draw: '绘',
+  i2v: '片',
   face: '换',
-  chat: '聊',
+  undress: '衣',
+  draw: '绘',
   novel: '文',
+  dress: '装',
 }
 
-const open = (name: string) => {
-  showToast(`${name} 稍后接入`)
-}
-
-const openItem = (item: CoverItem) => {
-  router.push(comicPath(item.id))
+const open = (tool: { key: string; title: string }) => {
+  if (tool.key === 'face') {
+    router.push('/ai/faceswap')
+    return
+  }
+  showToast(`${tool.title} 稍后接入`)
 }
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
-.site-name {
+.ai-home {
+  padding-bottom: calc(#{$tabbar-height} + 16px + env(safe-area-inset-bottom, 0px));
+}
+
+.hero {
+  margin: 0 12px 14px;
+  padding: calc(18px + var(--app-header-top)) 16px 20px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 140% at 20% 0%, rgba(255, 92, 147, 0.55), transparent 55%),
+    linear-gradient(135deg, #3a1a28 0%, #1a1218 70%);
+  box-shadow: $shadow-card;
+}
+
+.hero-copy h1 {
   margin: 0;
-  font-size: 20px;
+  font-size: 26px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: $text-color;
+  color: #fff;
 }
 
-.ai-desc {
-  margin-top: 6px;
-  font-size: 12px;
-  color: $text-color-secondary;
+.works-link {
+  margin-top: 12px;
+  height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: $radius-pill;
+  background: #fff;
+  color: $primary-color;
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.tools {
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.card {
+  min-height: 168px;
+  padding: 12px;
+  border: 0;
+  border-radius: 16px;
+  text-align: left;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.tool {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid $line;
-  background: #16161c;
-  border-radius: 12px;
-  padding: 12px;
-  text-align: left;
-  color: inherit;
+  background: #2a1620;
 
   &:active {
-    transform: scale(0.985);
-    background: #1e1e26;
+    transform: scale(0.98);
   }
-}
-
-.copy {
-  flex: 1;
-  min-width: 0;
 
   h3 {
-    font-size: 15px;
-    font-weight: 700;
-    color: $text-color;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
   }
 
   p {
-    margin-top: 4px;
-    font-size: 12px;
-    color: $text-color-secondary;
+    margin-top: auto;
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.72);
   }
 }
 
-.icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: $primary-soft;
-  color: $primary-color;
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.go {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.16);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.tool--face .icon {
-  background: rgba(176, 108, 255, 0.16);
-  color: #c59bff;
-}
-
-.tool--chat .icon {
-  background: rgba(86, 156, 255, 0.16);
-  color: #7eb6ff;
-}
-
-.tool--novel .icon {
-  background: rgba(255, 176, 92, 0.16);
-  color: #ffc27a;
-}
-
-.arrow {
-  flex-shrink: 0;
-  color: $text-color-muted;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
 }
 
-.recent .section-title {
-  display: inline-block;
-  margin-bottom: 10px;
+.visual {
+  width: 56px;
+  height: 56px;
+  margin: 16px auto 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.card--face {
+  background: linear-gradient(180deg, #ff6b9d 0%, #c43d72 100%);
+}
+.card--i2v {
+  background: linear-gradient(180deg, #ff8f6b 0%, #c45a3d 100%);
+}
+.card--undress {
+  background: linear-gradient(180deg, #c59bff 0%, #7a4cc4 100%);
+}
+.card--draw {
+  background: linear-gradient(180deg, #7eb6ff 0%, #3d6ec4 100%);
+}
+.card--novel {
+  background: linear-gradient(180deg, #ffc27a 0%, #c47a3d 100%);
+}
+.card--dress {
+  background: linear-gradient(180deg, #7ad4c4 0%, #3d9a8a 100%);
 }
 </style>

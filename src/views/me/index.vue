@@ -61,7 +61,7 @@
         <strong>0</strong>
         <span>AI脱衣次数</span>
       </button>
-      <button type="button" @click="go('/ai')">
+      <button type="button" @click="go('/ai/works')">
         <strong>0</strong>
         <span>AI换脸次数</span>
       </button>
