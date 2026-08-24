@@ -187,3 +187,24 @@ export function fetchInvitees(page = 1, size = 50) {
 export function fetchCustomerUrl() {
   return request<{ url: string }>('/user/customer-url')
 }
+
+export type UserTask = {
+  id: number
+  name: string
+  type: string
+  description: string
+  max_num: number
+  done_today: number
+  reward?: number
+}
+
+export function fetchUserTasks() {
+  return request<{ list: UserTask[] }>('/user/tasks')
+}
+
+export function doUserTask(taskId: number) {
+  return request<{ done_today: number; max_num: number; reward: number }>('/user/task/do', {
+    method: 'POST',
+    body: JSON.stringify({ task_id: taskId }),
+  })
+}

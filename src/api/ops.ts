@@ -14,11 +14,26 @@ export function fetchRedeemLogs(page = 1, size = 20) {
   return request<{ list: RedeemLog[]; total?: number }>(`/user/code/logs?page=${page}&size=${size}`)
 }
 
+export type CheckinReward = {
+  day_num: number
+  label?: string
+  gold: number
+  points?: number
+  vip_days: number
+  is_milestone?: number
+}
+export type CheckinRecord = {
+  date: string
+  continuously_days: number
+  reward_gold: number
+  reward_points?: number
+  reward_vip_days?: number
+}
 export type CheckinInfo = {
   today_checked: boolean
   continuously_days: number
-  rewards: { day_num: number; gold: number; vip_days: number }[]
-  records: { date: string; continuously_days: number; reward_gold: number }[]
+  rewards: CheckinReward[]
+  records: CheckinRecord[]
 }
 
 export function fetchCheckinInfo() {
@@ -26,10 +41,12 @@ export function fetchCheckinInfo() {
 }
 
 export function doCheckin() {
-  return request<{ message: string; today_checked: boolean; continuously_days: number; rewards: { gold: number; vip_days: number }[] }>(
-    '/checkin/click',
-    { method: 'POST', body: '{}' },
-  )
+  return request<{
+    message: string
+    today_checked: boolean
+    continuously_days: number
+    rewards: { gold: number; points?: number; vip_days: number }[]
+  }>('/checkin/click', { method: 'POST', body: '{}' })
 }
 
 export type CouponTpl = {

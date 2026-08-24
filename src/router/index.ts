@@ -86,7 +86,13 @@ const routes: RouteRecordRaw[] = [
     path: '/checkin',
     name: 'Checkin',
     component: () => import('@/views/common/checkin.vue'),
-    meta: { title: '签到' },
+    meta: { title: '福利任务' },
+  },
+  {
+    path: '/checkin/detail',
+    name: 'CheckinDetail',
+    component: () => import('@/views/common/checkin-detail.vue'),
+    meta: { title: '签到明细' },
   },
   {
     path: '/vip',
