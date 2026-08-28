@@ -141,6 +141,17 @@ import { useUserStore } from '@/stores/user'
 import { formatDuration } from '@/utils/format'
 import { userPath, videoPath } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
+import {
+  applyMark,
+  beginMark,
+  collectedIds,
+  endMark,
+  isMarkPending,
+  keepDirty,
+  likedIds,
+  markKey,
+  mergeMarks,
+} from '@/components/douyin/marks'
 
 type PlayerEx = { play: () => void; pause: () => void; toggle: () => void; seek: (sec: number) => void }
 
@@ -169,8 +180,8 @@ const muted = ref(true)
 const paused = ref(true)
 const currentTime = ref(0)
 const duration = ref(0)
-const liked = ref(new Set<number>())
-const collected = ref(new Set<number>())
+const liked = likedIds
+const collected = collectedIds
 const followedUp = ref(new Set<number>())
 const unfollowedUp = ref(new Set<number>())
 const players = new Map<number, PlayerEx>()
@@ -300,54 +311,31 @@ const ensureAuth = async () => {
   }
 }
 
-const markKey = (kind: 'like' | 'fav', id: number) => `${kind}:${id}`
-const markPending = new Set<string>()
-const markDirty = new Set<string>()
 let marksTick = 0
-
-const applyMark = (kind: 'like' | 'fav', id: number, on: boolean) => {
-  const src = kind === 'like' ? liked.value : collected.value
-  const copy = new Set(src)
-  if (on) copy.add(id)
-  else copy.delete(id)
-  if (kind === 'like') liked.value = copy
-  else collected.value = copy
-}
 
 const seedMarks = () => {
   const ids = props.items.map((x) => x.id)
-  if (props.presetLiked) liked.value = new Set(ids)
-  if (props.presetCollected) collected.value = new Set(ids)
+  if (props.presetLiked) mergeMarks('like', ids)
+  if (props.presetCollected) mergeMarks('fav', ids)
 }
 
 const toggleMark = async (item: DouyinItem, kind: 'like' | 'fav') => {
   if (!(await ensureAuth())) return
   const key = markKey(kind, item.id)
-  if (markPending.has(key)) return
+  if (isMarkPending(key)) return
   const src = kind === 'like' ? liked.value : collected.value
   const next = !src.has(item.id)
-  markPending.add(key)
-  markDirty.add(key)
+  beginMark(key)
   applyMark(kind, item.id, next)
   try {
     await operateCollect(item.id, MEDIA_VIDEO, next, kind === 'like' ? COLLECT_LIKE : COLLECT_FAV)
   } catch (err) {
     applyMark(kind, item.id, !next)
-    markDirty.delete(key)
+    endMark(key, true)
     toastError(err)
-  } finally {
-    markPending.delete(key)
+    return
   }
-}
-
-const keepDirty = (kind: 'like' | 'fav', next: Set<number>) => {
-  markDirty.forEach((key) => {
-    const [k, raw] = key.split(':')
-    if (k !== kind) return
-    const id = Number(raw)
-    if ((kind === 'like' ? liked.value : collected.value).has(id)) next.add(id)
-    else next.delete(id)
-  })
+  endMark(key)
 }
 
 const loadMarks = async () => {

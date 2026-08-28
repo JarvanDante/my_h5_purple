@@ -31,7 +31,6 @@
 
     <DouyinFeed
       v-else
-      :key="feedTab"
       :items="items"
       :loading="loading"
       :empty="emptyText"
