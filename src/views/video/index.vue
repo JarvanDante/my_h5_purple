@@ -25,19 +25,31 @@
             </button>
           </section>
 
-          <SectionPanel :title="sectionTitle" more @more="go(morePath)">
-            <p v-if="!covers.length" class="page-empty">{{ emptyText }}</p>
-            <div v-else class="video-grid">
-              <article v-for="item in covers" :key="item.id" @click="open(item)">
-                <div class="thumb" :class="`tone-${item.tone}`">
-                  <EncryptedImage v-if="item.cover" :src="item.cover" alt="" />
-                  <span v-if="item.tag" class="badge">{{ item.tag }}</span>
-                  <span v-if="item.duration" class="duration">{{ item.duration }}</span>
-                </div>
-                <p class="title">{{ item.title }}</p>
-              </article>
-            </div>
-          </SectionPanel>
+          <template v-if="floors.length">
+            <FloorBlock
+              v-for="floor in floors"
+              :key="floor.id"
+              :title="floor.title"
+              :sub="floor.sub"
+              more
+              @more="go(floor.more)"
+            >
+              <p v-if="!floor.items.length" class="page-empty">{{ floor.empty }}</p>
+              <PosterRail v-else-if="floor.layout === 'rail'" :items="floor.items" @select="open" />
+              <PosterRail v-else-if="floor.layout === 'wide-rail'" :items="floor.items" wide @select="open" />
+              <PosterGrid v-else-if="floor.layout === 'grid-2'" :items="floor.items" :cols="2" @select="open" />
+              <PosterGrid v-else-if="floor.layout === 'wide-grid'" :items="floor.items" :cols="2" wide @select="open" />
+              <div v-else-if="floor.layout === 'hero-mix'" class="hero-mix">
+                <PosterCard v-if="floor.items[0]" class="hero-mix-main" :item="floor.items[0]" wide @select="open" />
+                <PosterGrid :items="floor.items.slice(1)" :cols="2" wide @select="open" />
+              </div>
+              <div v-else-if="floor.layout === 'one-wide'" class="one-wide">
+                <PosterCard :item="floor.items[0]" wide @select="open" />
+              </div>
+              <PosterGrid v-else :items="floor.items" @select="open" />
+            </FloorBlock>
+          </template>
+          <p v-else class="page-empty">{{ emptyText }}</p>
         </div>
       </transition>
     </div>
@@ -45,26 +57,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import { fetchVideoCategories, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
 import AdSwipe from '@/components/AdSwipe.vue'
+import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import { fetchVideoCategories, fetchVideoList, type VideoItem } from '@/api/video'
+import PosterCard from '@/components/home/PosterCard.vue'
+import PosterGrid from '@/components/home/PosterGrid.vue'
+import PosterRail from '@/components/home/PosterRail.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
-import SectionPanel from '@/components/SectionPanel.vue'
 import { videos, type CoverItem } from '@/data/mock'
+import { formatDuration, isRecent } from '@/utils/format'
 import { videoPath } from '@/utils/idcrypt'
-import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
-import EncryptedImage from '@/components/EncryptedImage.vue'
 import { mediaUrl, toastError } from '@/utils/request'
+import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
 
 defineOptions({ name: 'Video' })
 
 const fallbackTabs = ['最新', '推荐', '视频榜', '电影', '短剧', '综艺']
 const router = useRouter()
 const channels = ref([...fallbackTabs])
-const cateKind = ref<Record<string, number>>({})
 const channelSlide = useTabSlide(channels.value, fallbackTabs[0])
 const channel = computed(() => channelSlide.current.value)
 const innerName = ref('tab-left')
@@ -74,58 +88,59 @@ const selectChannel = (item: string) => {
   innerName.value = channelSlide.name.value
 }
 
-const list = ref<VideoItem[]>([])
-
-const pad = (n: number) => String(n).padStart(2, '0')
-const formatDuration = (sec: number) => {
-  if (!sec) return ''
-  const h = Math.floor(sec / 3600)
-  const m = Math.floor((sec % 3600) / 60)
-  const s = sec % 60
-  return `${pad(h)}:${pad(m)}:${pad(s)}`
+type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
+type FloorBlockItem = {
+  id: number
+  title: string
+  sub: string
+  layout: FloorLayout
+  more: string
+  empty: string
+  items: CoverItem[]
 }
 
-const toCover = (v: VideoItem): CoverItem => ({
+const floors = ref<FloorBlockItem[]>([])
+
+const toCover = (v: VideoItem, mark?: CoverItem['mark']): CoverItem => ({
   id: String(v.id),
   title: v.title,
   duration: formatDuration(v.duration),
   tag: 'Free',
   cover: mediaUrl(v.cover_url),
+  mark: mark || (isRecent(v.created_at) ? 'new' : undefined),
   tone: v.id % 6,
 })
 
-const covers = computed<CoverItem[]>(() => list.value.map(toCover))
 const ads = computed<CoverItem[]>(() => {
-  const live = covers.value.slice(0, 6)
+  const live = floors.value.find((f) => f.items.length)?.items.slice(0, 6) || []
   return live.length ? live : videos.slice(0, 6)
 })
 
-const currentKind = computed(() => cateKind.value[channel.value])
+const emptyText = '暂无模块，请在子后台「视频模块」配置'
 
-const sectionTitle = computed(() => {
-  const kind = currentKind.value
-  if (kind === 2 || channel.value === '推荐') return '精选推荐'
-  if (kind === 3 || channel.value.includes('榜')) return channel.value || '视频榜'
-  if (kind === 0) return channel.value || '今日上新'
-  return '今日上新'
-})
+const moduleLayout = (style: number): FloorLayout => {
+  if (style === 1) return 'hero-mix'
+  if (style === 2) return 'wide-grid'
+  if (style === 3) return 'one-wide'
+  if (style === 4) return 'grid-2'
+  if (style === 5) return 'rail'
+  if (style === 6) return 'wide-rail'
+  return 'grid-3'
+}
 
-const emptyText = computed(() => {
-  const kind = currentKind.value
-  if (kind === 2 || channel.value === '推荐') return '暂无推荐视频'
-  if (kind === 3 || channel.value.includes('榜')) return '暂无视频榜'
-  if (kind === 0) return `暂无「${channel.value}」视频，上架并选择该分类后显示`
-  return '暂无视频，子后台「视频管理」上架后显示'
-})
+const moduleSub = (icon: number) => {
+  if (icon === 2) return 'STAR'
+  if (icon === 3) return 'HOT'
+  return 'NEW'
+}
 
-const morePath = computed(() => {
-  const kind = currentKind.value
-  const name = channel.value
-  if (kind === 3 || name.includes('榜')) return '/list?media=video&type=rank'
-  if (kind === 2 || name === '推荐') return '/list?media=video&type=recommend'
-  if (kind === 1 || name === '最新' || name === '新更' || name === '日更') return '/list?media=video&type=daily'
-  return `/list?media=video&type=category&category=${encodeURIComponent(name)}`
-})
+const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
+
+const moduleMore = (mod: VideoModule) => {
+  const tag = mod.tags?.[0]
+  if (tag) return `/list?media=video&tag=${encodeURIComponent(tag)}`
+  return '/list?media=video&type=daily'
+}
 
 const quicks = [
   { emoji: '👑', label: '抢先看', path: '/vip' },
@@ -153,129 +168,73 @@ const onQuick = (item: { label: string; path: string }) => {
   showToast(`${item.label} 稍后接入`)
 }
 
-const loadList = () => {
-  const kind = cateKind.value[channel.value]
-  let category = ''
-  let sort = 1
-  if (kind === 1) {
-    sort = 1
-  } else if (kind === 2 || kind === 3) {
-    sort = 0
-  } else if (kind === 0 || kind === undefined) {
-    const name = channel.value
-    if (name === '最新' || name === '新更' || name === '日更') sort = 1
-    else if (name === '推荐' || name.includes('榜')) sort = 0
-    else {
-      category = name
-      sort = 1
+const loadCategories = async () => {
+  try {
+    const data = await fetchVideoCategories()
+    const rows = data.list || []
+    if (!rows.length) return
+    const names = rows.map((r) => r.name)
+    channels.value = names
+    if (!names.includes(channel.value)) {
+      channelSlide.select(names[0])
     }
+  } catch {
+    /* 顶栏分类失败时保留默认 tabs */
   }
-  fetchVideoList(1, 21, '', sort, category)
-    .then((data) => {
-      list.value = data.list || []
+}
+
+const loadFloors = async () => {
+  try {
+    const mods = (await fetchVideoModules('video_home')).list || []
+    floors.value = mods.map((mod) => {
+      const mark = moduleMark(mod.icon)
+      return {
+        id: mod.id,
+        title: mod.name,
+        sub: moduleSub(mod.icon),
+        layout: moduleLayout(mod.style),
+        more: moduleMore(mod),
+        empty: `暂无「${mod.name}」视频`,
+        items: (mod.items || []).map((v, i) => toCover(v, i < 2 ? mark : undefined)),
+      }
     })
-    .catch(toastError)
+  } catch (err) {
+    toastError(err)
+    floors.value = []
+  }
 }
 
 onMounted(() => {
-  fetchVideoCategories()
-    .then((data) => {
-      const rows = data.list || []
-      if (!rows.length) return
-      const names = rows.map((r) => r.name)
-      const kinds: Record<string, number> = {}
-      rows.forEach((r) => {
-        kinds[r.name] = r.kind
-      })
-      cateKind.value = kinds
-      channels.value = names
-      if (!names.includes(channel.value)) {
-        channelSlide.select(names[0])
-      }
-    })
-    .catch(() => undefined)
-    .finally(loadList)
+  loadCategories()
+  loadFloors()
 })
-
-watch(channel, loadList)
 </script>
 
 <style scoped lang="scss">
-@use '@/styles/variables.scss' as *;
-@use '@/styles/tones.scss' as *;
-
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 50vh;
 }
 
-.video-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 8px;
-}
-
-.video-grid > article {
-  min-width: 0;
-}
-
-.thumb {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: $radius-thumb;
-  overflow: hidden;
-
-  :deep(img) {
-    display: block;
-    width: 100%;
-    height: 100%;
-    max-width: 100%;
-    object-fit: cover;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0;
-    height: 42%;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.55));
-  }
-}
-
-.badge,
-.duration {
-  position: absolute;
-  z-index: 1;
-  color: #fff;
-  font-size: 10px;
-}
-
-.badge {
-  top: 6px;
-  left: 6px;
-  background: $primary-color;
-  border: 0;
-  border-radius: 6px;
-  padding: 1px 6px;
-}
-
-.duration {
-  left: 6px;
-  bottom: 6px;
-}
-
-.title {
-  margin-top: 6px;
+.page-empty {
+  padding: 36px 16px;
+  text-align: center;
+  color: #6f6f78;
   font-size: 13px;
-  color: #f2f2f5;
-  font-weight: 600;
-  line-height: 1.35;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-@include media-tones;
+.hero-mix {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-mix-main {
+  padding: 0 12px;
+}
+
+.one-wide {
+  padding: 0 12px;
+}
 </style>

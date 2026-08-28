@@ -68,8 +68,8 @@ import classIcon from '@/assets/icons/mid/class.png'
 import dailyIcon from '@/assets/icons/mid/daily.png'
 import hotIcon from '@/assets/icons/mid/hot.png'
 import rankIcon from '@/assets/icons/mid/rank.png'
-import { fetchCartoonCategories, fetchCartoonList, type CartoonCategory, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsModules, type ComicsItem, type ComicsModule } from '@/api/comics'
+import { fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -107,7 +107,6 @@ const cartoonQuicks = [
 ]
 const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
 
-type FloorCat = { id: number; name: string; kind: number }
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
 type FloorBlockItem = {
   id: number
@@ -146,54 +145,6 @@ const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => 
   tone: c.id % 6,
 })
 
-const media = computed(() => (isCartoon.value ? 'cartoon' : 'comic'))
-const mediaLabel = computed(() => (isCartoon.value ? '动漫' : '漫画'))
-
-const floorMeta = (cat: FloorCat) => {
-  const name = cat.name
-  const kind = cat.kind
-  const mid = media.value
-  if (kind === 1) {
-    return {
-      layout: 'rail' as const,
-      sub: 'NEW ARRIVALS',
-      more: `/list?media=${mid}&type=daily`,
-      size: 10,
-      mark: 'new' as CoverItem['mark'],
-    }
-  }
-  if (kind === 2) {
-    return {
-      layout: 'grid' as const,
-      sub: 'HOT',
-      more: `/list?media=${mid}&type=recommend`,
-      size: 9,
-      mark: 'hot' as CoverItem['mark'],
-    }
-  }
-  if (kind === 3) {
-    return {
-      layout: 'rail' as const,
-      sub: 'RANKING',
-      more: `/list?media=${mid}&type=rank`,
-      size: 10,
-      mark: 'hot' as CoverItem['mark'],
-    }
-  }
-  return {
-    layout: 'grid' as const,
-    sub: '',
-    more: `/list?media=${mid}&type=category&category=${encodeURIComponent(name)}`,
-    size: 9,
-    mark: undefined as CoverItem['mark'],
-  }
-}
-
-const fallbackCats = (prefix: number): FloorCat[] => [
-  { id: prefix + 1, name: '新更', kind: 1 },
-  { id: prefix + 2, name: '推荐', kind: 2 },
-]
-
 const banners = computed<CoverItem[]>(() => {
   const first = floors.value.find((f) => f.items.length)
   return first?.items.slice(0, 5) || []
@@ -201,7 +152,7 @@ const banners = computed<CoverItem[]>(() => {
 
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
-  if (isCartoon.value) return '暂无动漫，子后台「动漫管理」上架后显示'
+  if (isCartoon.value && !floors.value.length) return '暂无模块，请在子后台「动漫模块」配置'
   if (!floors.value.length) return '暂无模块，请在子后台「漫画模块」配置'
   return '暂无漫画，子后台「漫画管理」上架后显示'
 })
@@ -236,47 +187,10 @@ const moduleSub = (icon: number) => {
 
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
-const moduleMore = (mod: ComicsModule) => {
+const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[] }) => {
   const tag = mod.tags?.[0]
-  if (tag) return `/list?media=comic&tag=${encodeURIComponent(tag)}`
-  return '/list?media=comic&type=daily'
-}
-
-const loadCartoonItems = async (cat: FloorCat) => {
-  const meta = floorMeta(cat)
-  const category = cat.kind === 0 ? cat.name : ''
-  const sort = cat.kind === 1 ? 1 : 0
-  const data = await fetchCartoonList(1, meta.size, '', category, sort)
-  let rows = data.list || []
-  if ((cat.kind === 2 || cat.kind === 3) && !rows.length) {
-    const latest = await fetchCartoonList(1, meta.size, '', '', 1)
-    rows = latest.list || []
-  }
-  return rows.map((c, i) => toCartoonCover(c, i < 2 ? meta.mark : undefined))
-}
-
-const toFloors = async (cats: FloorCat[], loader: (cat: FloorCat) => Promise<CoverItem[]>) => {
-  const rows = await Promise.all(
-    cats.map(async (cat) => {
-      const meta = floorMeta(cat)
-      let items: CoverItem[] = []
-      try {
-        items = await loader(cat)
-      } catch (err) {
-        toastError(err)
-      }
-      return {
-        id: cat.id,
-        title: cat.name,
-        sub: meta.sub,
-        layout: meta.layout,
-        more: meta.more,
-        empty: `暂无「${cat.name}」${mediaLabel.value}`,
-        items,
-      }
-    }),
-  )
-  floors.value = rows
+  if (tag) return `/list?media=${media}&tag=${encodeURIComponent(tag)}`
+  return `/list?media=${media}&type=daily`
 }
 
 const loadComicFloors = async () => {
@@ -293,7 +207,7 @@ const loadComicFloors = async () => {
         title: mod.name,
         sub: moduleSub(mod.icon),
         layout: moduleLayout(mod.style),
-        more: moduleMore(mod),
+        more: moduleMore('comic', mod),
         empty: `暂无「${mod.name}」漫画`,
         items: (mod.items || []).map((c, i) => toComicCover(c, i < 2 ? mark : undefined)),
       }
@@ -305,13 +219,28 @@ const loadComicFloors = async () => {
 }
 
 const loadCartoonFloors = async () => {
-  let cats: CartoonCategory[] = []
   try {
-    cats = (await fetchCartoonCategories()).list || []
-  } catch {
-    cats = []
+    const mods = (await fetchCartoonModules('cartoon_home')).list || []
+    if (!mods.length) {
+      floors.value = []
+      return
+    }
+    floors.value = mods.map((mod) => {
+      const mark = moduleMark(mod.icon)
+      return {
+        id: mod.id,
+        title: mod.name,
+        sub: moduleSub(mod.icon),
+        layout: moduleLayout(mod.style),
+        more: moduleMore('cartoon', mod),
+        empty: `暂无「${mod.name}」动漫`,
+        items: (mod.items || []).map((c, i) => toCartoonCover(c, i < 2 ? mark : undefined)),
+      }
+    })
+  } catch (err) {
+    toastError(err)
+    floors.value = []
   }
-  await toFloors(cats.length ? cats : fallbackCats(20), loadCartoonItems)
 }
 
 const loadFloors = () => {

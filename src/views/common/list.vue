@@ -61,10 +61,10 @@ const cartoonTitles: Record<string, string> = {
 
 const title = computed(() => {
   if (media.value === 'video') {
-    return videoTitles[type.value] || '相关视频'
+    return tag.value || category.value || videoTitles[type.value] || '相关视频'
   }
   if (media.value === 'cartoon') {
-    return category.value || cartoonTitles[type.value] || '相关动漫'
+    return tag.value || category.value || cartoonTitles[type.value] || '相关动漫'
   }
   if (tag.value) return tag.value
   if (category.value) return category.value
@@ -72,8 +72,13 @@ const title = computed(() => {
 })
 
 const emptyText = computed(() => {
-  if (media.value === 'video') return '暂无相关视频'
+  if (media.value === 'video') {
+    if (tag.value) return `暂无「${tag.value}」视频`
+    if (category.value) return `暂无「${category.value}」视频`
+    return '暂无相关视频'
+  }
   if (media.value === 'cartoon') {
+    if (tag.value) return `暂无「${tag.value}」动漫`
     if (category.value) return `暂无「${category.value}」动漫`
     return '暂无相关动漫'
   }
@@ -149,7 +154,7 @@ const load = async () => {
         cate = category.value
         sort = 1
       }
-      const data = await fetchVideoList(1, 40, '', sort, cate)
+      const data = await fetchVideoList(1, 40, '', sort, cate, tag.value)
       items.value = withAds((data.list || []).map(toVideoCover), 2)
       return
     }
@@ -161,7 +166,7 @@ const load = async () => {
         cate = category.value
         sort = 1
       }
-      const data = await fetchCartoonList(1, 40, '', cate, sort)
+      const data = await fetchCartoonList(1, 40, '', cate, sort, tag.value)
       items.value = withAds((data.list || []).map(toCartoonCover), 2)
       return
     }

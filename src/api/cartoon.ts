@@ -37,11 +37,30 @@ export function fetchCartoonList(
   keyword = '',
   category = '',
   sort = 0,
+  tag = '',
 ) {
   const q = new URLSearchParams({ page: String(page), size: String(size), sort: String(sort) })
   if (keyword) q.set('keyword', keyword)
   if (category) q.set('category', category)
+  if (tag) q.set('tag', tag)
   return request<{ list: CartoonItem[]; total: number; page: number; size: number }>(
     `/cartoon/list?${q}`,
   )
+}
+
+export type CartoonModule = {
+  id: number
+  name: string
+  style: number
+  icon: number
+  size: number
+  tags: string[]
+  items: CartoonItem[]
+}
+
+export function fetchCartoonModules(position = 'cartoon_home') {
+  const q = new URLSearchParams()
+  if (position) q.set('position', position)
+  const suffix = q.toString() ? `?${q}` : ''
+  return request<{ list: CartoonModule[] }>(`/cartoon/modules${suffix}`)
 }
