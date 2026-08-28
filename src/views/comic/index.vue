@@ -23,14 +23,17 @@
           </section>
 
           <template v-if="ready">
-            <FloorBlock title="竖图横滑" sub="NEW ARRIVALS" more @more="go(railMore)">
-              <p v-if="!railItems.length" class="page-empty">{{ emptyText }}</p>
-              <PosterRail v-else :items="railItems" @select="open" />
-            </FloorBlock>
-
-            <FloorBlock title="竖图九宫格" sub="NEW ARRIVALS" more @more="go(gridMore)">
-              <p v-if="!gridItems.length" class="page-empty">{{ emptyText }}</p>
-              <PosterGrid v-else :items="gridItems" @select="open" />
+            <FloorBlock
+              v-for="floor in floors"
+              :key="floor.id"
+              :title="floor.title"
+              :sub="floor.sub"
+              more
+              @more="go(floor.more)"
+            >
+              <p v-if="!floor.items.length" class="page-empty">{{ floor.empty }}</p>
+              <PosterRail v-else-if="floor.layout === 'rail'" :items="floor.items" @select="open" />
+              <PosterGrid v-else :items="floor.items" @select="open" />
             </FloorBlock>
           </template>
 
@@ -53,8 +56,8 @@ import classIcon from '@/assets/icons/mid/class.png'
 import dailyIcon from '@/assets/icons/mid/daily.png'
 import hotIcon from '@/assets/icons/mid/hot.png'
 import rankIcon from '@/assets/icons/mid/rank.png'
-import { fetchCartoonList, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsList, type ComicsItem } from '@/api/comics'
+import { fetchCartoonCategories, fetchCartoonList, type CartoonCategory, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsCategories, fetchComicsList, type ComicsCategory, type ComicsItem } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -92,10 +95,19 @@ const cartoonQuicks = [
 ]
 const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
 
-const comicLatest = ref<ComicsItem[]>([])
-const comicHot = ref<ComicsItem[]>([])
-const cartoonLatest = ref<CartoonItem[]>([])
-const cartoonHot = ref<CartoonItem[]>([])
+type FloorCat = { id: number; name: string; kind: number }
+type FloorLayout = 'rail' | 'grid'
+type FloorBlockItem = {
+  id: number
+  title: string
+  sub: string
+  layout: FloorLayout
+  more: string
+  empty: string
+  items: CoverItem[]
+}
+
+const floors = ref<FloorBlockItem[]>([])
 
 const toComicCover = (c: ComicsItem, mark?: CoverItem['mark']): CoverItem => {
   const ended = c.update_status === 2
@@ -122,28 +134,63 @@ const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => 
   tone: c.id % 6,
 })
 
-const railItems = computed<CoverItem[]>(() => {
-  if (isCartoon.value) return cartoonLatest.value.slice(0, 10).map((c, i) => toCartoonCover(c, i < 2 ? 'new' : undefined))
-  if (isComic.value) return comicLatest.value.slice(0, 10).map((c, i) => toComicCover(c, i < 2 ? 'new' : undefined))
-  return []
-})
+const media = computed(() => (isCartoon.value ? 'cartoon' : 'comic'))
+const mediaLabel = computed(() => (isCartoon.value ? '动漫' : '漫画'))
 
-const gridItems = computed<CoverItem[]>(() => {
-  if (isCartoon.value) return cartoonHot.value.slice(0, 9).map((c, i) => toCartoonCover(c, i < 2 ? 'hot' : undefined))
-  if (isComic.value) return comicHot.value.slice(0, 9).map((c, i) => toComicCover(c, i < 2 ? 'hot' : undefined))
-  return []
-})
+const floorMeta = (cat: FloorCat) => {
+  const name = cat.name
+  const kind = cat.kind
+  const mid = media.value
+  if (kind === 1) {
+    return {
+      layout: 'rail' as const,
+      sub: 'NEW ARRIVALS',
+      more: `/list?media=${mid}&type=daily`,
+      size: 10,
+      mark: 'new' as CoverItem['mark'],
+    }
+  }
+  if (kind === 2) {
+    return {
+      layout: 'grid' as const,
+      sub: 'HOT',
+      more: `/list?media=${mid}&type=recommend`,
+      size: 9,
+      mark: 'hot' as CoverItem['mark'],
+    }
+  }
+  if (kind === 3) {
+    return {
+      layout: 'rail' as const,
+      sub: 'RANKING',
+      more: `/list?media=${mid}&type=rank`,
+      size: 10,
+      mark: 'hot' as CoverItem['mark'],
+    }
+  }
+  return {
+    layout: 'grid' as const,
+    sub: '',
+    more: `/list?media=${mid}&type=category&category=${encodeURIComponent(name)}`,
+    size: 9,
+    mark: undefined as CoverItem['mark'],
+  }
+}
 
-const banners = computed<CoverItem[]>(() => railItems.value.slice(0, 5))
+const fallbackCats = (prefix: number): FloorCat[] => [
+  { id: prefix + 1, name: '新更', kind: 1 },
+  { id: prefix + 2, name: '推荐', kind: 2 },
+]
+
+const banners = computed<CoverItem[]>(() => {
+  const first = floors.value.find((f) => f.items.length)
+  return first?.items.slice(0, 5) || []
+})
 
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
   return isCartoon.value ? '暂无动漫，子后台「动漫管理」上架后显示' : '暂无漫画，子后台「漫画管理」上架后显示'
 })
-
-const media = computed(() => (isCartoon.value ? 'cartoon' : 'comic'))
-const railMore = computed(() => `/list?media=${media.value}&type=daily`)
-const gridMore = computed(() => `/list?media=${media.value}&type=recommend`)
 
 const go = (path: string) => {
   router.push(path)
@@ -157,33 +204,79 @@ const open = (item: CoverItem) => {
   router.push(comicPath(item.id))
 }
 
-const loadComicFloors = () => {
-  Promise.all([
-    fetchComicsList(1, 10, '', '', 2),
-    fetchComicsList(1, 9, '', '', 0, 1),
-  ])
-    .then(([latest, hot]) => {
-      comicLatest.value = latest.list || []
-      const rec = hot.list || []
-      comicHot.value = rec.length ? rec : (latest.list || []).slice(0, 9)
-    })
-    .catch(toastError)
+const loadComicItems = async (cat: FloorCat) => {
+  const meta = floorMeta(cat)
+  const category = cat.kind === 0 ? cat.name : ''
+  const sort = cat.kind === 3 ? 1 : cat.kind === 2 ? 0 : 2
+  const recommend = cat.kind === 2 ? 1 : 0
+  const data = await fetchComicsList(1, meta.size, '', category, sort, recommend)
+  let rows = data.list || []
+  if (cat.kind === 2 && !rows.length) {
+    const latest = await fetchComicsList(1, meta.size, '', '', 2)
+    rows = latest.list || []
+  }
+  return rows.map((c, i) => toComicCover(c, i < 2 ? meta.mark : undefined))
 }
 
-const loadCartoonFloors = () => {
-  Promise.all([
-    fetchCartoonList(1, 10, '', '', 1),
-    fetchCartoonList(1, 9, '', '', 0),
-  ])
-    .then(([latest, hot]) => {
-      cartoonLatest.value = latest.list || []
-      const rec = hot.list || []
-      cartoonHot.value = rec.length ? rec : (latest.list || []).slice(0, 9)
-    })
-    .catch(toastError)
+const loadCartoonItems = async (cat: FloorCat) => {
+  const meta = floorMeta(cat)
+  const category = cat.kind === 0 ? cat.name : ''
+  const sort = cat.kind === 1 ? 1 : 0
+  const data = await fetchCartoonList(1, meta.size, '', category, sort)
+  let rows = data.list || []
+  if ((cat.kind === 2 || cat.kind === 3) && !rows.length) {
+    const latest = await fetchCartoonList(1, meta.size, '', '', 1)
+    rows = latest.list || []
+  }
+  return rows.map((c, i) => toCartoonCover(c, i < 2 ? meta.mark : undefined))
+}
+
+const toFloors = async (cats: FloorCat[], loader: (cat: FloorCat) => Promise<CoverItem[]>) => {
+  const rows = await Promise.all(
+    cats.map(async (cat) => {
+      const meta = floorMeta(cat)
+      let items: CoverItem[] = []
+      try {
+        items = await loader(cat)
+      } catch (err) {
+        toastError(err)
+      }
+      return {
+        id: cat.id,
+        title: cat.name,
+        sub: meta.sub,
+        layout: meta.layout,
+        more: meta.more,
+        empty: `暂无「${cat.name}」${mediaLabel.value}`,
+        items,
+      }
+    }),
+  )
+  floors.value = rows
+}
+
+const loadComicFloors = async () => {
+  let cats: ComicsCategory[] = []
+  try {
+    cats = (await fetchComicsCategories()).list || []
+  } catch {
+    cats = []
+  }
+  await toFloors(cats.length ? cats : fallbackCats(10), loadComicItems)
+}
+
+const loadCartoonFloors = async () => {
+  let cats: CartoonCategory[] = []
+  try {
+    cats = (await fetchCartoonCategories()).list || []
+  } catch {
+    cats = []
+  }
+  await toFloors(cats.length ? cats : fallbackCats(20), loadCartoonItems)
 }
 
 const loadFloors = () => {
+  floors.value = []
   if (isCartoon.value) {
     loadCartoonFloors()
     return

@@ -66,8 +66,14 @@ export function fetchComicsList(
   return request<{ list: ComicsItem[]; total: number }>(`/comics/list?${q}`)
 }
 
+export type ComicsCategory = {
+  id: number
+  name: string
+  kind: number
+}
+
 export function fetchComicsCategories() {
-  return request<{ list: { id: number; name: string; kind: number }[] }>('/comics/categories')
+  return request<{ list: ComicsCategory[] }>('/comics/categories')
 }
 
 export function fetchComicsDetail(id: number) {
