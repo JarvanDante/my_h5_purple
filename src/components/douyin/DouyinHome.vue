@@ -160,8 +160,10 @@ onMounted(() => {
 .feed-tabs {
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 0 14px 2px;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 28px;
+  padding: 2px 20px 10px;
 }
 
 .feed-tab {
@@ -169,26 +171,28 @@ onMounted(() => {
   position: relative;
   border: 0;
   background: transparent;
-  color: #9a9aa3;
+  color: rgba(255, 255, 255, 0.42);
   font-size: 15px;
-  line-height: 32px;
-  padding: 0;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  padding: 8px 2px 11px;
 
   &.on {
     color: #fff;
-    font-weight: 700;
+    font-weight: 800;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
 
     &::after {
       content: '';
       position: absolute;
       left: 50%;
-      bottom: 2px;
-      width: 18px;
+      bottom: 1px;
+      width: 16px;
       height: 3px;
       transform: translateX(-50%);
       border-radius: 99px;
       background: #ff5c93;
-      box-shadow: 0 0 10px rgba(255, 92, 147, 0.7);
     }
   }
 }
