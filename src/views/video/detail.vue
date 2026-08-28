@@ -329,7 +329,7 @@ onBeforeUnmount(() => {
 
 .video-play {
   padding-bottom: 16px;
-  background: #fff;
+  background: $background-page;
 }
 
 .player {
@@ -418,8 +418,8 @@ onBeforeUnmount(() => {
 .pause-ad-vip {
   border: 0;
   border-radius: 999px;
-  background: #ffd84d;
-  color: #1a1a1f;
+  background: $primary-color;
+  color: $on-accent;
   font-size: 11px;
   font-weight: 700;
   padding: 5px 12px;
@@ -485,20 +485,21 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 18px;
   padding: 12px 14px 0;
-  background: #fff;
+  background: $background-page;
+  border-bottom: 1px solid $line;
 }
 
 .tab {
   border: 0;
   background: transparent;
-  color: $text-color-secondary;
+  color: $tab-idle;
   font-size: 15px;
   font-weight: 600;
-  padding: 6px 0 8px;
+  padding: 6px 0 10px;
   position: relative;
 
   &.active {
-    color: #1a1a1f;
+    color: $text-color;
     font-weight: 800;
 
     &::after {
@@ -509,7 +510,7 @@ onBeforeUnmount(() => {
       width: 18px;
       height: 3px;
       border-radius: 2px;
-      background: #ffd84d;
+      background: $primary-color;
       transform: translateX(-50%);
     }
   }
@@ -518,8 +519,8 @@ onBeforeUnmount(() => {
 .line-btn {
   margin-left: auto;
   border: 0;
-  background: #1a1a1f;
-  color: #fff;
+  background: $primary-color;
+  color: $on-accent;
   font-size: 11px;
   font-weight: 700;
   border-radius: $radius-pill;
@@ -528,12 +529,12 @@ onBeforeUnmount(() => {
 
 .intro {
   padding: 14px 14px 4px;
-  background: #fff;
+  background: $background-page;
 
   h2 {
     font-size: 16px;
     font-weight: 800;
-    color: #1a1a1f;
+    color: $text-color;
     line-height: 1.45;
   }
 }
@@ -546,8 +547,8 @@ onBeforeUnmount(() => {
 
   span {
     font-size: 12px;
-    color: #e07a2f;
-    background: #fff1e4;
+    color: $primary-color;
+    background: $primary-soft;
     border-radius: 999px;
     padding: 4px 10px;
   }
@@ -556,19 +557,19 @@ onBeforeUnmount(() => {
 .meta {
   margin-top: 8px;
   font-size: 12px;
-  color: #8e8e93;
+  color: $text-color-muted;
 }
 
 .actions {
   display: flex;
   justify-content: space-around;
   padding: 14px 8px 8px;
-  background: #fff;
+  background: $background-page;
 
   button {
     border: 0;
     background: transparent;
-    color: #1a1a1f;
+    color: $text-color-secondary;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -595,20 +596,20 @@ onBeforeUnmount(() => {
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
   padding: 8px 14px 12px;
-  background: #fff;
+  background: $background-page;
 }
 
 .ad-slot {
   aspect-ratio: 1;
   border-radius: 8px;
-  background: #f1f1f4;
+  background: $background-surface2;
   display: flex;
   align-items: center;
   justify-content: center;
 
   span {
     font-size: 10px;
-    color: #8e8e93;
+    color: $text-color-muted;
   }
 }
 
@@ -616,7 +617,7 @@ onBeforeUnmount(() => {
   min-height: 160px;
   margin: 12px 14px;
   padding: 12px;
-  background: #fff;
-  border-radius: 12px;
+  background: $background-surface2;
+  border-radius: $radius-card;
 }
 </style>
