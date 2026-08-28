@@ -1,6 +1,6 @@
 <template>
   <article class="poster-card" @click="$emit('select', item)">
-    <div class="poster-thumb">
+    <div class="poster-thumb" :class="{ wide }">
       <EncryptedImage v-if="item.cover" :src="item.cover" alt="" />
       <span v-if="item.mark" class="poster-mark" :class="item.mark">{{ item.mark }}</span>
       <div class="poster-meta">
@@ -21,9 +21,10 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import type { CoverItem } from '@/data/mock'
 
-defineProps<{
+withDefaults(defineProps<{
   item: CoverItem
-}>()
+  wide?: boolean
+}>(), { wide: false })
 
 defineEmits<{
   select: [item: CoverItem]
@@ -39,6 +40,10 @@ defineEmits<{
   position: relative;
   aspect-ratio: 3 / 4;
   border-radius: 10px;
+
+  &.wide {
+    aspect-ratio: 16 / 9;
+  }
   overflow: hidden;
   background: #1a1a20;
 

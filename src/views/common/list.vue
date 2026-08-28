@@ -41,6 +41,7 @@ const media = computed(() => {
 })
 const type = computed(() => String(route.query.type || ''))
 const category = computed(() => String(route.query.category || ''))
+const tag = computed(() => String(route.query.tag || ''))
 
 const videoTitles: Record<string, string> = {
   topic: '专题',
@@ -65,6 +66,7 @@ const title = computed(() => {
   if (media.value === 'cartoon') {
     return category.value || cartoonTitles[type.value] || '相关动漫'
   }
+  if (tag.value) return tag.value
   if (category.value) return category.value
   return listTitles[type.value] || '列表'
 })
@@ -75,6 +77,7 @@ const emptyText = computed(() => {
     if (category.value) return `暂无「${category.value}」动漫`
     return '暂无相关动漫'
   }
+  if (tag.value) return `暂无「${tag.value}」漫画`
   if (category.value) return `暂无「${category.value}」漫画`
   return '暂无相关漫画'
 })
@@ -173,7 +176,7 @@ const load = async () => {
       cate = category.value
       sort = 2
     }
-    const data = await fetchComicsList(1, 40, '', cate, sort, recommend)
+    const data = await fetchComicsList(1, 40, '', cate, sort, recommend, tag.value)
     items.value = withAds((data.list || []).map(toComicCover), 3)
   } catch (err) {
     toastError(err)
@@ -182,7 +185,7 @@ const load = async () => {
   }
 }
 
-watch(() => [media.value, type.value, category.value], load, { immediate: true })
+watch(() => [media.value, type.value, category.value, tag.value], load, { immediate: true })
 </script>
 
 <style scoped lang="scss">

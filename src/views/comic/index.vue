@@ -33,8 +33,19 @@
             >
               <p v-if="!floor.items.length" class="page-empty">{{ floor.empty }}</p>
               <PosterRail v-else-if="floor.layout === 'rail'" :items="floor.items" @select="open" />
+              <PosterRail v-else-if="floor.layout === 'wide-rail'" :items="floor.items" wide @select="open" />
+              <PosterGrid v-else-if="floor.layout === 'grid-2'" :items="floor.items" :cols="2" @select="open" />
+              <PosterGrid v-else-if="floor.layout === 'wide-grid'" :items="floor.items" :cols="2" wide @select="open" />
+              <div v-else-if="floor.layout === 'hero-mix'" class="hero-mix">
+                <PosterCard v-if="floor.items[0]" class="hero-mix-main" :item="floor.items[0]" wide @select="open" />
+                <PosterGrid :items="floor.items.slice(1)" :cols="2" wide @select="open" />
+              </div>
+              <div v-else-if="floor.layout === 'one-wide'" class="one-wide">
+                <PosterCard :item="floor.items[0]" wide @select="open" />
+              </div>
               <PosterGrid v-else :items="floor.items" @select="open" />
             </FloorBlock>
+            <p v-if="!floors.length" class="page-empty">{{ emptyText }}</p>
           </template>
 
           <p v-else class="page-empty">{{ emptyText }}</p>
@@ -49,6 +60,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
+import PosterCard from '@/components/home/PosterCard.vue'
 import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
@@ -57,7 +69,7 @@ import dailyIcon from '@/assets/icons/mid/daily.png'
 import hotIcon from '@/assets/icons/mid/hot.png'
 import rankIcon from '@/assets/icons/mid/rank.png'
 import { fetchCartoonCategories, fetchCartoonList, type CartoonCategory, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsCategories, fetchComicsList, type ComicsCategory, type ComicsItem } from '@/api/comics'
+import { fetchComicsModules, type ComicsItem, type ComicsModule } from '@/api/comics'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -96,7 +108,7 @@ const cartoonQuicks = [
 const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
 
 type FloorCat = { id: number; name: string; kind: number }
-type FloorLayout = 'rail' | 'grid'
+type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
 type FloorBlockItem = {
   id: number
   title: string
@@ -189,7 +201,9 @@ const banners = computed<CoverItem[]>(() => {
 
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
-  return isCartoon.value ? '暂无动漫，子后台「动漫管理」上架后显示' : '暂无漫画，子后台「漫画管理」上架后显示'
+  if (isCartoon.value) return '暂无动漫，子后台「动漫管理」上架后显示'
+  if (!floors.value.length) return '暂无模块，请在子后台「漫画模块」配置'
+  return '暂无漫画，子后台「漫画管理」上架后显示'
 })
 
 const go = (path: string) => {
@@ -204,18 +218,28 @@ const open = (item: CoverItem) => {
   router.push(comicPath(item.id))
 }
 
-const loadComicItems = async (cat: FloorCat) => {
-  const meta = floorMeta(cat)
-  const category = cat.kind === 0 ? cat.name : ''
-  const sort = cat.kind === 3 ? 1 : cat.kind === 2 ? 0 : 2
-  const recommend = cat.kind === 2 ? 1 : 0
-  const data = await fetchComicsList(1, meta.size, '', category, sort, recommend)
-  let rows = data.list || []
-  if (cat.kind === 2 && !rows.length) {
-    const latest = await fetchComicsList(1, meta.size, '', '', 2)
-    rows = latest.list || []
-  }
-  return rows.map((c, i) => toComicCover(c, i < 2 ? meta.mark : undefined))
+const moduleLayout = (style: number): FloorLayout => {
+  if (style === 1) return 'hero-mix'
+  if (style === 2) return 'wide-grid'
+  if (style === 3) return 'one-wide'
+  if (style === 4) return 'grid-2'
+  if (style === 5) return 'rail'
+  if (style === 6) return 'wide-rail'
+  return 'grid-3'
+}
+
+const moduleSub = (icon: number) => {
+  if (icon === 2) return 'STAR'
+  if (icon === 3) return 'HOT'
+  return 'NEW'
+}
+
+const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
+
+const moduleMore = (mod: ComicsModule) => {
+  const tag = mod.tags?.[0]
+  if (tag) return `/list?media=comic&tag=${encodeURIComponent(tag)}`
+  return '/list?media=comic&type=daily'
 }
 
 const loadCartoonItems = async (cat: FloorCat) => {
@@ -256,13 +280,28 @@ const toFloors = async (cats: FloorCat[], loader: (cat: FloorCat) => Promise<Cov
 }
 
 const loadComicFloors = async () => {
-  let cats: ComicsCategory[] = []
   try {
-    cats = (await fetchComicsCategories()).list || []
-  } catch {
-    cats = []
+    const mods = (await fetchComicsModules('comic_home')).list || []
+    if (!mods.length) {
+      floors.value = []
+      return
+    }
+    floors.value = mods.map((mod) => {
+      const mark = moduleMark(mod.icon)
+      return {
+        id: mod.id,
+        title: mod.name,
+        sub: moduleSub(mod.icon),
+        layout: moduleLayout(mod.style),
+        more: moduleMore(mod),
+        empty: `暂无「${mod.name}」漫画`,
+        items: (mod.items || []).map((c, i) => toComicCover(c, i < 2 ? mark : undefined)),
+      }
+    })
+  } catch (err) {
+    toastError(err)
+    floors.value = []
   }
-  await toFloors(cats.length ? cats : fallbackCats(10), loadComicItems)
 }
 
 const loadCartoonFloors = async () => {
@@ -351,6 +390,20 @@ watch(channel, loadFloors)
   text-align: center;
   color: #6f6f78;
   font-size: 13px;
+}
+
+.hero-mix {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hero-mix-main {
+  padding: 0 12px;
+}
+
+.one-wide {
+  padding: 0 12px;
 }
 </style>
 

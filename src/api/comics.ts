@@ -76,6 +76,23 @@ export function fetchComicsCategories() {
   return request<{ list: ComicsCategory[] }>('/comics/categories')
 }
 
+export type ComicsModule = {
+  id: number
+  name: string
+  style: number
+  icon: number
+  size: number
+  tags: string[]
+  items: ComicsItem[]
+}
+
+export function fetchComicsModules(position = 'comic_home') {
+  const q = new URLSearchParams()
+  if (position) q.set('position', position)
+  const suffix = q.toString() ? `?${q}` : ''
+  return request<{ list: ComicsModule[] }>(`/comics/modules${suffix}`)
+}
+
 export function fetchComicsDetail(id: number) {
   return request<ComicsDetail>(`/comics/detail?id=${id}`)
 }

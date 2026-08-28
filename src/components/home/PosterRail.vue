@@ -4,7 +4,9 @@
       v-for="item in items"
       :key="item.id"
       class="rail-item"
+      :class="{ wide }"
       :item="item"
+      :wide="wide"
       @select="$emit('select', $event)"
     />
   </div>
@@ -14,9 +16,10 @@
 import type { CoverItem } from '@/data/mock'
 import PosterCard from './PosterCard.vue'
 
-defineProps<{
+withDefaults(defineProps<{
   items: CoverItem[]
-}>()
+  wide?: boolean
+}>(), { wide: false })
 
 defineEmits<{
   select: [item: CoverItem]
@@ -40,5 +43,10 @@ defineEmits<{
 .rail-item {
   flex: 0 0 118px;
   width: 118px;
+
+  &.wide {
+    flex-basis: 210px;
+    width: 210px;
+  }
 }
 </style>
