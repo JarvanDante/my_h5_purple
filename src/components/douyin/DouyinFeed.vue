@@ -19,6 +19,7 @@
             :src="playSrc(item)"
             :poster="mediaUrl(item.cover_url)"
             :controls="false"
+            fit="cover"
             :muted="muted"
             :autoplay="idx === current"
             @click="togglePlay"
@@ -416,7 +417,7 @@ onMounted(() => {
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
 
   :deep(.media) {
@@ -425,7 +426,7 @@ onMounted(() => {
     z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
   }
 }
 

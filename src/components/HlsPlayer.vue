@@ -2,7 +2,7 @@
   <video
     ref="el"
     class="media"
-    :class="{ 'is-bare': !controls }"
+    :class="{ 'is-bare': !controls, 'is-cover': fit === 'cover' }"
     :controls="controls"
     :muted="muted"
     :autoplay="autoplay"
@@ -25,8 +25,15 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { showToast } from 'vant'
 
 const props = withDefaults(
-  defineProps<{ src: string; poster?: string; controls?: boolean; muted?: boolean; autoplay?: boolean }>(),
-  { controls: true, muted: false, autoplay: false },
+  defineProps<{
+    src: string
+    poster?: string
+    controls?: boolean
+    muted?: boolean
+    autoplay?: boolean
+    fit?: 'contain' | 'cover'
+  }>(),
+  { controls: true, muted: false, autoplay: false, fit: 'contain' },
 )
 const emit = defineEmits<{
   play: []
@@ -227,5 +234,9 @@ defineExpose({ play, pause, toggle, seek })
   max-height: none;
   height: 100%;
   object-fit: contain;
+}
+
+.media.is-bare.is-cover {
+  object-fit: cover;
 }
 </style>
