@@ -36,6 +36,7 @@
       :loading="loading"
       :empty="emptyText"
       @liked="goLiked"
+      @collected="goCollected"
     />
 
     <DouyinFeed
@@ -46,6 +47,7 @@
       empty="暂无抖音"
       @close="overlay = false"
       @liked="goLiked"
+      @collected="goCollected"
     />
   </div>
 </template>
@@ -55,7 +57,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
 import DouyinGrid from '@/components/douyin/DouyinGrid.vue'
 import { fetchDouyinCategories, fetchDouyinList, type DouyinCategory, type DouyinItem } from '@/api/douyin'
-import { COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO } from '@/api/collect'
+import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO } from '@/api/collect'
 import { fetchVideoDetail } from '@/api/video'
 import { useUserStore } from '@/stores/user'
 import { getToken, toastError } from '@/utils/request'
@@ -65,6 +67,7 @@ const feedTabs = [
   { key: 'discover', label: '发现' },
   { key: 'hot', label: '热门' },
   { key: 'like', label: '喜欢' },
+  { key: 'fav', label: '收藏' },
 ] as const
 
 type FeedKey = (typeof feedTabs)[number]['key']
@@ -83,6 +86,7 @@ const chips = computed(() => cats.value.filter((c) => c.kind === 0 || c.kind ===
 const emptyText = computed(() => {
   if (feedTab.value === 'follow') return '关注创作者后，作品会出现在这里'
   if (feedTab.value === 'like') return getToken() ? '还没有喜欢的抖音' : '登录后查看喜欢的作品'
+  if (feedTab.value === 'fav') return getToken() ? '还没有收藏的抖音' : '登录后查看收藏的作品'
   return '暂无抖音，去子后台「抖音管理」上架'
 })
 
@@ -92,6 +96,7 @@ const selectFeed = (key: FeedKey) => {
 }
 
 const goLiked = () => selectFeed('like')
+const goCollected = () => selectFeed('fav')
 
 const selectChip = (name: string) => {
   category.value = category.value === name ? '' : name
@@ -123,13 +128,14 @@ const loadList = async () => {
       items.value = data.list || []
       return
     }
-    if (feedTab.value === 'like') {
+    if (feedTab.value === 'like' || feedTab.value === 'fav') {
       if (!getToken()) {
         items.value = []
         return
       }
       await userStore.ensureLogin().catch(() => undefined)
-      const ids = ((await fetchCollectList(COLLECT_LIKE, MEDIA_VIDEO, 1, 30)).list || []).map((x) => x.content_id)
+      const type = feedTab.value === 'like' ? COLLECT_LIKE : COLLECT_FAV
+      const ids = ((await fetchCollectList(type, MEDIA_VIDEO, 1, 30)).list || []).map((x) => x.content_id)
       const rows = await Promise.all(ids.map((id) => fetchVideoDetail(id).catch(() => null)))
       items.value = rows.filter((x): x is DouyinItem => Boolean(x?.id && x.source_url))
       return
@@ -166,7 +172,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  gap: 28px;
+  gap: 20px;
   padding: 2px 20px 10px;
 }
 
