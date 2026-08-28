@@ -27,6 +27,10 @@
             @timeupdate="(cur, dur) => idx === current && onTime(cur, dur)"
           />
           <button v-if="muted && idx === current" type="button" class="unmute" @click.stop="muted = false">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 10v4h3.2L12 18V6L7.2 10H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+              <path d="m16 9 5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
             解除静音
           </button>
           <button v-if="paused && idx === current" type="button" class="play-ico" @click.stop="togglePlay">
@@ -71,6 +75,17 @@
               <path d="M8 14h12M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
             <span>分享</span>
+          </button>
+          <button type="button" class="side-btn" :class="{ warn: muted }" @click="muted = !muted">
+            <svg v-if="muted" viewBox="0 0 28 28" fill="none">
+              <path d="M5 11v6h3.6L14 21.5V6.5L8.6 11H5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+              <path d="m18 10 6 8M24 10l-6 8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+            <svg v-else viewBox="0 0 28 28" fill="none">
+              <path d="M5 11v6h3.6L14 21.5V6.5L8.6 11H5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+              <path d="M18 11.2a4.4 4.4 0 0 1 0 5.6M21 8.8a8 8 0 0 1 0 10.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
+            <span>{{ muted ? '静音' : '声音' }}</span>
           </button>
         </aside>
 
@@ -368,18 +383,28 @@ onMounted(() => {
 }
 
 .unmute {
-  top: 16px;
-  left: 14px;
-  height: 30px;
-  padding: 0 12px;
+  top: 12px;
+  left: 12px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 10px;
   border-radius: 999px;
-  background: rgba(20, 20, 24, 0.62);
+  background: rgba(20, 20, 24, 0.72);
   font-size: 12px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .play-ico {
   left: 50%;
   top: 46%;
+  z-index: 4;
   width: 64px;
   height: 64px;
   margin: -32px 0 0 -32px;
@@ -422,6 +447,10 @@ onMounted(() => {
 
   &.on {
     color: #ffd0df;
+  }
+
+  &.warn {
+    color: #ffd36a;
   }
 }
 
