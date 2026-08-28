@@ -22,8 +22,9 @@ import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '@/components/PageHeader.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import { fetchCartoonList, cartoonCategories, type CartoonItem } from '@/api/cartoon'
-import { fetchVideoList, type VideoItem } from '@/api/video'
 import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
+import { fetchNovelList, type NovelItem } from '@/api/novel'
+import { fetchVideoList, type VideoItem } from '@/api/video'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -36,7 +37,7 @@ const loading = ref(true)
 
 const media = computed(() => {
   const m = String(route.query.media || '')
-  if (m === 'video' || m === 'cartoon') return m
+  if (m === 'video' || m === 'cartoon' || m === 'novel') return m
   return 'comic'
 })
 const type = computed(() => String(route.query.type || ''))
@@ -66,6 +67,9 @@ const title = computed(() => {
   if (media.value === 'cartoon') {
     return tag.value || category.value || cartoonTitles[type.value] || '相关动漫'
   }
+  if (media.value === 'novel') {
+    return tag.value || category.value || '相关小说'
+  }
   if (tag.value) return tag.value
   if (category.value) return category.value
   return listTitles[type.value] || '列表'
@@ -81,6 +85,10 @@ const emptyText = computed(() => {
     if (tag.value) return `暂无「${tag.value}」动漫`
     if (category.value) return `暂无「${category.value}」动漫`
     return '暂无相关动漫'
+  }
+  if (media.value === 'novel') {
+    if (category.value) return `暂无「${category.value}」小说`
+    return '暂无相关小说'
   }
   if (tag.value) return `暂无「${tag.value}」漫画`
   if (category.value) return `暂无「${category.value}」漫画`
@@ -115,6 +123,18 @@ const toCartoonCover = (v: CartoonItem): CoverItem => {
     cover: mediaUrl(v.cover_url),
     badge: cate || undefined,
     tone: v.id % 6,
+  }
+}
+
+const toNovelCover = (n: NovelItem): CoverItem => {
+  const ended = n.update_status === 2
+  return {
+    id: String(n.id),
+    title: n.title,
+    tag: n.is_vip ? 'VIP' : 'Free',
+    cover: mediaUrl(n.cover),
+    badge: ended ? '已完结' : `共${n.chapter_count || 0}章`,
+    tone: n.id % 6,
   }
 }
 
@@ -168,6 +188,11 @@ const load = async () => {
       }
       const data = await fetchCartoonList(1, 40, '', cate, sort, tag.value)
       items.value = withAds((data.list || []).map(toCartoonCover), 2)
+      return
+    }
+    if (media.value === 'novel') {
+      const data = await fetchNovelList(1, 40, '', category.value, 2)
+      items.value = withAds((data.list || []).map(toNovelCover), 3)
       return
     }
     let sort = 2

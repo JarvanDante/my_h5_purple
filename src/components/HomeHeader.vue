@@ -350,6 +350,24 @@ defineEmits<{
     overflow-y: hidden;
   }
 
+  .sub-row {
+    margin-top: 0;
+    height: 34px;
+    padding: 0 4px 0 22px;
+    gap: 18px;
+  }
+
+  .sub-item {
+    color: #9a9aa3;
+    font-size: 13px;
+    line-height: 34px;
+
+    &.active {
+      color: $primary-color;
+      font-weight: 700;
+    }
+  }
+
   .search-row {
     margin-top: 0;
     padding-top: 6px;

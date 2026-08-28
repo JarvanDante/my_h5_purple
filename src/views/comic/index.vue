@@ -4,7 +4,10 @@
       dark
       :channels="channels"
       :channel="channel"
+      :sub-tabs="subTabs"
+      :sub-tab="subTab"
       @select-channel="selectChannel"
+      @select-sub="selectSub"
       @checkin="go('/checkin')"
       @search="go(searchPath(channel))"
       @vip="go('/vip')"
@@ -68,8 +71,10 @@ import classIcon from '@/assets/icons/mid/class.png'
 import dailyIcon from '@/assets/icons/mid/daily.png'
 import hotIcon from '@/assets/icons/mid/hot.png'
 import rankIcon from '@/assets/icons/mid/rank.png'
-import { fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsModules, type ComicsItem } from '@/api/comics'
+import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsCategories, fetchComicsModules, type ComicsItem } from '@/api/comics'
+import { fetchNovelCategories } from '@/api/novel'
+import { fetchVideoCategories } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -88,9 +93,57 @@ const isCartoon = computed(() => channel.value === '动漫')
 const isComic = computed(() => channel.value === '漫画')
 const ready = computed(() => isComic.value || isCartoon.value)
 
+type SubCat = { name: string; kind: number }
+const catsByChannel = ref<Record<string, SubCat[]>>({
+  漫画: [],
+  动漫: [],
+  小说: [],
+  短剧: [],
+})
+const subTab = ref('')
+const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c) => c.name))
+
+const channelMedia = (name: string) => {
+  if (name === '动漫') return 'cartoon'
+  if (name === '小说') return 'novel'
+  if (name === '短剧') return 'video'
+  return 'comic'
+}
+
+const subListPath = (ch: string, cat?: SubCat) => {
+  const media = channelMedia(ch)
+  if (!cat) return `/list?media=${media}`
+  if (cat.kind === 1) return `/list?media=${media}&type=daily`
+  if (cat.kind === 2) return `/list?media=${media}&type=recommend`
+  if (cat.kind === 3) return `/list?media=${media}&type=rank`
+  return `/list?media=${media}&type=category&category=${encodeURIComponent(cat.name)}`
+}
+
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
+  subTab.value = ''
+}
+
+const selectSub = (name: string) => {
+  subTab.value = name
+  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
+  go(subListPath(channel.value, cat))
+}
+
+const loadSubCats = async () => {
+  const toCats = (list?: { name: string; kind: number }[]) =>
+    (list || []).filter((x) => x.name).map((x) => ({ name: x.name, kind: x.kind || 0 }))
+  const [comics, cartoon, novel, video] = await Promise.allSettled([
+    fetchComicsCategories(),
+    fetchCartoonCategories(),
+    fetchNovelCategories(),
+    fetchVideoCategories(),
+  ])
+  if (comics.status === 'fulfilled') catsByChannel.value.漫画 = toCats(comics.value.list)
+  if (cartoon.status === 'fulfilled') catsByChannel.value.动漫 = toCats(cartoon.value.list)
+  if (novel.status === 'fulfilled') catsByChannel.value.小说 = toCats(novel.value.list)
+  if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
 }
 
 const comicQuicks = [
@@ -255,7 +308,10 @@ const loadFloors = () => {
   }
 }
 
-onMounted(loadFloors)
+onMounted(() => {
+  loadSubCats()
+  loadFloors()
+})
 watch(channel, loadFloors)
 </script>
 
