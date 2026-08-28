@@ -15,10 +15,12 @@ export function fetchDouyinList(
   sort = 0,
   category = '',
   tag = '',
+  follow = 0,
 ) {
   const q = new URLSearchParams({ page: String(page), size: String(size), sort: String(sort) })
   if (keyword) q.set('keyword', keyword)
   if (category) q.set('category', category)
   if (tag) q.set('tag', tag)
+  if (follow) q.set('follow', String(follow))
   return request<{ list: DouyinItem[]; total: number; page: number; size: number }>(`/douyin/list?${q}`)
 }

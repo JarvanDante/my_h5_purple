@@ -10,6 +10,10 @@ export type VideoItem = {
   categories?: string[]
   duration: number
   created_at: string
+  up_user_id?: number
+  up_nickname?: string
+  up_avatar?: string
+  followed?: boolean
 }
 
 export type VideoCategory = {

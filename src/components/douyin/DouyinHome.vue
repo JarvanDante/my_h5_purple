@@ -110,7 +110,13 @@ const loadList = async () => {
   loading.value = true
   try {
     if (feedTab.value === 'follow') {
-      items.value = []
+      if (!getToken()) {
+        items.value = []
+        return
+      }
+      await userStore.ensureLogin().catch(() => undefined)
+      const data = await fetchDouyinList(1, 24, '', 0, '', '', 1)
+      items.value = data.list || []
       return
     }
     if (feedTab.value === 'like') {

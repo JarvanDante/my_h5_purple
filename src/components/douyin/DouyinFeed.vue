@@ -41,6 +41,12 @@
         </div>
 
         <aside class="side">
+          <div v-if="item.up_user_id" class="up">
+            <button type="button" class="up-face" @click.stop="goUp(item)">
+              <UserAvatar :src="mediaUrl(item.up_avatar)" :size="46" :fallback="handle(item)" />
+            </button>
+            <button v-if="showPlus(item)" type="button" class="plus" aria-label="关注" @click.stop="onFollow(item)">+</button>
+          </div>
           <button type="button" class="side-btn" :class="{ on: liked.has(item.id) }" @click="toggleMark(item, 'like')">
             <svg viewBox="0 0 28 28" fill="none">
               <path
@@ -91,7 +97,7 @@
 
         <div class="info">
           <button type="button" class="vip" @click="goVip">开通会员 畅享完整版</button>
-          <p class="name">@{{ handle(item) }}</p>
+          <p class="name" :class="{ link: item.up_user_id }" @click="item.up_user_id && goUp(item)">@{{ handle(item) }}</p>
           <p class="desc">{{ item.title }}</p>
           <p v-if="item.description" class="desc dim">{{ item.description }}</p>
           <div class="stats">
@@ -126,11 +132,13 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
+import UserAvatar from '@/components/UserAvatar.vue'
 import type { DouyinItem } from '@/api/douyin'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
+import { toggleFollow } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { formatDuration } from '@/utils/format'
-import { videoPath } from '@/utils/idcrypt'
+import { userPath, videoPath } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
 type PlayerEx = { play: () => void; pause: () => void; toggle: () => void; seek: (sec: number) => void }
@@ -160,6 +168,8 @@ const currentTime = ref(0)
 const duration = ref(0)
 const liked = ref(new Set<number>())
 const collected = ref(new Set<number>())
+const followedUp = ref(new Set<number>())
+const unfollowedUp = ref(new Set<number>())
 const players = new Map<number, PlayerEx>()
 
 const setPlayer = (idx: number, el: unknown) => {
@@ -173,7 +183,51 @@ const tagsOf = (item: DouyinItem) => {
   return raw.map((s) => s.trim()).filter(Boolean).slice(0, 4)
 }
 
-const handle = (item: DouyinItem) => (item.title || '抖音').replace(/\s+/g, '').slice(0, 8) || '抖音'
+const handle = (item: DouyinItem) => {
+  const nick = (item.up_nickname || '').trim()
+  if (nick) return nick
+  return (item.title || '抖音').replace(/\s+/g, '').slice(0, 8) || '抖音'
+}
+
+const isFollowed = (item: DouyinItem) => {
+  const uid = item.up_user_id || 0
+  if (!uid) return true
+  if (unfollowedUp.value.has(uid)) return false
+  if (followedUp.value.has(uid)) return true
+  return Boolean(item.followed)
+}
+
+const showPlus = (item: DouyinItem) => {
+  const uid = item.up_user_id || 0
+  if (!uid) return false
+  if (uid === (userStore.user?.id || 0)) return false
+  return !isFollowed(item)
+}
+
+const goUp = (item: DouyinItem) => {
+  if (!item.up_user_id) return
+  router.push(userPath(item.up_user_id))
+}
+
+const onFollow = async (item: DouyinItem) => {
+  if (!item.up_user_id || !(await ensureAuth())) return
+  try {
+    const { followed } = await toggleFollow(item.up_user_id)
+    const on = new Set(followedUp.value)
+    const off = new Set(unfollowedUp.value)
+    if (followed) {
+      on.add(item.up_user_id)
+      off.delete(item.up_user_id)
+    } else {
+      on.delete(item.up_user_id)
+      off.add(item.up_user_id)
+    }
+    followedUp.value = on
+    unfollowedUp.value = off
+  } catch (err) {
+    toastError(err)
+  }
+}
 
 const playSrc = (item: DouyinItem) => mediaUrl(item.source_url)
 
@@ -424,7 +478,53 @@ onMounted(() => {
   z-index: 3;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
+}
+
+.up {
+  position: relative;
+  width: 48px;
+  height: 54px;
+  margin-bottom: 2px;
+}
+
+.up-face {
+  appearance: none;
+  display: block;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #1a1a1f;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+
+  :deep(.user-avatar) {
+    display: block;
+  }
+}
+
+.plus {
+  appearance: none;
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 50%;
+  background: #fe2c55;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 
 .side-btn {
@@ -481,6 +581,10 @@ onMounted(() => {
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 700;
+
+  &.link {
+    cursor: pointer;
+  }
 }
 
 .desc {
