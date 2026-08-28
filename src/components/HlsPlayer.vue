@@ -5,6 +5,7 @@
     :class="{ 'is-bare': !controls }"
     :controls="controls"
     :muted="muted"
+    :autoplay="autoplay"
     playsinline
     webkit-playsinline
     controlslist="nodownload"
@@ -24,8 +25,8 @@ import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { showToast } from 'vant'
 
 const props = withDefaults(
-  defineProps<{ src: string; poster?: string; controls?: boolean; muted?: boolean }>(),
-  { controls: true, muted: false },
+  defineProps<{ src: string; poster?: string; controls?: boolean; muted?: boolean; autoplay?: boolean }>(),
+  { controls: true, muted: false, autoplay: false },
 )
 const emit = defineEmits<{
   play: []
@@ -37,11 +38,50 @@ const emit = defineEmits<{
 const el = ref<HTMLVideoElement | null>(null)
 let hls: { destroy: () => void } | null = null
 let ignorePause = false
+let playWanted = false
+let resolveReady = () => {}
+let ready = new Promise<void>((resolve) => {
+  resolveReady = resolve
+})
+let readyOnce = false
+
+const resetReady = () => {
+  readyOnce = false
+  ready = new Promise<void>((resolve) => {
+    resolveReady = resolve
+  })
+}
+
+const markReady = () => {
+  if (readyOnce) return
+  readyOnce = true
+  resolveReady()
+  if (props.autoplay || playWanted) void tryPlay()
+}
+
+const tryPlay = async () => {
+  const video = el.value
+  if (!video) return
+  video.muted = props.muted
+  try {
+    await video.play()
+  } catch {
+    video.addEventListener(
+      'canplay',
+      () => {
+        if (playWanted || props.autoplay) void video.play().catch(() => undefined)
+      },
+      { once: true },
+    )
+  }
+}
 
 const attach = async (url: string) => {
   const video = el.value
   if (!video || !url) return
   ignorePause = true
+  playWanted = props.autoplay
+  resetReady()
   hls?.destroy()
   hls = null
   video.removeAttribute('src')
@@ -55,6 +95,7 @@ const attach = async (url: string) => {
       const inst = new Hls({ enableWorker: true, xhrSetup: (xhr) => {
         xhr.withCredentials = false
       } })
+      inst.on(Hls.Events.MANIFEST_PARSED, () => markReady())
       inst.on(Hls.Events.ERROR, (_evt, data) => {
         if (data.fatal) {
           showToast('视频加载失败')
@@ -68,6 +109,11 @@ const attach = async (url: string) => {
     }
   } else {
     video.src = url
+  }
+  if (!hls) {
+    const onCan = () => markReady()
+    video.addEventListener('canplay', onCan, { once: true })
+    video.addEventListener('loadeddata', onCan, { once: true })
   }
   video.muted = props.muted
   window.setTimeout(() => {
@@ -98,8 +144,11 @@ const onClick = () => emit('click')
 const toggle = () => {
   const video = el.value
   if (!video) return
-  if (video.paused) video.play()
-  else video.pause()
+  if (video.paused) void play()
+  else {
+    playWanted = false
+    video.pause()
+  }
 }
 
 const seek = (sec: number) => {
@@ -112,6 +161,17 @@ watch(
   () => props.muted,
   (muted) => {
     if (el.value) el.value.muted = muted
+  },
+)
+
+watch(
+  () => props.autoplay,
+  (on) => {
+    if (on) void play()
+    else {
+      playWanted = false
+      pause()
+    }
   },
 )
 
@@ -129,8 +189,15 @@ const onDocFullscreen = () => {
   if (document.fullscreenElement === el.value) stealNativeFullscreen()
 }
 
-const play = () => el.value?.play()
-const pause = () => el.value?.pause()
+const play = async () => {
+  playWanted = true
+  await ready
+  await tryPlay()
+}
+const pause = () => {
+  playWanted = false
+  el.value?.pause()
+}
 
 onMounted(() => {
   attach(props.src)

@@ -12,19 +12,20 @@
     <div v-else ref="scroller" class="scroller" @scroll.passive="onScroll">
       <section v-for="(item, idx) in items" :key="item.id" class="slide">
         <div class="stage">
+          <EncryptedImage v-if="item.cover_url" class="poster" :src="mediaUrl(item.cover_url)" alt="" />
           <HlsPlayer
             v-if="Math.abs(idx - current) <= 1 && item.source_url"
             :ref="(el) => setPlayer(idx, el)"
-            :src="item.source_url"
+            :src="playSrc(item)"
             :poster="mediaUrl(item.cover_url)"
             :controls="false"
             :muted="muted"
+            :autoplay="idx === current"
             @click="togglePlay"
             @play="paused = false"
             @user-pause="paused = true"
             @timeupdate="(cur, dur) => idx === current && onTime(cur, dur)"
           />
-          <EncryptedImage v-else-if="item.cover_url" class="poster" :src="mediaUrl(item.cover_url)" alt="" />
           <button v-if="muted && idx === current" type="button" class="unmute" @click.stop="muted = false">
             解除静音
           </button>
@@ -139,7 +140,7 @@ const userStore = useUserStore()
 const scroller = ref<HTMLElement | null>(null)
 const current = ref(0)
 const muted = ref(true)
-const paused = ref(false)
+const paused = ref(true)
 const currentTime = ref(0)
 const duration = ref(0)
 const liked = ref(new Set<number>())
@@ -159,6 +160,8 @@ const tagsOf = (item: DouyinItem) => {
 
 const handle = (item: DouyinItem) => (item.title || '抖音').replace(/\s+/g, '').slice(0, 8) || '抖音'
 
+const playSrc = (item: DouyinItem) => mediaUrl(item.source_url)
+
 const clock = (sec: number) => formatDuration(Math.floor(sec || 0)) || '00:00'
 
 const playCurrent = async () => {
@@ -167,7 +170,6 @@ const playCurrent = async () => {
     if (idx === current.value) void p.play()
     else p.pause()
   })
-  paused.value = false
 }
 
 const togglePlay = () => {
@@ -339,9 +341,19 @@ onMounted(() => {
   inset: 0;
   background: #000;
 
-  :deep(.media),
-  :deep(img.poster),
+  :deep(.poster),
   :deep(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  :deep(.media) {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: contain;
