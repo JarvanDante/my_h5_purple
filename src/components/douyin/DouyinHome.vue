@@ -115,22 +115,17 @@ const loadCats = async () => {
 const loadList = async () => {
   loading.value = true
   try {
-    if (feedTab.value === 'follow') {
+    if (feedTab.value === 'follow' || feedTab.value === 'like' || feedTab.value === 'fav') {
+      await userStore.ensureLogin().catch(() => undefined)
       if (!getToken()) {
         items.value = []
         return
       }
-      await userStore.ensureLogin().catch(() => undefined)
-      const data = await fetchDouyinList(1, 24, '', 0, '', '', 1)
-      items.value = data.list || []
-      return
-    }
-    if (feedTab.value === 'like' || feedTab.value === 'fav') {
-      if (!getToken()) {
-        items.value = []
+      if (feedTab.value === 'follow') {
+        const data = await fetchDouyinList(1, 24, '', 0, '', '', 1)
+        items.value = data.list || []
         return
       }
-      await userStore.ensureLogin().catch(() => undefined)
       const type = feedTab.value === 'like' ? COLLECT_LIKE : COLLECT_FAV
       const ids = ((await fetchCollectList(type, MEDIA_VIDEO, 1, 30)).list || []).map((x) => x.content_id)
       const rows = await Promise.all(ids.map((id) => fetchVideoDetail(id).catch(() => null)))
@@ -149,7 +144,7 @@ const loadList = async () => {
   }
 }
 
-watch([feedTab, category], loadList)
+watch([feedTab, category, () => userStore.loggedIn], loadList)
 onMounted(() => {
   loadCats()
   loadList()
