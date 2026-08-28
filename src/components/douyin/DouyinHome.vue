@@ -35,6 +35,7 @@
       :items="items"
       :loading="loading"
       :empty="emptyText"
+      @liked="goLiked"
     />
 
     <DouyinFeed
@@ -44,6 +45,7 @@
       :start="overlayIndex"
       empty="暂无抖音"
       @close="overlay = false"
+      @liked="goLiked"
     />
   </div>
 </template>
@@ -53,7 +55,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
 import DouyinGrid from '@/components/douyin/DouyinGrid.vue'
 import { fetchDouyinCategories, fetchDouyinList, type DouyinCategory, type DouyinItem } from '@/api/douyin'
-import { COLLECT_FAV, fetchCollectList, MEDIA_VIDEO } from '@/api/collect'
+import { COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO } from '@/api/collect'
 import { fetchVideoDetail } from '@/api/video'
 import { useUserStore } from '@/stores/user'
 import { getToken, toastError } from '@/utils/request'
@@ -88,6 +90,8 @@ const selectFeed = (key: FeedKey) => {
   feedTab.value = key
   overlay.value = false
 }
+
+const goLiked = () => selectFeed('like')
 
 const selectChip = (name: string) => {
   category.value = category.value === name ? '' : name
@@ -125,7 +129,7 @@ const loadList = async () => {
         return
       }
       await userStore.ensureLogin().catch(() => undefined)
-      const ids = ((await fetchCollectList(COLLECT_FAV, MEDIA_VIDEO, 1, 30)).list || []).map((x) => x.content_id)
+      const ids = ((await fetchCollectList(COLLECT_LIKE, MEDIA_VIDEO, 1, 30)).list || []).map((x) => x.content_id)
       const rows = await Promise.all(ids.map((id) => fetchVideoDetail(id).catch(() => null)))
       items.value = rows.filter((x): x is DouyinItem => Boolean(x?.id && x.source_url))
       return
