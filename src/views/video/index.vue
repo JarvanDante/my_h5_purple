@@ -1,12 +1,13 @@
 <template>
-  <div class="page-shell video-page">
+  <div class="page-shell video-page" :class="{ 'is-douyin': isDouyin }">
     <HomeHeader
       dark
       :channels="channels"
       :channel="channel"
-      :sub-tabs="subTabs"
+      :sub-tabs="isDouyin ? [] : subTabs"
       :sub-tab="subTab"
       :search-text="searchHint"
+      :hide-search="isDouyin"
       @select-channel="selectChannel"
       @select-sub="selectSub"
       @checkin="go('/checkin')"
@@ -14,6 +15,9 @@
       @vip="go('/vip')"
     />
 
+    <DouyinHome v-if="isDouyin" />
+
+    <template v-else>
     <section class="ad-rail-wrap">
       <AdSwipe :items="ads" />
     </section>
@@ -21,7 +25,7 @@
     <div class="inner-slide">
       <transition :name="innerName">
         <div :key="channel" class="inner-pane">
-          <section v-if="!isDouyin" class="quick-strip">
+          <section class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
               <span class="quick-icon">{{ item.emoji }}</span>
               <span class="quick-label">{{ item.label }}</span>
@@ -56,6 +60,7 @@
         </div>
       </transition>
     </div>
+    </template>
   </div>
 </template>
 
@@ -63,9 +68,9 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import { fetchDouyinCategories, fetchDouyinList } from '@/api/douyin'
 import { fetchVideoCategories, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
 import AdSwipe from '@/components/AdSwipe.vue'
+import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import PosterCard from '@/components/home/PosterCard.vue'
@@ -146,9 +151,7 @@ const ads = computed<CoverItem[]>(() => {
   return live.length ? live : videos.slice(0, 6)
 })
 
-const emptyText = computed(() =>
-  isDouyin.value ? '暂无抖音，请在子后台「抖音管理」上架' : '暂无模块，请在子后台「视频模块」配置',
-)
+const emptyText = '暂无模块，请在子后台「视频模块」配置'
 
 const moduleLayout = (style: number): FloorLayout => {
   if (style === 1) return 'hero-mix'
@@ -203,31 +206,17 @@ const onQuick = (item: { label: string; path: string }) => {
 const loadSubCats = async () => {
   const toCats = (list?: { name: string; kind: number }[]) =>
     (list || []).filter((x) => x.name).map((x) => ({ name: x.name, kind: x.kind || 0 }))
-  const [video, douyin] = await Promise.allSettled([fetchVideoCategories(), fetchDouyinCategories()])
-  if (video.status === 'fulfilled') catsByChannel.value.视频 = toCats(video.value.list)
-  if (douyin.status === 'fulfilled') catsByChannel.value.抖音 = toCats(douyin.value.list)
+  try {
+    const video = await fetchVideoCategories()
+    catsByChannel.value.视频 = toCats(video.list)
+  } catch {
+    catsByChannel.value.视频 = []
+  }
 }
 
 const loadFloors = async () => {
+  if (isDouyin.value) return
   try {
-    if (isDouyin.value) {
-      const data = await fetchDouyinList(1, 18, '', 1)
-      const items = (data.list || []).map((v, i) => toCover(v, i < 2 ? 'new' : undefined))
-      floors.value = items.length
-        ? [
-            {
-              id: 0,
-              title: '发现',
-              sub: 'NEW',
-              layout: 'wide-grid',
-              more: '/list?media=douyin&type=daily',
-              empty: '暂无抖音',
-              items,
-            },
-          ]
-        : []
-      return
-    }
     const mods = (await fetchVideoModules('video_home')).list || []
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
@@ -256,6 +245,13 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.video-page.is-douyin {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: #050506;
+}
+
 .inner-slide {
   position: relative;
   overflow: hidden;

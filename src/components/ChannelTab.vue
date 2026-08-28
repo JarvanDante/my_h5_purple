@@ -1,5 +1,5 @@
 <template>
-  <button type="button" class="channel-tab" :class="{ active }" @click="$emit('select')">
+  <button type="button" class="channel-tab" :class="{ active, 'is-hot': label === '抖音' }" @click="$emit('select')">
     <span class="channel-text">{{ label }}</span>
     <svg class="channel-ring" viewBox="0 0 96 44" aria-hidden="true">
       <defs>
@@ -93,6 +93,22 @@ const uid = useId().replace(/\W/g, '')
 .spark {
   fill: #fff6ea;
   filter: drop-shadow(0 0 2px rgba(255, 240, 220, 0.9));
+}
+
+.channel-tab.is-hot.active {
+  color: #ffe56a;
+
+  .channel-text {
+    text-shadow: 0 0 14px rgba(255, 214, 80, 0.65);
+  }
+
+  .spark {
+    fill: #ffe9a8;
+  }
+
+  &::before {
+    background: radial-gradient(ellipse at center, rgba(255, 214, 80, 0.28) 0%, rgba(255, 92, 147, 0.12) 48%, transparent 74%);
+  }
 }
 
 .channel-tab.active {

@@ -2,7 +2,9 @@
   <video
     ref="el"
     class="media"
-    controls
+    :class="{ 'is-bare': !controls }"
+    :controls="controls"
+    :muted="muted"
     playsinline
     webkit-playsinline
     controlslist="nodownload"
@@ -11,6 +13,9 @@
     :poster="poster || undefined"
     @play="onPlay"
     @pause="onPause"
+    @timeupdate="onTime"
+    @loadedmetadata="onTime"
+    @click="onClick"
   />
 </template>
 
@@ -18,11 +23,16 @@
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { showToast } from 'vant'
 
-const props = defineProps<{ src: string; poster?: string }>()
+const props = withDefaults(
+  defineProps<{ src: string; poster?: string; controls?: boolean; muted?: boolean }>(),
+  { controls: true, muted: false },
+)
 const emit = defineEmits<{
   play: []
   'user-pause': []
   'native-fullscreen': []
+  timeupdate: [current: number, duration: number]
+  click: []
 }>()
 const el = ref<HTMLVideoElement | null>(null)
 let hls: { destroy: () => void } | null = null
@@ -59,6 +69,7 @@ const attach = async (url: string) => {
   } else {
     video.src = url
   }
+  video.muted = props.muted
   window.setTimeout(() => {
     ignorePause = false
   }, 0)
@@ -75,6 +86,34 @@ const onPlay = () => {
   ignorePause = false
   emit('play')
 }
+
+const onTime = () => {
+  const video = el.value
+  if (!video) return
+  emit('timeupdate', video.currentTime || 0, video.duration || 0)
+}
+
+const onClick = () => emit('click')
+
+const toggle = () => {
+  const video = el.value
+  if (!video) return
+  if (video.paused) video.play()
+  else video.pause()
+}
+
+const seek = (sec: number) => {
+  const video = el.value
+  if (!video || !Number.isFinite(sec)) return
+  video.currentTime = Math.max(0, sec)
+}
+
+watch(
+  () => props.muted,
+  (muted) => {
+    if (el.value) el.value.muted = muted
+  },
+)
 
 const stealNativeFullscreen = () => {
   const video = el.value as (HTMLVideoElement & { webkitExitFullscreen?: () => void }) | null
@@ -107,7 +146,7 @@ onBeforeUnmount(() => {
   hls = null
 })
 
-defineExpose({ play, pause })
+defineExpose({ play, pause, toggle, seek })
 </script>
 
 <style scoped>
@@ -115,5 +154,11 @@ defineExpose({ play, pause })
   width: 100%;
   max-height: 240px;
   background: #000;
+}
+
+.media.is-bare {
+  max-height: none;
+  height: 100%;
+  object-fit: contain;
 }
 </style>

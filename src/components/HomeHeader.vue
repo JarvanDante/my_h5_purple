@@ -42,7 +42,7 @@
       </button>
     </div>
 
-    <div class="search-row">
+    <div v-if="!hideSearch" class="search-row">
       <div class="search-pill" @click="$emit('search')">
         <span class="search-ico"><LineIcon name="search" /></span>
         <span>{{ searchText || `搜索更多${channel}` }}</span>
@@ -75,8 +75,9 @@ withDefaults(
     subTab?: string
     dark?: boolean
     searchText?: string
+    hideSearch?: boolean
   }>(),
-  { subTabs: () => [], subTab: '', dark: false, searchText: '' },
+  { subTabs: () => [], subTab: '', dark: false, searchText: '', hideSearch: false },
 )
 
 defineEmits<{
