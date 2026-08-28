@@ -370,6 +370,11 @@ onMounted(() => {
   z-index: 80;
   padding-top: var(--app-header-top, 0px);
   background: #050506;
+
+  .unmute {
+    top: 10px;
+    right: 12px;
+  }
 }
 
 .back {
@@ -439,7 +444,7 @@ onMounted(() => {
 
 .unmute {
   top: 12px;
-  left: 12px;
+  right: 12px;
   z-index: 4;
   display: inline-flex;
   align-items: center;
