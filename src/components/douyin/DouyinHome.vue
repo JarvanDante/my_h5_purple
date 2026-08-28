@@ -68,7 +68,7 @@ const feedTabs = [
 type FeedKey = (typeof feedTabs)[number]['key']
 
 const userStore = useUserStore()
-const feedTab = ref<FeedKey>('discover')
+const feedTab = ref<FeedKey>('hot')
 const cats = ref<DouyinCategory[]>([])
 const category = ref('')
 const items = ref<DouyinItem[]>([])
