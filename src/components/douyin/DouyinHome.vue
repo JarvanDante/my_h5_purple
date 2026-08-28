@@ -35,6 +35,8 @@
       :items="items"
       :loading="loading"
       :empty="emptyText"
+      :preset-liked="feedTab === 'like'"
+      :preset-collected="feedTab === 'fav'"
     />
 
     <DouyinFeed

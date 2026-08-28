@@ -151,8 +151,10 @@ const props = withDefaults(
     empty?: string
     start?: number
     overlay?: boolean
+    presetLiked?: boolean
+    presetCollected?: boolean
   }>(),
-  { empty: '暂无内容', start: 0, overlay: false },
+  { empty: '暂无内容', start: 0, overlay: false, presetLiked: false, presetCollected: false },
 )
 
 defineEmits<{
@@ -298,33 +300,73 @@ const ensureAuth = async () => {
   }
 }
 
+const markKey = (kind: 'like' | 'fav', id: number) => `${kind}:${id}`
+const markPending = new Set<string>()
+const markDirty = new Set<string>()
+let marksTick = 0
+
+const applyMark = (kind: 'like' | 'fav', id: number, on: boolean) => {
+  const src = kind === 'like' ? liked.value : collected.value
+  const copy = new Set(src)
+  if (on) copy.add(id)
+  else copy.delete(id)
+  if (kind === 'like') liked.value = copy
+  else collected.value = copy
+}
+
+const seedMarks = () => {
+  const ids = props.items.map((x) => x.id)
+  if (props.presetLiked) liked.value = new Set(ids)
+  if (props.presetCollected) collected.value = new Set(ids)
+}
+
 const toggleMark = async (item: DouyinItem, kind: 'like' | 'fav') => {
   if (!(await ensureAuth())) return
-  const set = kind === 'like' ? liked : collected
-  const next = !set.value.has(item.id)
+  const key = markKey(kind, item.id)
+  if (markPending.has(key)) return
+  const src = kind === 'like' ? liked.value : collected.value
+  const next = !src.has(item.id)
+  markPending.add(key)
+  markDirty.add(key)
+  applyMark(kind, item.id, next)
   try {
     await operateCollect(item.id, MEDIA_VIDEO, next, kind === 'like' ? COLLECT_LIKE : COLLECT_FAV)
-    const copy = new Set(set.value)
-    if (next) copy.add(item.id)
-    else copy.delete(item.id)
-    set.value = copy
   } catch (err) {
+    applyMark(kind, item.id, !next)
+    markDirty.delete(key)
     toastError(err)
+  } finally {
+    markPending.delete(key)
   }
+}
+
+const keepDirty = (kind: 'like' | 'fav', next: Set<number>) => {
+  markDirty.forEach((key) => {
+    const [k, raw] = key.split(':')
+    if (k !== kind) return
+    const id = Number(raw)
+    if ((kind === 'like' ? liked.value : collected.value).has(id)) next.add(id)
+    else next.delete(id)
+  })
 }
 
 const loadMarks = async () => {
   if (!getToken() || !props.items.length) return
+  const tick = ++marksTick
   try {
     const [fav, like] = await Promise.all([
       fetchCollectList(COLLECT_FAV, MEDIA_VIDEO, 1, 100),
       fetchCollectList(COLLECT_LIKE, MEDIA_VIDEO, 1, 100),
     ])
-    collected.value = new Set((fav.list || []).map((r) => r.content_id))
-    liked.value = new Set((like.list || []).map((r) => r.content_id))
+    if (tick !== marksTick) return
+    const nextFav = new Set((fav.list || []).map((r) => r.content_id))
+    const nextLike = new Set((like.list || []).map((r) => r.content_id))
+    keepDirty('fav', nextFav)
+    keepDirty('like', nextLike)
+    collected.value = nextFav
+    liked.value = nextLike
   } catch {
-    collected.value = new Set()
-    liked.value = new Set()
+    if (tick !== marksTick) return
   }
 }
 
@@ -341,12 +383,14 @@ const jumpStart = async () => {
 watch(
   () => props.items.map((x) => x.id).join(','),
   () => {
+    seedMarks()
     loadMarks()
     jumpStart()
   },
 )
 
 onMounted(() => {
+  seedMarks()
   loadMarks()
   jumpStart()
 })
