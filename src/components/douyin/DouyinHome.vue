@@ -35,7 +35,6 @@
       :items="items"
       :loading="loading"
       :empty="emptyText"
-      @liked="goLiked"
     />
 
     <DouyinFeed
@@ -45,7 +44,6 @@
       :start="overlayIndex"
       empty="暂无抖音"
       @close="overlay = false"
-      @liked="goLiked"
     />
   </div>
 </template>
@@ -92,8 +90,6 @@ const selectFeed = (key: FeedKey) => {
   feedTab.value = key
   overlay.value = false
 }
-
-const goLiked = () => selectFeed('like')
 
 const selectChip = (name: string) => {
   category.value = category.value === name ? '' : name

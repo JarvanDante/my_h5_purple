@@ -155,9 +155,8 @@ const props = withDefaults(
   { empty: '暂无内容', start: 0, overlay: false },
 )
 
-const emit = defineEmits<{
+defineEmits<{
   close: []
-  liked: []
 }>()
 
 const router = useRouter()
@@ -309,7 +308,6 @@ const toggleMark = async (item: DouyinItem, kind: 'like' | 'fav') => {
     if (next) copy.add(item.id)
     else copy.delete(item.id)
     set.value = copy
-    if (kind === 'like' && next) emit('liked')
   } catch (err) {
     toastError(err)
   }
