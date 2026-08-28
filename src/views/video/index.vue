@@ -4,10 +4,13 @@
       dark
       :channels="channels"
       :channel="channel"
+      :sub-tabs="subTabs"
+      :sub-tab="subTab"
       :search-text="searchHint"
       @select-channel="selectChannel"
+      @select-sub="selectSub"
       @checkin="go('/checkin')"
-      @search="go(searchPath('video'))"
+      @search="go(searchPath(channel))"
       @vip="go('/vip')"
     />
 
@@ -18,7 +21,7 @@
     <div class="inner-slide">
       <transition :name="innerName">
         <div :key="channel" class="inner-pane">
-          <section class="quick-strip">
+          <section v-if="!isDouyin" class="quick-strip">
             <button v-for="item in quicks.slice(0, 4)" :key="item.label" type="button" class="quick-item" @click="onQuick(item)">
               <span class="quick-icon">{{ item.emoji }}</span>
               <span class="quick-label">{{ item.label }}</span>
@@ -57,9 +60,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import { fetchDouyinCategories, fetchDouyinList } from '@/api/douyin'
 import { fetchVideoCategories, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
 import AdSwipe from '@/components/AdSwipe.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'
@@ -76,16 +80,42 @@ import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
 
 defineOptions({ name: 'Video' })
 
-const fallbackTabs = ['最新', '推荐', '视频榜', '电影', '短剧', '综艺']
 const router = useRouter()
-const channels = ref([...fallbackTabs])
-const channelSlide = useTabSlide(channels.value, fallbackTabs[0])
+const channels = ['视频', '抖音']
+const channelSlide = useTabSlide(channels)
 const channel = computed(() => channelSlide.current.value)
+const isDouyin = computed(() => channel.value === '抖音')
 const innerName = ref('tab-left')
+
+type SubCat = { name: string; kind: number }
+const catsByChannel = ref<Record<string, SubCat[]>>({
+  视频: [],
+  抖音: [],
+})
+const subTab = ref('')
+const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c) => c.name))
+
+const channelMedia = (name: string) => (name === '抖音' ? 'douyin' : 'video')
+
+const subListPath = (ch: string, cat?: SubCat) => {
+  const media = channelMedia(ch)
+  if (!cat) return `/list?media=${media}`
+  if (cat.kind === 1) return `/list?media=${media}&type=daily`
+  if (cat.kind === 2) return `/list?media=${media}&type=recommend`
+  if (cat.kind === 3) return `/list?media=${media}&type=rank`
+  return `/list?media=${media}&type=category&category=${encodeURIComponent(cat.name)}`
+}
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
+  subTab.value = ''
+}
+
+const selectSub = (name: string) => {
+  subTab.value = name
+  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
+  go(subListPath(channel.value, cat))
 }
 
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
@@ -116,7 +146,9 @@ const ads = computed<CoverItem[]>(() => {
   return live.length ? live : videos.slice(0, 6)
 })
 
-const emptyText = '暂无模块，请在子后台「视频模块」配置'
+const emptyText = computed(() =>
+  isDouyin.value ? '暂无抖音，请在子后台「抖音管理」上架' : '暂无模块，请在子后台「视频模块」配置',
+)
 
 const moduleLayout = (style: number): FloorLayout => {
   if (style === 1) return 'hero-mix'
@@ -149,7 +181,7 @@ const quicks = [
   { emoji: '💰', label: '金币专区', path: '/wallet' },
 ]
 
-const searchHint = computed(() => videoSearchHint('video'))
+const searchHint = computed(() => videoSearchHint(isDouyin.value ? 'douyin' : 'video'))
 
 const go = (path: string) => router.push(path)
 const open = (item: CoverItem) => {
@@ -168,23 +200,34 @@ const onQuick = (item: { label: string; path: string }) => {
   showToast(`${item.label} 稍后接入`)
 }
 
-const loadCategories = async () => {
-  try {
-    const data = await fetchVideoCategories()
-    const rows = data.list || []
-    if (!rows.length) return
-    const names = rows.map((r) => r.name)
-    channels.value = names
-    if (!names.includes(channel.value)) {
-      channelSlide.select(names[0])
-    }
-  } catch {
-    /* 顶栏分类失败时保留默认 tabs */
-  }
+const loadSubCats = async () => {
+  const toCats = (list?: { name: string; kind: number }[]) =>
+    (list || []).filter((x) => x.name).map((x) => ({ name: x.name, kind: x.kind || 0 }))
+  const [video, douyin] = await Promise.allSettled([fetchVideoCategories(), fetchDouyinCategories()])
+  if (video.status === 'fulfilled') catsByChannel.value.视频 = toCats(video.value.list)
+  if (douyin.status === 'fulfilled') catsByChannel.value.抖音 = toCats(douyin.value.list)
 }
 
 const loadFloors = async () => {
   try {
+    if (isDouyin.value) {
+      const data = await fetchDouyinList(1, 18, '', 1)
+      const items = (data.list || []).map((v, i) => toCover(v, i < 2 ? 'new' : undefined))
+      floors.value = items.length
+        ? [
+            {
+              id: 0,
+              title: '发现',
+              sub: 'NEW',
+              layout: 'wide-grid',
+              more: '/list?media=douyin&type=daily',
+              empty: '暂无抖音',
+              items,
+            },
+          ]
+        : []
+      return
+    }
     const mods = (await fetchVideoModules('video_home')).list || []
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
@@ -204,8 +247,10 @@ const loadFloors = async () => {
   }
 }
 
+watch(channel, loadFloors)
+
 onMounted(() => {
-  loadCategories()
+  loadSubCats()
   loadFloors()
 })
 </script>

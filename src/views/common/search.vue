@@ -77,7 +77,7 @@
         v-else
         :items="results"
         :cols="gridCols"
-        :wide="scope === 'video' || scope === 'short'"
+        :wide="scope === 'video' || scope === 'short' || scope === 'douyin'"
         :poster="scope === 'cartoon'"
         @select="open"
       />
@@ -146,7 +146,7 @@
           v-else
           :items="library"
           :cols="gridCols"
-          :wide="scope === 'video' || scope === 'short'"
+          :wide="scope === 'video' || scope === 'short' || scope === 'douyin'"
           :poster="scope === 'cartoon'"
           @select="open"
         />
@@ -165,6 +165,7 @@ import { fetchCartoonList, fetchCartoonCategories, cartoonCategories, type Carto
 import { fetchComicsList, fetchComicsCategories, comicCategories, type ComicsItem } from '@/api/comics'
 import { fetchRepoTags } from '@/api/ops'
 import { fetchHotSearch } from '@/api/ranks'
+import { fetchDouyinCategories, fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, fetchVideoCategories, type VideoItem } from '@/api/video'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -188,6 +189,7 @@ const REPO_TAG_TYPE: Partial<Record<SearchScope, number>> = {
   novel: 7,
   short: 1,
   video: 1,
+  douyin: 2,
 }
 
 const route = useRoute()
@@ -212,7 +214,7 @@ const sortChips = SORT_CHIPS
 const scope = computed(() => parseScope(route.query.scope))
 const scopeName = computed(() => scopeLabel(scope.value))
 const placeholder = computed(() => searchHint(scope.value))
-const ready = computed(() => ['comic', 'cartoon', 'video', 'short'].includes(scope.value))
+const ready = computed(() => ['comic', 'cartoon', 'video', 'short', 'douyin'].includes(scope.value))
 const gridCols = computed(() => (scope.value === 'comic' || scope.value === 'novel' ? 'cols-3' : 'cols-2'))
 const emptyText = computed(() => {
   if (!ready.value) return `${scopeName.value}搜索即将接入`
@@ -279,6 +281,10 @@ const fetchByScope = async (word = '') => {
     const data = await fetchVideoList(1, 30, word, word ? 0 : 1, cate)
     return (data.list || []).map(toVideoCover)
   }
+  if (scope.value === 'douyin') {
+    const data = await fetchDouyinList(1, 30, word, word ? 0 : 1)
+    return (data.list || []).map(toVideoCover)
+  }
   if (scope.value === 'comic') {
     const data = await fetchComicsList(1, 30, word, '', word ? 0 : 2)
     return (data.list || []).map(toComicCover)
@@ -333,6 +339,8 @@ const loadFilterChips = async () => {
       list = (await fetchCartoonCategories()).list || []
     } else if (scope.value === 'video' || scope.value === 'short') {
       list = (await fetchVideoCategories()).list || []
+    } else if (scope.value === 'douyin') {
+      list = (await fetchDouyinCategories()).list || []
     }
     categoryChips.value = list.filter((x) => x.name)
   } catch {
@@ -361,6 +369,11 @@ const fetchLibraryList = async () => {
     const name = kind === 0 ? cate : ''
     const fallback = scope.value === 'short' && !name ? '短剧' : name
     const data = await fetchVideoList(1, 36, '', mediaSort(sort), fallback)
+    return (data.list || []).map(toVideoCover)
+  }
+  if (scope.value === 'douyin') {
+    const name = kind === 0 ? cate : ''
+    const data = await fetchDouyinList(1, 36, '', mediaSort(sort), name)
     return (data.list || []).map(toVideoCover)
   }
   if (scope.value === 'comic') {
@@ -414,7 +427,7 @@ const clearHistory = () => {
 }
 
 const open = (item: CoverItem) => {
-  if (scope.value === 'cartoon' || scope.value === 'video' || scope.value === 'short') {
+  if (scope.value === 'cartoon' || scope.value === 'video' || scope.value === 'short' || scope.value === 'douyin') {
     router.push(videoPath(item.id))
     return
   }

@@ -1,4 +1,4 @@
-export type SearchScope = 'comic' | 'cartoon' | 'novel' | 'short' | 'video' | 'planet' | 'ai'
+export type SearchScope = 'comic' | 'cartoon' | 'novel' | 'short' | 'video' | 'douyin' | 'planet' | 'ai'
 
 const SCOPE_LABEL: Record<SearchScope, string> = {
   comic: '漫画',
@@ -6,6 +6,7 @@ const SCOPE_LABEL: Record<SearchScope, string> = {
   novel: '小说',
   short: '短剧',
   video: '视频',
+  douyin: '抖音',
   planet: '社区',
   ai: 'AI',
 }
@@ -21,6 +22,8 @@ const ALIAS: Record<string, SearchScope> = {
   短剧: 'short',
   video: 'video',
   视频: 'video',
+  douyin: 'douyin',
+  抖音: 'douyin',
   planet: 'planet',
   星球: 'planet',
   社区: 'planet',

@@ -7,8 +7,8 @@
       <MediaGrid
         v-else
         :items="items"
-        :cols="media === 'video' || media === 'cartoon' ? 'cols-2' : 'cols-3'"
-        :wide="media === 'video'"
+        :cols="media === 'video' || media === 'cartoon' || media === 'douyin' ? 'cols-2' : 'cols-3'"
+        :wide="media === 'video' || media === 'douyin'"
         :poster="media === 'cartoon'"
         @select="open"
       />
@@ -24,6 +24,7 @@ import MediaGrid from '@/components/MediaGrid.vue'
 import { fetchCartoonList, cartoonCategories, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
 import { fetchNovelList, type NovelItem } from '@/api/novel'
+import { fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
@@ -37,7 +38,7 @@ const loading = ref(true)
 
 const media = computed(() => {
   const m = String(route.query.media || '')
-  if (m === 'video' || m === 'cartoon' || m === 'novel') return m
+  if (m === 'video' || m === 'cartoon' || m === 'novel' || m === 'douyin') return m
   return 'comic'
 })
 const type = computed(() => String(route.query.type || ''))
@@ -49,6 +50,15 @@ const videoTitles: Record<string, string> = {
   hot: '热门视频',
   daily: '日更限定',
   rank: '视频排行',
+  recommend: '精选推荐',
+  category: '分类',
+}
+const douyinTitles: Record<string, string> = {
+  topic: '专题',
+  hot: '热门抖音',
+  daily: '最新上架',
+  rank: '抖音榜',
+  recommend: '精选推荐',
   category: '分类',
 }
 const cartoonTitles: Record<string, string> = {
@@ -63,6 +73,9 @@ const cartoonTitles: Record<string, string> = {
 const title = computed(() => {
   if (media.value === 'video') {
     return tag.value || category.value || videoTitles[type.value] || '相关视频'
+  }
+  if (media.value === 'douyin') {
+    return tag.value || category.value || douyinTitles[type.value] || '相关抖音'
   }
   if (media.value === 'cartoon') {
     return tag.value || category.value || cartoonTitles[type.value] || '相关动漫'
@@ -80,6 +93,11 @@ const emptyText = computed(() => {
     if (tag.value) return `暂无「${tag.value}」视频`
     if (category.value) return `暂无「${category.value}」视频`
     return '暂无相关视频'
+  }
+  if (media.value === 'douyin') {
+    if (tag.value) return `暂无「${tag.value}」抖音`
+    if (category.value) return `暂无「${category.value}」抖音`
+    return '暂无相关抖音'
   }
   if (media.value === 'cartoon') {
     if (tag.value) return `暂无「${tag.value}」动漫`
@@ -156,7 +174,7 @@ const withAds = (list: CoverItem[], cols: number) =>
 
 const open = (item: CoverItem) => {
   if (item.isAd) return
-  if (media.value === 'video' || media.value === 'cartoon') {
+  if (media.value === 'video' || media.value === 'cartoon' || media.value === 'douyin') {
     router.push(videoPath(item.id))
     return
   }
@@ -166,7 +184,7 @@ const open = (item: CoverItem) => {
 const load = async () => {
   loading.value = true
   try {
-    if (media.value === 'video') {
+    if (media.value === 'video' || media.value === 'douyin') {
       let sort = 1
       let cate = ''
       if (type.value === 'recommend' || type.value === 'rank' || type.value === 'hot') sort = 0
@@ -174,7 +192,8 @@ const load = async () => {
         cate = category.value
         sort = 1
       }
-      const data = await fetchVideoList(1, 40, '', sort, cate, tag.value)
+      const fetchList = media.value === 'douyin' ? fetchDouyinList : fetchVideoList
+      const data = await fetchList(1, 40, '', sort, cate, tag.value)
       items.value = withAds((data.list || []).map(toVideoCover), 2)
       return
     }
