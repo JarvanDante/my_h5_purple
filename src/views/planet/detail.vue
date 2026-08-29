@@ -33,14 +33,17 @@
       <p v-if="!comments.length" class="empty">还没有评论，来说两句吧～</p>
       <div v-for="item in comments" :key="item.id" class="thread">
         <CommentRow :item="item" @reply="startReply" @like="onCommentLike" />
-        <CommentRow
-          v-for="reply in item.replies || []"
-          :key="reply.id"
-          nested
-          :item="reply"
-          @reply="startReply"
-          @like="onCommentLike"
-        />
+        <div v-if="item.replies?.length" class="replies">
+          <CommentRow
+            v-for="reply in item.replies"
+            :key="reply.id"
+            nested
+            :thread-id="item.id"
+            :item="reply"
+            @reply="startReply"
+            @like="onCommentLike"
+          />
+        </div>
       </div>
       <p v-if="comments.length" class="end">没有更多了</p>
     </section>
@@ -398,6 +401,12 @@ onMounted(load)
 
 .thread {
   border-bottom: 1px solid #22222b;
+}
+
+.replies {
+  margin: 0 0 4px 46px;
+  padding: 0;
+  border-top: 1px solid #2a2a34;
 }
 
 .empty,

@@ -7,8 +7,7 @@
         <i v-if="item.is_vip || official" class="vip" aria-label="VIP">◆</i>
       </p>
       <p class="text">
-        <em v-if="mention" class="at">@{{ mention }}</em>
-        {{ item.content }}
+        <em v-if="mention" class="at">@{{ mention }}:</em>{{ item.content }}
       </p>
       <button v-if="pic" type="button" class="shot" @click="preview">
         <EncryptedImage :src="pic" alt="" />
@@ -51,8 +50,9 @@ const props = withDefaults(
     item: CommentItem
     nested?: boolean
     official?: boolean
+    threadId?: number
   }>(),
-  { nested: false, official: false },
+  { nested: false, official: false, threadId: 0 },
 )
 
 defineEmits<{
@@ -64,10 +64,10 @@ const name = computed(() => props.item.nickname?.trim() || (props.item.user_id ?
 const avatar = computed(() => mediaUrl(props.item.img))
 const pic = computed(() => mediaUrl(props.item.pics?.[0] || ''))
 const mention = computed(() => {
-  if (props.nested && props.item.reply_nickname && props.item.parent_id && props.item.parent_id !== props.item.root_id) {
-    return props.item.reply_nickname
-  }
-  return ''
+  const parentId = props.item.parent_id || 0
+  const rootId = props.threadId || props.item.root_id || 0
+  if (!props.nested || !parentId || !rootId || parentId === rootId) return ''
+  return props.item.reply_nickname?.trim() || (props.item.reply_user_id ? `用户${encodeId(props.item.reply_user_id)}` : '')
 })
 
 const time = computed(() => {
@@ -97,8 +97,11 @@ const preview = () => {
 }
 
 .nested {
-  padding: 10px 0 10px 8px;
-  border-top: 1px solid #22222b;
+  padding: 10px 0;
+
+  & + & {
+    border-top: 1px solid #2a2a34;
+  }
 }
 
 .face {
@@ -141,7 +144,7 @@ const preview = () => {
 .at {
   font-style: normal;
   color: #ff5c93;
-  margin-right: 4px;
+  margin-right: 2px;
 }
 
 .shot {
