@@ -67,7 +67,7 @@
             </article>
           </template>
           <template v-else>
-            <article v-for="item in shownDouyin" :key="item.id" class="post">
+            <article v-for="item in shownDouyin" :key="item.id" class="post" @click="openDouyin(item)">
               <div class="cover">
                 <EncryptedImage v-if="item.cover_url" :src="item.cover_url" alt="" />
               </div>
@@ -84,6 +84,15 @@
         </div>
       </transition>
     </div>
+
+    <DouyinFeed
+      v-if="overlay"
+      overlay
+      :items="playList"
+      :start="overlayIndex"
+      empty="暂无抖音"
+      @close="overlay = false"
+    />
   </div>
 </template>
 
@@ -93,6 +102,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
 import { fetchMyDouyin, type DouyinMineItem } from '@/api/douyin'
 import { fetchMyPosts, type PostItem } from '@/api/ops'
 import { fetchWalletBalance, type WalletBalance } from '@/api/wallet'
@@ -150,9 +160,21 @@ const goCompose = () => {
 const goWallet = () => router.push('/wallet/waters')
 const soon = () => showToast('请联系客服提现')
 const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 14) : '')
+const overlay = ref(false)
+const overlayIndex = ref(0)
+const playList = computed(() => shownDouyin.value.filter((x) => x.source_url))
 
 const open = (post: PostItem) => {
   router.push(postPath(post.id))
+}
+
+const openDouyin = (item: DouyinMineItem) => {
+  if (!item.source_url) {
+    showToast(item.status === 2 ? '已下架' : '暂无可播资源')
+    return
+  }
+  overlayIndex.value = Math.max(0, playList.value.findIndex((x) => x.id === item.id))
+  overlay.value = true
 }
 
 const load = async () => {
@@ -321,6 +343,7 @@ onMounted(load)
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid #22222b;
+  cursor: pointer;
 }
 
 .cover {
