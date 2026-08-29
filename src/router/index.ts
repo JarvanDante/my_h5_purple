@@ -191,10 +191,16 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '发布帖子' },
   },
   {
+    path: '/douyin/compose',
+    name: 'DouyinCompose',
+    component: () => import('@/views/douyin/compose.vue'),
+    meta: { title: '发布抖音' },
+  },
+  {
     path: '/creator',
     name: 'Creator',
     component: () => import('@/views/planet/creator.vue'),
-    meta: { title: '我的帖子' },
+    meta: { title: '创作中心' },
   },
   {
     path: '/planet/topics',

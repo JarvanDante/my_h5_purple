@@ -46,11 +46,22 @@
       empty="暂无抖音"
       @close="overlay = false"
     />
+
+    <button
+      v-if="feedTab === 'discover' && !overlay"
+      type="button"
+      class="fab"
+      aria-label="发布抖音"
+      @click="goCompose"
+    >
+      +
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
 import DouyinGrid from '@/components/douyin/DouyinGrid.vue'
 import { fetchDouyinCategories, fetchDouyinList, type DouyinCategory, type DouyinItem } from '@/api/douyin'
@@ -69,6 +80,7 @@ const feedTabs = [
 
 type FeedKey = (typeof feedTabs)[number]['key']
 
+const router = useRouter()
 const userStore = useUserStore()
 const feedTab = ref<FeedKey>('hot')
 const cats = ref<DouyinCategory[]>([])
@@ -94,6 +106,15 @@ const selectFeed = (key: FeedKey) => {
 
 const selectChip = (name: string) => {
   category.value = category.value === name ? '' : name
+}
+
+const goCompose = async () => {
+  try {
+    await userStore.ensureLogin()
+    router.push({ path: '/douyin/compose', query: { from: 'discover' } })
+  } catch {
+    /* 未登录已由 ensureLogin 提示 */
+  }
 }
 
 const openOverlay = (item: DouyinItem) => {
@@ -149,6 +170,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .dy-home {
   flex: 1;
   min-height: 0;
@@ -225,6 +248,29 @@ onMounted(() => {
   &.on {
     color: #fff;
     font-weight: 700;
+  }
+}
+
+.fab {
+  position: fixed;
+  right: 16px;
+  bottom: calc(#{$tabbar-height} + 20px);
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 400;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+  z-index: 20;
+}
+
+@media (min-width: $desktop-preview-min) {
+  .fab {
+    right: calc(50% - #{$phone-max-width} / 2 + 16px);
   }
 }
 </style>

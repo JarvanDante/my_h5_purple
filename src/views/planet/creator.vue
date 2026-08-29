@@ -1,7 +1,9 @@
 <template>
   <div class="page-shell sub-page creator-page">
-    <PageHeader title="我的帖子" fallback="/me">
-      <button type="button" class="post-btn" @click="goCompose">发帖</button>
+    <PageHeader :title="kind === 'douyin' ? '我的抖音' : '我的帖子'" fallback="/me">
+      <button type="button" class="post-btn" @click="goCompose">
+        {{ kind === 'douyin' ? '发布' : '发帖' }}
+      </button>
     </PageHeader>
 
     <section class="earn">
@@ -16,6 +18,19 @@
         <button type="button" @click="soon">立即提现</button>
       </div>
     </section>
+
+    <div class="kinds">
+      <button
+        v-for="item in kinds"
+        :key="item.key"
+        type="button"
+        class="kind"
+        :class="{ on: kind === item.key }"
+        @click="selectKind(item.key)"
+      >
+        {{ item.title }}
+      </button>
+    </div>
 
     <div class="tabs">
       <button
@@ -32,22 +47,40 @@
 
     <div class="inner-slide">
       <transition :name="name">
-        <div :key="tab" class="pane">
+        <div :key="`${kind}-${tab}`" class="pane">
           <p v-if="loading" class="empty">加载中…</p>
-          <p v-else-if="!shown.length" class="empty">当前页面暂无内容～</p>
-          <article v-for="post in shown" :key="post.id" class="post" @click="open(post)">
-            <div class="cover">
-              <EncryptedImage v-if="post.pics?.[0]" :src="post.pics[0]" alt="" />
-            </div>
-            <div class="meta">
-              <h3>{{ post.title || '未命名帖子' }}</h3>
-              <p class="excerpt">{{ post.content }}</p>
-              <p v-if="tab === 'reject'" class="reason">
-                失败原因：{{ post.reject_reason || '未填写' }}
-              </p>
-              <span>{{ formatTime(post.created_at) }}</span>
-            </div>
-          </article>
+          <p v-else-if="kind === 'post' && !shownPosts.length" class="empty">当前页面暂无内容～</p>
+          <p v-else-if="kind === 'douyin' && !shownDouyin.length" class="empty">当前页面暂无内容～</p>
+          <template v-if="kind === 'post'">
+            <article v-for="post in shownPosts" :key="post.id" class="post" @click="open(post)">
+              <div class="cover">
+                <EncryptedImage v-if="post.pics?.[0]" :src="post.pics[0]" alt="" />
+              </div>
+              <div class="meta">
+                <h3>{{ post.title || '未命名帖子' }}</h3>
+                <p class="excerpt">{{ post.content }}</p>
+                <p v-if="tab === 'reject'" class="reason">
+                  失败原因：{{ post.reject_reason || '未填写' }}
+                </p>
+                <span>{{ formatTime(post.created_at) }}</span>
+              </div>
+            </article>
+          </template>
+          <template v-else>
+            <article v-for="item in shownDouyin" :key="item.id" class="post">
+              <div class="cover">
+                <EncryptedImage v-if="item.cover_url" :src="item.cover_url" alt="" />
+              </div>
+              <div class="meta">
+                <h3>{{ item.title || '未命名抖音' }}</h3>
+                <p v-if="item.status === 2" class="excerpt">已下架</p>
+                <p v-if="tab === 'reject'" class="reason">
+                  失败原因：{{ item.reject_reason || '未填写' }}
+                </p>
+                <span>{{ formatTime(item.created_at) }}</span>
+              </div>
+            </article>
+          </template>
         </div>
       </transition>
     </div>
@@ -60,6 +93,7 @@ import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
+import { fetchMyDouyin, type DouyinMineItem } from '@/api/douyin'
 import { fetchMyPosts, type PostItem } from '@/api/ops'
 import { fetchWalletBalance, type WalletBalance } from '@/api/wallet'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -67,10 +101,16 @@ import { useUserStore } from '@/stores/user'
 import { postPath } from '@/utils/idcrypt'
 import { toastError } from '@/utils/request'
 
+const kinds = [
+  { key: 'post', title: '帖子' },
+  { key: 'douyin', title: '抖音' },
+] as const
+type KindKey = (typeof kinds)[number]['key']
+
 const tabs = [
-  { key: 'pass', title: '已发布', status: 1 },
-  { key: 'wait', title: '待审核', status: 0 },
-  { key: 'reject', title: '审核失败', status: 2 },
+  { key: 'pass', title: '已发布' },
+  { key: 'wait', title: '待审核' },
+  { key: 'reject', title: '审核失败' },
 ] as const
 
 const router = useRouter()
@@ -78,16 +118,35 @@ const userStore = useUserStore()
 const slide = useTabSlide(tabs.map((t) => t.key), 'pass')
 const tab = computed(() => slide.current.value)
 const name = computed(() => slide.name.value)
+const kind = ref<KindKey>((sessionStorage.getItem('h5_creator_kind') as KindKey) === 'douyin' ? 'douyin' : 'post')
 const all = ref<PostItem[]>([])
+const mine = ref<DouyinMineItem[]>([])
 const wallet = ref<WalletBalance | null>(null)
 const loading = ref(false)
-const shown = computed(() => {
-  const status = tabs.find((t) => t.key === tab.value)?.status
+const shownPosts = computed(() => {
+  const status = tab.value === 'pass' ? 1 : tab.value === 'wait' ? 0 : 2
   return all.value.filter((p) => (p.status ?? 1) === status)
+})
+const shownDouyin = computed(() => {
+  return mine.value.filter((item) => {
+    if (tab.value === 'wait') return item.status === 3
+    if (tab.value === 'reject') return item.status === 4
+    return item.status === 1 || item.status === 2
+  })
 })
 
 const select = (item: string) => slide.select(item)
-const goCompose = () => router.push({ path: '/planet/compose', query: { from: 'creator' } })
+const selectKind = (key: KindKey) => {
+  kind.value = key
+  sessionStorage.setItem('h5_creator_kind', key)
+}
+const goCompose = () => {
+  if (kind.value === 'douyin') {
+    router.push('/douyin/compose')
+    return
+  }
+  router.push({ path: '/planet/compose', query: { from: 'creator' } })
+}
 const goWallet = () => router.push('/wallet/waters')
 const soon = () => showToast('请联系客服提现')
 const formatTime = (raw: string) => (raw ? raw.replace(/^\d{4}-/, '').slice(0, 14) : '')
@@ -100,8 +159,13 @@ const load = async () => {
   loading.value = true
   try {
     await userStore.ensureLogin()
-    const [posts, bal] = await Promise.all([fetchMyPosts(1, 100), fetchWalletBalance().catch(() => null)])
+    const [posts, douyin, bal] = await Promise.all([
+      fetchMyPosts(1, 100),
+      fetchMyDouyin(1, 100).catch(() => ({ list: [] as DouyinMineItem[] })),
+      fetchWalletBalance().catch(() => null),
+    ])
     all.value = posts.list || []
+    mine.value = douyin.list || []
     wallet.value = bal
   } catch (err) {
     toastError(err)
@@ -168,6 +232,28 @@ onMounted(load)
     color: #ff3d7f;
     font-size: 11px;
     font-weight: 700;
+  }
+}
+
+.kinds {
+  display: flex;
+  gap: 8px;
+  margin: 12px 16px 0;
+}
+
+.kind {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 15px;
+  background: #191920;
+  color: #8c8c9c;
+  font-size: 13px;
+  font-weight: 600;
+
+  &.on {
+    background: #ff3d7f;
+    color: #fff;
   }
 }
 
