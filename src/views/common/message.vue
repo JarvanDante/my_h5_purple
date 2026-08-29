@@ -118,12 +118,7 @@ const unread = ref({ sys: 0, comment: 0, like: 0 })
 const tabUnread = computed(() => unread.value[tab.value] > 0)
 const empty = computed(() => (tab.value === 'sys' ? !sysList.value.length : !interactList.value.length))
 
-const select = (key: TabKey) => {
-  slide.select(key)
-  if (String(route.query.tab || '') !== key) {
-    router.replace({ path: '/message', query: { ...route.query, tab: key } })
-  }
-}
+const select = (key: TabKey) => slide.select(key)
 
 const actorName = (m: InteractItem) => m.actor_name?.trim() || (m.actor_id ? `用户${encodeId(m.actor_id)}` : '用户')
 
@@ -157,7 +152,7 @@ const load = async () => {
   sysList.value = []
   interactList.value = []
   try {
-    await userStore.ensureLogin()
+    if (!userStore.loggedIn) await userStore.ensureLogin()
     await loadUnread()
     if (tab.value === 'sys') {
       const a = await fetchMessages()
