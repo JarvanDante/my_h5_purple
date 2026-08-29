@@ -71,11 +71,11 @@
             </svg>
             <span>收藏</span>
           </button>
-          <button type="button" class="side-btn" @click="openDetail(item)">
+          <button type="button" class="side-btn" @click.stop="openComments(item)">
             <svg viewBox="0 0 28 28" fill="none">
               <path d="M6 7.5h16v10.4h-6.6L6 22V7.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
             </svg>
-            <span>评论</span>
+            <span>{{ formatViews(commentN(item)) || '0' }}</span>
           </button>
           <button type="button" class="side-btn" @click="share(item)">
             <svg viewBox="0 0 28 28" fill="none">
@@ -124,6 +124,14 @@
         </div>
       </section>
     </div>
+
+    <CommentDrawer
+      :open="drawerOpen"
+      :content-id="drawerId"
+      :count="drawerCount"
+      @close="drawerOpen = false"
+      @update:count="onDrawerCount"
+    />
   </div>
 </template>
 
@@ -134,11 +142,12 @@ import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import CommentDrawer from '@/components/douyin/CommentDrawer.vue'
 import type { DouyinItem } from '@/api/douyin'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
 import { toggleFollow } from '@/api/user'
 import { useUserStore } from '@/stores/user'
-import { formatDuration } from '@/utils/format'
+import { formatDuration, formatViews } from '@/utils/format'
 import { userPath, videoPath } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 import {
@@ -283,8 +292,27 @@ const onScroll = () => {
 
 const goVip = () => router.push('/vip')
 
-const openDetail = (item: DouyinItem) => {
-  router.push(videoPath(item.id))
+const drawerOpen = ref(false)
+const drawerId = ref(0)
+const drawerCount = ref(0)
+const commentExtra = ref(new Map<number, number>())
+
+const commentN = (item: DouyinItem) => commentExtra.value.get(item.id) ?? item.comment_count ?? 0
+
+const openComments = (item: DouyinItem) => {
+  drawerId.value = item.id
+  drawerCount.value = commentN(item)
+  drawerOpen.value = true
+}
+
+const onDrawerCount = (n: number) => {
+  drawerCount.value = n
+  if (!drawerId.value) return
+  const next = new Map(commentExtra.value)
+  next.set(drawerId.value, n)
+  commentExtra.value = next
+  const row = props.items.find((x) => x.id === drawerId.value)
+  if (row) row.comment_count = n
 }
 
 const share = async (item: DouyinItem) => {

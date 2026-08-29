@@ -150,17 +150,17 @@ export type CommentItem = {
   replies?: CommentItem[]
 }
 
-export function fetchComments(contentId: number, page = 1, size = 20, sort = 0) {
+export function fetchComments(contentId: number, page = 1, size = 20, sort = 0, mediaType = 2) {
   return request<{ list: CommentItem[]; total: number }>('/comment/list', {
     method: 'POST',
-    body: JSON.stringify({ media_type: 2, content_id: contentId, page, size, sort }),
+    body: JSON.stringify({ media_type: mediaType, content_id: contentId, page, size, sort }),
   })
 }
 
-export function addComment(contentId: number, content: string, parentId = 0, pics: string[] = []) {
+export function addComment(contentId: number, content: string, parentId = 0, pics: string[] = [], mediaType = 2) {
   return request<{ id: number; status: number }>('/comment/add', {
     method: 'POST',
-    body: JSON.stringify({ media_type: 2, content_id: contentId, parent_id: parentId, content, pics }),
+    body: JSON.stringify({ media_type: mediaType, content_id: contentId, parent_id: parentId, content, pics }),
   })
 }
 

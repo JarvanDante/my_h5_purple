@@ -10,6 +10,7 @@ declare module 'vue' {
     AdSwipe: typeof import('./src/components/AdSwipe.vue')['default']
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
     ChannelTab: typeof import('./src/components/ChannelTab.vue')['default']
+    CommentDrawer: typeof import('./src/components/douyin/CommentDrawer.vue')['default']
     CommentRow: typeof import('./src/components/CommentRow.vue')['default']
     CoverMosaic: typeof import('./src/components/CoverMosaic.vue')['default']
     DouyinFeed: typeof import('./src/components/douyin/DouyinFeed.vue')['default']
