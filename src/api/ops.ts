@@ -134,22 +134,40 @@ export type PostItem = {
 export type CommentItem = {
   id: number
   user_id: number
+  nickname?: string
+  img?: string
+  is_vip?: boolean
+  parent_id?: number
+  root_id?: number
+  reply_user_id?: number
+  reply_nickname?: string
   content: string
+  pics?: string[]
   like_count: number
+  reply_count?: number
+  liked?: boolean
   created_at: string
+  replies?: CommentItem[]
 }
 
-export function fetchComments(contentId: number, page = 1, size = 20) {
+export function fetchComments(contentId: number, page = 1, size = 20, sort = 0) {
   return request<{ list: CommentItem[]; total: number }>('/comment/list', {
     method: 'POST',
-    body: JSON.stringify({ media_type: 2, content_id: contentId, page, size }),
+    body: JSON.stringify({ media_type: 2, content_id: contentId, page, size, sort }),
   })
 }
 
-export function addComment(contentId: number, content: string) {
+export function addComment(contentId: number, content: string, parentId = 0, pics: string[] = []) {
   return request<{ id: number; status: number }>('/comment/add', {
     method: 'POST',
-    body: JSON.stringify({ media_type: 2, content_id: contentId, content }),
+    body: JSON.stringify({ media_type: 2, content_id: contentId, parent_id: parentId, content, pics }),
+  })
+}
+
+export function likeComment(id: number, flag: boolean) {
+  return request<{ liked: boolean; like_count: number }>('/comment/like', {
+    method: 'POST',
+    body: JSON.stringify({ id, flag }),
   })
 }
 
