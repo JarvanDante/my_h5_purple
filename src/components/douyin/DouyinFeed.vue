@@ -44,7 +44,7 @@
         <aside class="side">
           <div v-if="item.up_user_id" class="up">
             <button type="button" class="up-face" @click.stop="goUp(item)">
-              <UserAvatar :src="mediaUrl(item.up_avatar)" :size="46" :fallback="handle(item)" />
+              <UserAvatar :src="upAvatar(item)" :size="46" :sex="upSex(item)" :fallback="handle(item)" />
             </button>
             <button v-if="showPlus(item)" type="button" class="plus" aria-label="关注" @click.stop="onFollow(item)">+</button>
           </div>
@@ -208,9 +208,23 @@ const tagsOf = (item: DouyinItem) => {
   return raw.map((s) => s.trim()).filter(Boolean).slice(0, 4)
 }
 
+const isMine = (item: DouyinItem) => {
+  const uid = item.up_user_id || 0
+  return uid > 0 && uid === (userStore.user?.id || 0)
+}
+
+const upAvatar = (item: DouyinItem) => {
+  if (item.up_avatar) return mediaUrl(item.up_avatar)
+  if (isMine(item)) return mediaUrl(userStore.user?.img)
+  return ''
+}
+
+const upSex = (item: DouyinItem) => (isMine(item) ? userStore.user?.sex : 0)
+
 const handle = (item: DouyinItem) => {
   const nick = (item.up_nickname || '').trim()
   if (nick) return nick
+  if (isMine(item) && userStore.user?.nickname) return userStore.user.nickname
   return (item.title || '抖音').replace(/\s+/g, '').slice(0, 8) || '抖音'
 }
 
