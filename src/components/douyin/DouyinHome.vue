@@ -84,7 +84,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const feedTab = ref<FeedKey>('hot')
 const cats = ref<DouyinCategory[]>([])
-const category = ref('发现')
+const category = ref('')
 const items = ref<DouyinItem[]>([])
 const loading = ref(false)
 const overlay = ref(false)
@@ -151,9 +151,7 @@ const loadList = async () => {
       return
     }
     const sort = feedTab.value === 'hot' ? 0 : 1
-    // 「发现」是导航，不是作品分类；按分类名过滤会把只打了「甜妹」的用户稿滤掉。
-    const cate =
-      feedTab.value === 'discover' && category.value && category.value !== '发现' ? category.value : ''
+    const cate = feedTab.value === 'discover' ? category.value : ''
     const data = await fetchDouyinList(1, 24, '', sort, cate)
     items.value = data.list || []
   } catch (err) {
