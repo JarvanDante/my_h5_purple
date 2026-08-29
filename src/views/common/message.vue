@@ -14,6 +14,7 @@
         @click="select(item.key)"
       >
         {{ item.label }}
+        <i v-if="unread[item.key] > 0" class="count">{{ badge(unread[item.key]) }}</i>
       </button>
     </div>
 
@@ -125,6 +126,7 @@ const tabUnread = computed(() => unread.value[tab.value] > 0)
 const empty = computed(() => (tab.value === 'sys' ? !sysList.value.length : !interactList.value.length))
 
 const select = (key: TabKey) => slide.select(key)
+const badge = (n: number) => (n > 99 ? '99+' : String(n))
 
 const actorName = (m: InteractItem) => m.actor_name?.trim() || (m.actor_id ? `用户${encodeId(m.actor_id)}` : '用户')
 
@@ -254,7 +256,7 @@ onMounted(load)
   color: #8c8c9c;
   font-size: 15px;
   font-weight: 600;
-  padding: 10px 8px 12px;
+  padding: 10px 14px 12px 8px;
   position: relative;
 
   &.active {
@@ -273,6 +275,23 @@ onMounted(load)
       transform: translateX(-50%);
     }
   }
+}
+
+.count {
+  position: absolute;
+  top: 4px;
+  right: 0;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: #ff3d7f;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  font-style: normal;
+  line-height: 16px;
+  text-align: center;
 }
 
 .inner-slide {
