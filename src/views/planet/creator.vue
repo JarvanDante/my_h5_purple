@@ -237,23 +237,36 @@ onMounted(load)
 
 .kinds {
   display: flex;
-  gap: 8px;
-  margin: 12px 16px 0;
+  align-items: stretch;
+  margin-top: 10px;
+  border-bottom: 1px solid #2a2a34;
 }
 
 .kind {
-  height: 30px;
-  padding: 0 14px;
+  flex: 1;
+  height: 46px;
   border: 0;
-  border-radius: 15px;
-  background: #191920;
+  background: transparent;
   color: #8c8c9c;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 600;
+  position: relative;
 
   &.on {
-    background: #ff3d7f;
-    color: #fff;
+    color: #f5f5f8;
+    font-weight: 800;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 28px;
+      height: 3px;
+      border-radius: 2px;
+      background: #ff3d7f;
+      transform: translateX(-50%);
+    }
   }
 }
 
