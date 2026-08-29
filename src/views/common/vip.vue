@@ -32,7 +32,7 @@
         <span v-if="current === plan.id" class="timer">倒计时 {{ clock.h }}:{{ clock.m }}:{{ clock.s }}</span>
       </button>
     </section>
-    <p v-else class="empty">暂无套餐，请在子后台「会员等级」配置</p>
+    <p v-else class="empty">暂无等级，请在子后台「VIP等级」配置</p>
 
     <section class="priv">
       <h3>专享特权</h3>
@@ -75,14 +75,24 @@ const clock = ref({ h: '00', m: '00', s: '00' })
 let timer = 0
 
 const avatarSrc = computed(() => mediaUrl(userStore.user?.img))
-const isVip = computed(() => Boolean(userStore.user?.group_name && userStore.user.group_name !== '普通用户'))
+const isVip = computed(() => {
+  const name = userStore.user?.group_name || ''
+  if (!name || name === '普通用户') return false
+  const end = Number(userStore.user?.group_end_time || 0)
+  return !end || end * 1000 > Date.now()
+})
 const picked = computed(() => list.value.find((p) => p.id === current.value))
 const expireLabel = computed(() => {
-  const ext = userStore.user?.ext || {}
-  const raw = [ext.vip_expire, ext.expire_at, ext.vip_end_at, ext.vip_at].find((v) => typeof v === 'string' && v)
-  if (raw) return `到期时间: ${raw}`
-  if (isVip.value) return `当前：${userStore.user?.group_name}`
-  return '开通后畅享全站内容'
+  if (!isVip.value) return '开通后畅享全站内容'
+  const name = userStore.user?.group_name || 'VIP'
+  const end = Number(userStore.user?.group_end_time || 0)
+  if (end > 0) {
+    const d = new Date(end * 1000)
+    const mm = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return `VIP等级：${name}　${d.getFullYear()}-${mm}-${dd}到期`
+  }
+  return `VIP等级：${name}`
 })
 const payLabel = computed(() => {
   if (loading.value) return '开通中…'
