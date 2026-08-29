@@ -19,7 +19,30 @@
       </button>
     </section>
 
-    <div class="feed">
+    <nav class="tabs">
+      <button
+        v-for="item in tabs"
+        :key="item.key"
+        type="button"
+        class="tab"
+        :class="{ on: tab === item.key }"
+        @click="tab = item.key"
+      >
+        {{ item.label }}
+      </button>
+    </nav>
+
+    <div v-show="tab === 'douyin'" class="pane">
+      <DouyinGrid
+        :items="douyinList"
+        :loading="loadingDouyin"
+        empty="暂无抖音"
+        @select="openDouyin"
+      />
+      <p v-if="douyinList.length && !loadingDouyin" class="end">没有更多了</p>
+    </div>
+
+    <div v-show="tab === 'post'" class="feed">
       <p v-if="!list.length" class="empty">暂无帖子</p>
       <PostCard
         v-for="post in list"
@@ -35,6 +58,15 @@
       />
       <p v-if="list.length" class="end">没有更多了</p>
     </div>
+
+    <DouyinFeed
+      v-if="overlay"
+      overlay
+      :items="douyinList"
+      :start="overlayIndex"
+      empty="暂无抖音"
+      @close="overlay = false"
+    />
   </div>
 </template>
 
@@ -45,12 +77,22 @@ import { showToast } from 'vant'
 import UserAvatar from '@/components/UserAvatar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PostCard from '@/components/PostCard.vue'
+import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
+import DouyinGrid from '@/components/douyin/DouyinGrid.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
+import { fetchDouyinList, type DouyinItem } from '@/api/douyin'
 import { fetchPostList, type PostItem } from '@/api/ops'
 import { fetchUserHome, toggleFollow, type PublicUser } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { encodeId, postPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
+
+const tabs = [
+  { key: 'douyin', label: '抖音' },
+  { key: 'post', label: '帖子' },
+] as const
+
+type TabKey = (typeof tabs)[number]['key']
 
 const route = useRoute()
 const router = useRouter()
@@ -59,6 +101,11 @@ const user = ref<PublicUser | null>(null)
 const followed = ref(false)
 const list = ref<PostItem[]>([])
 const liked = ref(new Set<number>())
+const douyinList = ref<DouyinItem[]>([])
+const loadingDouyin = ref(false)
+const overlay = ref(false)
+const overlayIndex = ref(0)
+const tab = ref<TabKey>('douyin')
 const uid = computed(() => routeId(route.params.id))
 const mine = computed(() => uid.value > 0 && uid.value === (userStore.user?.id || 0))
 const name = computed(() => user.value?.nickname?.trim() || (uid.value ? `用户${encodeId(uid.value)}` : ''))
@@ -66,17 +113,30 @@ const avatarSrc = computed(() => mediaUrl(user.value?.img))
 
 const goPost = (id: number) => router.push(postPath(id))
 
+const openDouyin = (item: DouyinItem) => {
+  overlayIndex.value = Math.max(0, douyinList.value.findIndex((x) => x.id === item.id))
+  overlay.value = true
+}
+
 const load = async () => {
   if (!uid.value) return
+  overlay.value = false
   try {
     await userStore.ensureLogin()
     const home = await fetchUserHome(uid.value)
     user.value = home.user
     followed.value = home.is_followed
-    const data = await fetchPostList('new', 1, 20, uid.value)
-    list.value = data.list || []
+    loadingDouyin.value = true
+    const [posts, douyin] = await Promise.all([
+      fetchPostList('new', 1, 20, uid.value),
+      fetchDouyinList(1, 24, '', 1, '', '', 0, uid.value),
+    ])
+    list.value = posts.list || []
+    douyinList.value = douyin.list || []
   } catch (err) {
     toastError(err)
+  } finally {
+    loadingDouyin.value = false
   }
 }
 
@@ -185,8 +245,47 @@ onMounted(load)
   }
 }
 
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  margin-top: 4px;
+  padding: 6px 16px 0;
+}
+
+.tab {
+  appearance: none;
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 12px 4px 14px;
+
+  &.on {
+    color: #fff;
+    font-weight: 800;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      width: 18px;
+      height: 3px;
+      border-radius: 99px;
+      background: #fff;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+.pane,
 .feed {
-  margin-top: 12px;
+  margin-top: 4px;
   background: #0d0d12;
   padding-bottom: 24px;
 }
