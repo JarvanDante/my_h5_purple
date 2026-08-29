@@ -152,7 +152,7 @@ const routes: RouteRecordRaw[] = [
     path: '/message',
     name: 'Message',
     component: () => import('@/views/common/message.vue'),
-    meta: { title: '站内消息' },
+    meta: { title: '消息' },
   },
   {
     path: '/feedback',

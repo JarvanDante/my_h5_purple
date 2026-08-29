@@ -239,7 +239,40 @@ export function fetchMessages(page = 1, size = 20) {
 }
 
 export function fetchUnreadCount() {
-  return request<{ count: number }>('/message/unread')
+  return request<{ count: number; sys?: number; comment?: number; like?: number }>('/message/unread')
+}
+
+export type InteractItem = {
+  id: number
+  channel: string
+  sub_type: string
+  is_read: boolean
+  created_at: string
+  actor_id: number
+  actor_name: string
+  actor_avatar: string
+  actor_sex?: number
+  actor_count: number
+  media_type: number
+  content_id: number
+  object_title: string
+  target_type: string
+  comment_id: number
+  root_comment_id: number
+  snippet: string
+}
+
+export function fetchInteractMessages(channel: 'comment' | 'like', page = 1, size = 20) {
+  return request<{ list: InteractItem[]; total: number }>(
+    `/message/interact?channel=${channel}&page=${page}&size=${size}`,
+  )
+}
+
+export function readInteractMessage(id = 0, all = false, channel = '') {
+  return request<Record<string, never>>('/message/interact/read', {
+    method: 'POST',
+    body: JSON.stringify({ id, all, channel }),
+  })
 }
 
 export type FeedbackItem = {

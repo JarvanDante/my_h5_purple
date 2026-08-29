@@ -1,68 +1,218 @@
 <template>
   <div class="page-shell sub-page msg-page">
-    <PageHeader title="站内消息" fallback="/me">
-      <button v-if="unread" type="button" class="read-btn" @click="readAll">全部已读</button>
+    <PageHeader title="消息" fallback="/me">
+      <button v-if="tabUnread" type="button" class="read-btn" @click="readAll">全部已读</button>
     </PageHeader>
 
-    <p v-if="!list.length" class="empty">暂无消息</p>
-    <button
-      v-for="m in list"
-      :key="m.id"
-      type="button"
-      class="row"
-      :class="{ unread: !m.is_read }"
-      @click="open(m)"
-    >
-      <i v-if="!m.is_read" class="dot" />
-      <div class="meta">
-        <b>{{ m.title }}</b>
-        <p>{{ m.content }}</p>
-        <span>{{ m.created_at }}</span>
-      </div>
-    </button>
+    <div class="tabs">
+      <button
+        v-for="item in tabs"
+        :key="item.key"
+        type="button"
+        class="tab"
+        :class="{ active: tab === item.key }"
+        @click="select(item.key)"
+      >
+        {{ item.label }}
+      </button>
+    </div>
+
+    <div class="inner-slide">
+      <transition :name="name">
+        <div :key="tab" class="pane">
+          <p v-if="loading" class="empty">加载中…</p>
+          <p v-else-if="empty" class="empty">当前页面暂无内容～</p>
+
+          <template v-else-if="tab === 'sys'">
+            <button
+              v-for="m in sysList"
+              :key="m.id"
+              type="button"
+              class="card"
+              :class="{ unread: !m.is_read }"
+              @click="openSys(m)"
+            >
+              <i v-if="!m.is_read" class="dot" />
+              <div class="meta">
+                <b>{{ m.title }}</b>
+                <p>{{ m.content }}</p>
+                <span>{{ m.created_at }}</span>
+              </div>
+            </button>
+          </template>
+
+          <template v-else>
+            <button
+              v-for="m in interactList"
+              :key="m.id"
+              type="button"
+              class="row"
+              :class="{ unread: !m.is_read }"
+              @click="openInteract(m)"
+            >
+              <UserAvatar
+                :src="mediaUrl(m.actor_avatar)"
+                :sex="m.actor_sex"
+                :size="44"
+                :fallback="actorName(m)"
+              />
+              <div class="body">
+                <div class="line">
+                  <strong>{{ actorName(m) }}</strong>
+                  <em>{{ actionText(m) }}</em>
+                </div>
+                <p v-if="m.snippet">{{ m.snippet }}</p>
+                <span>{{ m.created_at }}</span>
+              </div>
+              <i v-if="!m.is_read" class="dot side" />
+            </button>
+          </template>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
-import { fetchMessages, fetchUnreadCount, readMessage, type MessageItem } from '@/api/ops'
+import UserAvatar from '@/components/UserAvatar.vue'
+import {
+  fetchInteractMessages,
+  fetchMessages,
+  fetchUnreadCount,
+  readInteractMessage,
+  readMessage,
+  type InteractItem,
+  type MessageItem,
+} from '@/api/ops'
+import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
-import { toastError } from '@/utils/request'
+import { encodeId, postPath } from '@/utils/idcrypt'
+import { mediaUrl, toastError } from '@/utils/request'
 
+const tabs = [
+  { key: 'comment', label: '评论' },
+  { key: 'like', label: '点赞' },
+  { key: 'sys', label: '站内消息' },
+] as const
+
+type TabKey = (typeof tabs)[number]['key']
+
+const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
-const list = ref<MessageItem[]>([])
-const unread = ref(0)
+const keys = tabs.map((t) => t.key)
+const initial = keys.includes(String(route.query.tab) as TabKey) ? String(route.query.tab) : 'comment'
+const slide = useTabSlide(keys, initial)
+const tab = computed(() => slide.current.value as TabKey)
+const name = computed(() => slide.name.value)
 
-const load = async () => {
-  const [a, b] = await Promise.all([fetchMessages(), fetchUnreadCount()])
-  list.value = a.list || []
-  unread.value = b.count || 0
+const sysList = ref<MessageItem[]>([])
+const interactList = ref<InteractItem[]>([])
+const loading = ref(false)
+const unread = ref({ sys: 0, comment: 0, like: 0 })
+
+const tabUnread = computed(() => unread.value[tab.value] > 0)
+const empty = computed(() => (tab.value === 'sys' ? !sysList.value.length : !interactList.value.length))
+
+const select = (key: TabKey) => {
+  slide.select(key)
+  if (String(route.query.tab || '') !== key) {
+    router.replace({ path: '/message', query: { ...route.query, tab: key } })
+  }
 }
 
-const open = async (m: MessageItem) => {
+const actorName = (m: InteractItem) => m.actor_name?.trim() || (m.actor_id ? `用户${encodeId(m.actor_id)}` : '用户')
+
+const actionText = (m: InteractItem) => {
+  const n = m.actor_count || 1
+  switch (m.sub_type) {
+    case 'reply':
+      return '回复了你的评论'
+    case 'mention':
+      return '回复了你'
+    case 'comment_like':
+      return n > 1 ? `等${n}人赞了你的评论` : '赞了你的评论'
+    case 'post_like':
+      return n > 1 ? `等${n}人赞了你的帖子` : '赞了你的帖子'
+    default:
+      return '评论了你的帖子'
+  }
+}
+
+const loadUnread = async () => {
+  const b = await fetchUnreadCount()
+  unread.value = {
+    sys: b.sys || 0,
+    comment: b.comment || 0,
+    like: b.like || 0,
+  }
+}
+
+const load = async () => {
+  loading.value = true
+  sysList.value = []
+  interactList.value = []
+  try {
+    await userStore.ensureLogin()
+    await loadUnread()
+    if (tab.value === 'sys') {
+      const a = await fetchMessages()
+      sysList.value = a.list || []
+    } else {
+      const a = await fetchInteractMessages(tab.value)
+      interactList.value = a.list || []
+    }
+  } catch (err) {
+    toastError(err)
+  } finally {
+    loading.value = false
+  }
+}
+
+const openSys = async (m: MessageItem) => {
   if (!m.is_read) {
     await readMessage(m.id)
     m.is_read = true
-    unread.value = Math.max(0, unread.value - 1)
+    unread.value.sys = Math.max(0, unread.value.sys - 1)
   }
   showToast(m.content || m.title)
 }
 
-const readAll = async () => {
-  await readMessage(0, true)
-  await load()
+const openInteract = async (m: InteractItem) => {
+  if (!m.is_read) {
+    await readInteractMessage(m.id)
+    m.is_read = true
+    unread.value[tab.value === 'like' ? 'like' : 'comment'] = Math.max(
+      0,
+      unread.value[tab.value === 'like' ? 'like' : 'comment'] - 1,
+    )
+  }
+  if (m.media_type === 2 && m.content_id) {
+    router.push(postPath(m.content_id))
+    return
+  }
+  showToast(m.snippet || actionText(m))
 }
 
-onMounted(async () => {
+const readAll = async () => {
   try {
-    await userStore.ensureLogin()
+    if (tab.value === 'sys') {
+      await readMessage(0, true)
+    } else {
+      await readInteractMessage(0, true, tab.value)
+    }
     await load()
   } catch (err) {
     toastError(err)
   }
-})
+}
+
+watch(tab, load)
+onMounted(load)
 </script>
 
 <style scoped lang="scss">
@@ -72,7 +222,6 @@ onMounted(async () => {
   background: #0d0d12;
   color: #f5f5f8;
   min-height: 100%;
-  padding: 8px 16px 24px;
 }
 
 .read-btn {
@@ -84,6 +233,52 @@ onMounted(async () => {
   padding: 0 8px;
 }
 
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 4px 8px 0;
+  border-bottom: 1px solid #22222b;
+}
+
+.tab {
+  border: 0;
+  background: transparent;
+  color: #8c8c9c;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 10px 8px 12px;
+  position: relative;
+
+  &.active {
+    color: #f5f5f8;
+    font-weight: 800;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 22px;
+      height: 3px;
+      border-radius: 2px;
+      background: #ff3d7f;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+.inner-slide {
+  position: relative;
+  overflow: hidden;
+  min-height: 50vh;
+}
+
+.pane {
+  padding: 8px 16px 24px;
+}
+
 .empty {
   padding: 64px 16px;
   text-align: center;
@@ -91,7 +286,7 @@ onMounted(async () => {
   color: #8c8c9c;
 }
 
-.row {
+.card {
   display: flex;
   align-items: flex-start;
   gap: 10px;
@@ -105,6 +300,19 @@ onMounted(async () => {
   color: inherit;
 }
 
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 12px 0;
+  border-bottom: 1px solid #1c1c24;
+  color: inherit;
+}
+
 .dot {
   width: 8px;
   height: 8px;
@@ -112,6 +320,10 @@ onMounted(async () => {
   border-radius: 50%;
   background: #ff3d7f;
   flex-shrink: 0;
+
+  &.side {
+    margin-top: 18px;
+  }
 }
 
 .meta {
@@ -139,7 +351,46 @@ onMounted(async () => {
   }
 }
 
-.unread b {
+.body {
+  min-width: 0;
+  flex: 1;
+
+  .line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  strong {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  em {
+    font-style: normal;
+    font-size: 13px;
+    color: #8c8c9c;
+  }
+
+  p {
+    margin: 4px 0 2px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #c8c8d0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  span {
+    font-size: 11px;
+    color: #8c8c9c;
+  }
+}
+
+.unread .meta b,
+.unread .body strong {
   color: #ff6699;
 }
 </style>
