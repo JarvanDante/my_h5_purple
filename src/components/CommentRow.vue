@@ -103,8 +103,20 @@ const preview = async () => {
 
 .focus {
   border-radius: 10px;
-  outline: 1px solid rgba(255, 61, 127, 0.55);
-  background: rgba(255, 61, 127, 0.08);
+  animation: locate-flash 0.55s ease-in-out 3;
+}
+
+@keyframes locate-flash {
+  0%,
+  100% {
+    outline: 1px solid transparent;
+    background: transparent;
+  }
+
+  50% {
+    outline: 1px solid rgba(255, 61, 127, 0.7);
+    background: rgba(255, 61, 127, 0.18);
+  }
 }
 
 .nested {
