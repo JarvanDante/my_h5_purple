@@ -12,6 +12,7 @@ export type UserInfo = {
   balance: number
   credit: number
   group_name: string
+  group_end_time?: number
   fans: number
   follow: number
   has_password?: boolean

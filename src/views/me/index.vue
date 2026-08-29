@@ -71,14 +71,14 @@
       <button type="button" class="hero vip" @click="go('/vip')">
         <div>
           <strong>会员中心</strong>
-          <p>VIP CENTER</p>
+          <p>{{ vipCardText }}</p>
         </div>
         <span class="hero-ico" v-html="iconCrown" />
       </button>
       <button type="button" class="hero wallet" @click="go('/wallet')">
         <div>
           <strong>金币钱包</strong>
-          <p>COIN WALLET</p>
+          <p>余额 {{ coinText }}</p>
         </div>
         <span class="hero-ico" v-html="iconCoin" />
       </button>
@@ -119,7 +119,23 @@ const userStore = useUserStore()
 const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
-const isVip = computed(() => Boolean(user.value?.group_name && user.value.group_name !== '普通用户'))
+const isVip = computed(() => {
+  const name = user.value?.group_name || ''
+  if (!name || name === '普通用户') return false
+  const end = Number(user.value?.group_end_time || 0)
+  return !end || end * 1000 > Date.now()
+})
+const vipCardText = computed(() => {
+  if (!isVip.value) return '开通会员'
+  const name = user.value?.group_name || 'VIP'
+  const end = Number(user.value?.group_end_time || 0)
+  if (!end) return name
+  return `${name}${new Date(end * 1000).getFullYear()}-`
+})
+const coinText = computed(() => {
+  const n = Number(user.value?.balance ?? 0)
+  return Number.isInteger(n) ? String(n) : n.toFixed(2)
+})
 const clock = ref({ h: '00', m: '00', s: '00' })
 const unread = ref(0)
 let timer = 0
@@ -537,9 +553,9 @@ onUnmounted(() => {
 
   p {
     margin-top: 4px;
-    font-size: 10px;
-    letter-spacing: 0.4px;
-    opacity: 0.55;
+    font-size: 12px;
+    letter-spacing: 0;
+    opacity: 0.82;
   }
 
   &.vip {
