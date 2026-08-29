@@ -64,6 +64,12 @@
                 <p v-if="m.snippet">{{ m.snippet }}</p>
                 <span>{{ m.created_at }}</span>
               </div>
+              <span class="view" aria-hidden="true">
+                查看
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M9 5.5 15.5 12 9 18.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </span>
               <i v-if="!m.is_read" class="dot side" />
             </button>
           </template>
@@ -187,7 +193,12 @@ const openInteract = async (m: InteractItem) => {
     )
   }
   if (m.media_type === 2 && m.content_id) {
-    router.push(postPath(m.content_id))
+    router.push(
+      postPath(m.content_id, {
+        comment: m.comment_id || undefined,
+        page: m.page || 1,
+      }),
+    )
     return
   }
   showToast(m.snippet || actionText(m))
@@ -381,6 +392,22 @@ onMounted(load)
   span {
     font-size: 11px;
     color: #8c8c9c;
+  }
+}
+
+.view {
+  flex-shrink: 0;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  color: #ff3d7f;
+  font-weight: 700;
+
+  svg {
+    width: 14px;
+    height: 14px;
   }
 }
 

@@ -49,8 +49,16 @@ export function comicReadPath(comicId: number | string, chapterId: number | stri
   return `/comic/${encodeId(comicId)}/read/${encodeId(chapterId)}`
 }
 
-export function postPath(id: number | string) {
-  return `/planet/${encodeId(id)}`
+export function postPath(
+  id: number | string,
+  extra?: { comment?: number; page?: number },
+) {
+  const path = `/planet/${encodeId(id)}`
+  const q = new URLSearchParams()
+  if (extra?.comment) q.set('comment', String(extra.comment))
+  if (extra?.page && extra.page > 1) q.set('page', String(extra.page))
+  const qs = q.toString()
+  return qs ? `${path}?${qs}` : path
 }
 
 export function userPath(id: number | string) {

@@ -260,6 +260,9 @@ export type InteractItem = {
   comment_id: number
   root_comment_id: number
   snippet: string
+  page?: number
+  page_size?: number
+  deleted?: boolean
 }
 
 export function fetchInteractMessages(channel: 'comment' | 'like', page = 1, size = 20) {

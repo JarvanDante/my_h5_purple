@@ -1,5 +1,5 @@
 <template>
-  <article class="cmt" :class="{ nested, official }">
+  <article :id="domId" class="cmt" :class="{ nested, official, focus }">
     <UserAvatar class="face" :src="avatar" :size="nested ? 28 : 36" :fallback="name" />
     <div class="body">
       <p class="who">
@@ -52,8 +52,9 @@ const props = withDefaults(
     nested?: boolean
     official?: boolean
     threadId?: number
+    focus?: boolean
   }>(),
-  { nested: false, official: false, threadId: 0 },
+  { nested: false, official: false, threadId: 0, focus: false },
 )
 
 defineEmits<{
@@ -61,6 +62,7 @@ defineEmits<{
   like: [item: CommentItem]
 }>()
 
+const domId = computed(() => (props.item.id > 0 ? `comment-${props.item.id}` : undefined))
 const name = computed(() => props.item.nickname?.trim() || (props.item.user_id ? `用户${encodeId(props.item.user_id)}` : '用户'))
 const avatar = computed(() => mediaUrl(props.item.img))
 const pic = computed(() => mediaUrl(props.item.pics?.[0] || ''))
@@ -97,6 +99,12 @@ const preview = async () => {
   display: flex;
   gap: 10px;
   padding: 12px 0;
+}
+
+.focus {
+  border-radius: 10px;
+  outline: 1px solid rgba(255, 61, 127, 0.55);
+  background: rgba(255, 61, 127, 0.08);
 }
 
 .nested {

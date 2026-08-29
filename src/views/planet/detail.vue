@@ -32,7 +32,7 @@
 
       <p v-if="!comments.length" class="empty">还没有评论，来说两句吧～</p>
       <div v-for="item in comments" :key="item.id" class="thread">
-        <CommentRow :item="item" @reply="startReply" @like="onCommentLike" />
+        <CommentRow :item="item" :focus="item.id === focusId" @reply="startReply" @like="onCommentLike" />
         <div v-if="item.replies?.length" class="replies">
           <CommentRow
             v-for="reply in item.replies"
@@ -40,6 +40,7 @@
             nested
             :thread-id="item.id"
             :item="reply"
+            :focus="reply.id === focusId"
             @reply="startReply"
             @like="onCommentLike"
           />
@@ -142,17 +143,35 @@ const busy = ref(false)
 const showEmoji = ref(false)
 const inputEl = ref<HTMLInputElement | null>(null)
 const replyTo = ref<{ id: number; nickname: string } | null>(null)
+const focusId = ref(0)
+const commentPage = ref(1)
 const myId = computed(() => userStore.user?.id || 0)
 const goUser = (userId: number) => router.push(userPath(userId))
+const jumpSize = 15
 
 const displayName = (item: CommentItem) => item.nickname?.trim() || `用户${encodeId(item.user_id)}`
 
 const loadComments = async () => {
   const id = post.value?.id || routeId(route.params.id)
   if (!id) return
-  const c = await fetchComments(id, 1, 40, sort.value)
+  const locating = focusId.value > 0
+  const page = locating ? commentPage.value : 1
+  const size = locating ? jumpSize : 40
+  const c = await fetchComments(id, page, size, locating ? 0 : sort.value)
   comments.value = c.list || []
   total.value = c.total || comments.value.length
+}
+
+const scrollToComment = async () => {
+  const id = focusId.value
+  if (!id) return
+  await nextTick()
+  const el = document.getElementById(`comment-${id}`)
+  if (!el) {
+    showToast('该评论已删除')
+    return
+  }
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
 }
 
 const load = async () => {
@@ -161,7 +180,15 @@ const load = async () => {
   try {
     const data = await fetchPostDetail(id)
     post.value = data.post
+    const qComment = Number(route.query.comment || 0)
+    const qPage = Number(route.query.page || 1)
+    if (qComment > 0) {
+      focusId.value = qComment
+      commentPage.value = qPage > 0 ? qPage : 1
+      sort.value = 0
+    }
     await loadComments()
+    if (qComment > 0) await scrollToComment()
     if (getToken() && post.value) {
       await userStore.ensureLogin()
       const [follows, likes] = await Promise.all([
@@ -177,8 +204,10 @@ const load = async () => {
 }
 
 const setSort = async (next: number) => {
-  if (sort.value === next) return
+  if (sort.value === next && !focusId.value) return
   sort.value = next
+  focusId.value = 0
+  commentPage.value = 1
   try {
     await loadComments()
   } catch (err) {
