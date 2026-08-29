@@ -77,7 +77,7 @@
             </svg>
             <span>{{ formatViews(commentN(item)) || '0' }}</span>
           </button>
-          <button type="button" class="side-btn" @click="share(item)">
+          <button type="button" class="side-btn" @click.stop="openShare(item)">
             <svg viewBox="0 0 28 28" fill="none">
               <path d="M8 14h12M16 10l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
@@ -132,6 +132,7 @@
       @close="drawerOpen = false"
       @update:count="onDrawerCount"
     />
+    <ShareSheet :open="!!shareItem" :item="shareItem" @close="shareItem = null" />
   </div>
 </template>
 
@@ -143,12 +144,13 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import CommentDrawer from '@/components/douyin/CommentDrawer.vue'
+import ShareSheet from '@/components/douyin/ShareSheet.vue'
 import type { DouyinItem } from '@/api/douyin'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
 import { toggleFollow } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { formatDuration, formatViews } from '@/utils/format'
-import { userPath, videoPath } from '@/utils/idcrypt'
+import { userPath } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 import {
   applyMark,
@@ -315,18 +317,10 @@ const onDrawerCount = (n: number) => {
   if (row) row.comment_count = n
 }
 
-const share = async (item: DouyinItem) => {
-  const url = `${location.origin}${videoPath(item.id)}`
-  try {
-    if (navigator.share) {
-      await navigator.share({ title: item.title, url })
-      return
-    }
-    await navigator.clipboard.writeText(url)
-    showToast('链接已复制')
-  } catch {
-    showToast('分享取消')
-  }
+const shareItem = ref<DouyinItem | null>(null)
+
+const openShare = (item: DouyinItem) => {
+  shareItem.value = item
 }
 
 const ensureAuth = async () => {
