@@ -42,6 +42,7 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
 import type { CommentItem } from '@/api/ops'
+import { resolveMediaSrc } from '@/utils/aesbnc'
 import { encodeId } from '@/utils/idcrypt'
 import { mediaUrl } from '@/utils/request'
 
@@ -84,8 +85,10 @@ const time = computed(() => {
   return `${mm}-${dd} ${hh}:${mi}`
 })
 
-const preview = () => {
-  if (pic.value) showImagePreview([pic.value])
+const preview = async () => {
+  if (!pic.value) return
+  const src = await resolveMediaSrc(pic.value)
+  if (src) showImagePreview({ images: [src] })
 }
 </script>
 
