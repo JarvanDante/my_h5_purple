@@ -60,19 +60,31 @@ let timer = 0
 let resumeTimer = 0
 let anim = 0
 let jumping = false
+let sliding = false
 
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
 
+const atClone = () => {
+  const el = track.value
+  const n = props.items.length
+  if (!el?.clientWidth || n <= 1) return false
+  return el.scrollLeft >= n * el.clientWidth - 4
+}
+
 const onScroll = () => {
   const el = track.value
-  if (jumping || !el?.clientWidth) return
-  index.value = Math.round(el.scrollLeft / el.clientWidth)
+  if (sliding || jumping || !el?.clientWidth) return
+  const n = props.items.length
+  const i = Math.round(el.scrollLeft / el.clientWidth)
+  index.value = n && i >= n ? n - 1 : i
 }
 
 const snapHome = () => {
   const el = track.value
   if (!el) return
   jumping = true
+  sliding = false
+  window.cancelAnimationFrame(anim)
   el.style.scrollSnapType = 'none'
   el.style.scrollBehavior = 'auto'
   el.scrollTo({ left: 0, behavior: 'auto' })
@@ -85,13 +97,15 @@ const snapHome = () => {
 }
 
 const settleClone = () => {
-  if (props.items.length > 1 && index.value >= props.items.length) snapHome()
+  if (sliding || jumping) return
+  if (atClone()) snapHome()
 }
 
 const scrollToIndex = (next: number) => {
   const el = track.value
   if (!el?.clientWidth) return
   window.cancelAnimationFrame(anim)
+  sliding = true
   const from = el.scrollLeft
   const to = next * el.clientWidth
   const started = performance.now()
@@ -103,8 +117,12 @@ const scrollToIndex = (next: number) => {
       anim = requestAnimationFrame(step)
       return
     }
+    sliding = false
+    if (next >= props.items.length) {
+      snapHome()
+      return
+    }
     el.style.scrollSnapType = ''
-    if (next >= props.items.length) settleClone()
   }
   anim = requestAnimationFrame(step)
 }
@@ -112,9 +130,10 @@ const scrollToIndex = (next: number) => {
 const goNext = () => {
   const el = track.value
   const n = props.items.length
-  if (jumping || !el?.clientWidth || n <= 1) return
-  const next = index.value >= n ? 1 : index.value + 1
-  index.value = next
+  if (sliding || jumping || !el?.clientWidth || n <= 1) return
+  const cur = Math.min(index.value, n - 1)
+  const next = cur + 1
+  if (next < n) index.value = next
   scrollToIndex(next)
 }
 
@@ -131,7 +150,6 @@ const start = () => {
 
 const pause = () => {
   stop()
-  window.cancelAnimationFrame(anim)
   window.clearTimeout(resumeTimer)
 }
 
