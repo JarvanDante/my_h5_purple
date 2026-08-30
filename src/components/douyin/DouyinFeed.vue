@@ -22,14 +22,14 @@
             fit="cover"
             :muted="muted"
             :autoplay="idx === current && !showTrial"
-            :trial-sec="item.need_vip ? item.preview_sec || 5 : 0"
+            :trial-sec="!isVip && item.need_vip ? item.preview_sec || 5 : 0"
             @click="togglePlay"
             @play="paused = false"
             @user-pause="paused = true"
             @ended="idx === current && onTrialEnd(item)"
             @timeupdate="(cur, dur) => idx === current && onTime(cur, dur)"
           />
-          <div v-if="showTrial && idx === current && item.need_vip" class="trial-cover">
+          <div v-if="!isVip && showTrial && idx === current && item.need_vip" class="trial-cover">
             <h3>试看结束</h3>
             <p>开通会员 全站视频免费看</p>
             <button type="button" class="trial-vip" @click.stop="goVip">开通会员免费看</button>
@@ -104,7 +104,7 @@
         </aside>
 
         <div class="info">
-          <button type="button" class="vip" @click="goVip">开通会员 畅享完整版</button>
+          <button v-if="!isVip" type="button" class="vip" @click="goVip">开通会员 畅享完整版</button>
           <p class="name" :class="{ link: item.up_user_id }" @click="item.up_user_id && goUp(item)">
             @{{ handle(item) }}
             <VipBadge :vip="item.up_is_vip" />
@@ -147,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
@@ -196,6 +196,7 @@ defineEmits<{
 
 const router = useRouter()
 const userStore = useUserStore()
+const isVip = computed(() => userStore.isVip)
 const scroller = ref<HTMLElement | null>(null)
 const current = ref(0)
 const muted = ref(true)
@@ -298,7 +299,7 @@ const togglePlay = () => {
 
 const showTrial = ref(false)
 const onTrialEnd = (item: DouyinItem) => {
-  if (!item.need_vip) return
+  if (isVip.value || !item.need_vip) return
   showTrial.value = true
   players.get(current.value)?.pause()
 }
