@@ -7,18 +7,22 @@
             <span class="head-mark">{{ mark }}</span>
             <strong>{{ appName }}</strong>
           </div>
-          <button type="button" class="head-close" aria-label="关闭" @click="drawer.hide()">×</button>
+          <button type="button" class="head-close" aria-label="关闭" @click="drawer.hide()">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M7 7l10 10M17 7 7 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            </svg>
+          </button>
         </header>
         <nav class="drawer-nav">
           <button v-for="item in menus" :key="item.path" type="button" @click="go(item.path)">
             <span class="nav-ico" v-html="item.icon" />
-            <span>{{ item.label }}</span>
+            <span class="nav-label">{{ item.label }}</span>
           </button>
         </nav>
         <footer class="drawer-foot">
           <button type="button" @click="go(loggedIn ? '/me' : '/account/login')">
             <span class="nav-ico" v-html="iconUser" />
-            <span>{{ loggedIn ? nickname : '登录 / 注册' }}</span>
+            <span class="nav-label">{{ loggedIn ? nickname : '登录 / 注册' }}</span>
           </button>
         </footer>
       </aside>
@@ -93,21 +97,23 @@ const go = (path: string) => {
   position: fixed;
   inset: 0;
   z-index: 1200;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.48);
 }
 
 .drawer-panel {
   position: absolute;
   top: 0;
   right: 0;
-  width: min(78%, 320px);
+  width: min(58vw, 236px);
   height: 100%;
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(120% 60% at 100% 0%, rgba(255, 92, 147, 0.22), transparent 46%),
+    radial-gradient(140% 42% at 100% 0%, rgba(255, 92, 147, 0.2), transparent 52%),
     $background-page;
-  box-shadow: -16px 0 36px rgba(0, 0, 0, 0.45);
+  border-left: 1px solid rgba(255, 92, 147, 0.16);
+  border-radius: 18px 0 0 18px;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.42);
   animation: drawer-in 0.22s ease-out;
 }
 
@@ -115,65 +121,80 @@ const go = (path: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(12px + var(--app-header-top)) 16px 16px;
-  border-bottom: 1px solid rgba(255, 92, 147, 0.22);
+  gap: 8px;
+  padding: calc(10px + var(--app-header-top)) 12px 12px;
+  border-bottom: 1px solid rgba(255, 92, 147, 0.16);
 }
 
 .head-brand {
+  min-width: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   color: $text-color;
 }
 
 .head-mark {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: linear-gradient(145deg, #ff8fb3 0%, $primary-color 58%, $primary-color-deep 100%);
-  box-shadow: 0 0 12px rgba(255, 92, 147, 0.35);
+  box-shadow: 0 0 10px rgba(255, 92, 147, 0.32);
   color: #fff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  line-height: 34px;
+  line-height: 28px;
   text-align: center;
 }
 
 .head-brand strong {
-  font-size: 17px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
 
 .head-close {
-  width: 32px;
-  height: 32px;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
+  padding: 0;
   background: $background-surface2;
   color: $text-color-secondary;
-  font-size: 22px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .drawer-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 10px;
+  padding: 8px 8px 4px;
 }
 
 .drawer-nav button {
   width: 100%;
-  height: 50px;
+  height: 44px;
   border: 0;
-  border-radius: 12px;
-  padding: 0 12px;
+  border-radius: 10px;
+  padding: 0 8px;
   background: transparent;
   color: $text-color;
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 15px;
+  gap: 10px;
+  font-size: 14px;
   font-weight: 600;
 
   &:active {
@@ -184,23 +205,24 @@ const go = (path: string) => {
 
 .drawer-foot button {
   width: 100%;
-  height: 48px;
-  border: 1px solid rgba(255, 92, 147, 0.35);
+  height: 42px;
+  border: 1px solid rgba(255, 92, 147, 0.28);
   border-radius: $radius-pill;
-  padding: 0 14px;
+  padding: 0 10px;
   background: $primary-soft;
   color: $primary-color;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 700;
 }
 
 .nav-ico {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   background: $background-surface2;
   color: $primary-color;
   display: flex;
@@ -208,14 +230,21 @@ const go = (path: string) => {
   justify-content: center;
 
   :deep(svg) {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }
 
+.nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .drawer-foot {
-  padding: 10px 14px calc(16px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid rgba(255, 92, 147, 0.16);
+  padding: 8px 10px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 92, 147, 0.14);
 }
 
 @keyframes drawer-in {
