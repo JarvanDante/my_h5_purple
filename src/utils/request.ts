@@ -70,6 +70,18 @@ export function mediaUrl(path?: string) {
   return next.startsWith('/') ? next : `/${next}`
 }
 
+const LOCAL_MINIO = /:19000\/|host\.docker\.internal|\/my-storage\/|\/my-media\//
+
+/** 帖子等 my-storage 视频：同域走 /media/object，避免 CF 下直连 19000。 */
+export function playMediaUrl(path?: string) {
+  const next = mediaUrl(path)
+  if (!next || next.startsWith('blob:') || next.startsWith('data:')) return next
+  if (LOCAL_MINIO.test(next)) {
+    return `/front/v1/media/object?u=${encodeURIComponent(next)}`
+  }
+  return next
+}
+
 function uploadFailMessage(text: string, status: number) {
   if (/ParseMul|request body too large|entity too large/i.test(text)) {
     return '文件过大，请压缩后重试'
