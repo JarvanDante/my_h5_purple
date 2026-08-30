@@ -71,17 +71,17 @@ onMounted(async () => {
 .notice-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 10px;
+  gap: 10px;
+  height: 44px;
+  padding: 0 12px;
   background: #111116;
   color: #f2f2f5;
 }
 
 .notice-horn {
   flex-shrink: 0;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   color: #c59bff;
 }
 
@@ -101,21 +101,21 @@ onMounted(async () => {
   display: inline-block;
   padding-left: 100%;
   white-space: nowrap;
-  font-size: 12px;
-  line-height: 36px;
+  font-size: 14px;
+  line-height: 44px;
   color: #f5f5f8;
   animation: notice-marquee linear infinite;
 }
 
 .notice-close {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border: 0;
   padding: 0;
   background: transparent;
   color: #8d8d96;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 1;
 }
 

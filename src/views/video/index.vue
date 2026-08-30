@@ -18,13 +18,6 @@
     <DouyinHome v-if="isDouyin" />
 
     <template v-else>
-    <div v-if="subTab" class="cat-pane">
-      <p v-if="catLoading" class="page-empty">加载中…</p>
-      <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」视频</p>
-      <PosterGrid v-else :items="catItems" :cols="2" wide @select="open" />
-    </div>
-
-    <template v-else>
     <section class="ad-rail-wrap">
       <AdSwipe :items="ads" />
     </section>
@@ -45,7 +38,13 @@
             </button>
           </section>
 
-          <template v-if="floors.length">
+          <div v-if="subTab" class="cat-pane">
+            <p v-if="catLoading" class="page-empty">加载中…</p>
+            <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」视频</p>
+            <PosterGrid v-else :items="catItems" :cols="2" wide @select="open" />
+          </div>
+
+          <template v-else-if="floors.length">
             <FloorBlock
               v-for="floor in floors"
               :key="floor.id"
@@ -73,7 +72,6 @@
         </div>
       </transition>
     </div>
-    </template>
     </template>
   </div>
 </template>

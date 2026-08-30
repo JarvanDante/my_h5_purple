@@ -13,19 +13,6 @@
       @vip="go('/vip')"
     />
 
-    <div v-if="subTab" class="cat-pane">
-      <p v-if="catLoading" class="page-empty">加载中…</p>
-      <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
-      <PosterGrid
-        v-else
-        :items="catItems"
-        :cols="isCartoon ? 2 : 3"
-        :wide="isCartoon"
-        @select="open"
-      />
-    </div>
-
-    <template v-else>
     <HomeHero :items="banners" @select="open" />
     <NoticeMarquee />
 
@@ -45,7 +32,19 @@
             </button>
           </section>
 
-          <template v-if="ready">
+          <div v-if="subTab" class="cat-pane">
+            <p v-if="catLoading" class="page-empty">加载中…</p>
+            <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
+            <PosterGrid
+              v-else
+              :items="catItems"
+              :cols="isCartoon ? 2 : 3"
+              :wide="isCartoon"
+              @select="open"
+            />
+          </div>
+
+          <template v-else-if="ready">
             <FloorBlock
               v-for="floor in floors"
               :key="floor.id"
@@ -75,7 +74,6 @@
         </div>
       </transition>
     </div>
-    </template>
   </div>
 </template>
 
