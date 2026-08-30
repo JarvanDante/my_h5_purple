@@ -53,10 +53,15 @@ const dotIndex = computed(() => {
   return index.value >= n ? 0 : index.value
 })
 
+const INTERVAL_MS = 5000
+const SLIDE_MS = 1000
+
 let timer = 0
 let resumeTimer = 0
-let snapTimer = 0
+let anim = 0
 let jumping = false
+
+const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
 
 const onScroll = () => {
   const el = track.value
@@ -83,17 +88,34 @@ const settleClone = () => {
   if (props.items.length > 1 && index.value >= props.items.length) snapHome()
 }
 
+const scrollToIndex = (next: number) => {
+  const el = track.value
+  if (!el?.clientWidth) return
+  window.cancelAnimationFrame(anim)
+  const from = el.scrollLeft
+  const to = next * el.clientWidth
+  const started = performance.now()
+  el.style.scrollSnapType = 'none'
+  const step = (now: number) => {
+    const t = Math.min(1, (now - started) / SLIDE_MS)
+    el.scrollLeft = from + (to - from) * easeInOut(t)
+    if (t < 1) {
+      anim = requestAnimationFrame(step)
+      return
+    }
+    el.style.scrollSnapType = ''
+    if (next >= props.items.length) settleClone()
+  }
+  anim = requestAnimationFrame(step)
+}
+
 const goNext = () => {
   const el = track.value
   const n = props.items.length
   if (jumping || !el?.clientWidth || n <= 1) return
   const next = index.value >= n ? 1 : index.value + 1
   index.value = next
-  el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
-  if (next >= n) {
-    window.clearTimeout(snapTimer)
-    snapTimer = window.setTimeout(settleClone, 420)
-  }
+  scrollToIndex(next)
 }
 
 const stop = () => {
@@ -104,11 +126,12 @@ const stop = () => {
 const start = () => {
   stop()
   if (props.items.length <= 1) return
-  timer = window.setInterval(goNext, 3000)
+  timer = window.setInterval(goNext, INTERVAL_MS)
 }
 
 const pause = () => {
   stop()
+  window.cancelAnimationFrame(anim)
   window.clearTimeout(resumeTimer)
 }
 
@@ -117,7 +140,7 @@ const resumeLater = () => {
   resumeTimer = window.setTimeout(() => {
     settleClone()
     start()
-  }, 3000)
+  }, INTERVAL_MS)
 }
 
 const onHide = () => {
@@ -132,7 +155,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   pause()
-  window.clearTimeout(snapTimer)
+  window.cancelAnimationFrame(anim)
   document.removeEventListener('visibilitychange', onHide)
 })
 
@@ -156,7 +179,7 @@ watch(
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   border-radius: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
