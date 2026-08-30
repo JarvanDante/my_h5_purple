@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onActivated, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
 import DouyinGrid from '@/components/douyin/DouyinGrid.vue'
@@ -167,6 +167,7 @@ onMounted(() => {
   loadCats()
   loadList()
 })
+onActivated(loadList)
 </script>
 
 <style scoped lang="scss">

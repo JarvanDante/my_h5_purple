@@ -16,6 +16,7 @@
     @pause="onPause"
     @timeupdate="onTime"
     @loadedmetadata="onTime"
+    @ended="onEnded"
     @click="onClick"
   />
 </template>
@@ -32,14 +33,16 @@ const props = withDefaults(
     muted?: boolean
     autoplay?: boolean
     fit?: 'contain' | 'cover'
+    trialSec?: number
   }>(),
-  { controls: true, muted: false, autoplay: false, fit: 'contain' },
+  { controls: true, muted: false, autoplay: false, fit: 'contain', trialSec: 0 },
 )
 const emit = defineEmits<{
   play: []
   'user-pause': []
   'native-fullscreen': []
   timeupdate: [current: number, duration: number]
+  ended: []
   click: []
 }>()
 const el = ref<HTMLVideoElement | null>(null)
@@ -99,9 +102,13 @@ const attach = async (url: string) => {
     const { default: Hls } = await import('hls.js')
     // MSE 可用时优先 hls.js, 避免 Safari 原生 HLS 跟 302 预签名失败。
     if (Hls.isSupported()) {
-      const inst = new Hls({ enableWorker: true, xhrSetup: (xhr) => {
-        xhr.withCredentials = false
-      } })
+      const inst = new Hls({
+        enableWorker: true,
+        maxBufferLength: props.trialSec > 0 ? Math.max(props.trialSec + 2, 8) : 30,
+        xhrSetup: (xhr) => {
+          xhr.withCredentials = false
+        },
+      })
       inst.on(Hls.Events.MANIFEST_PARSED, () => markReady())
       inst.on(Hls.Events.ERROR, (_evt, data) => {
         if (data.fatal) {
@@ -143,8 +150,15 @@ const onPlay = () => {
 const onTime = () => {
   const video = el.value
   if (!video) return
-  emit('timeupdate', video.currentTime || 0, video.duration || 0)
+  const cur = video.currentTime || 0
+  emit('timeupdate', cur, video.duration || 0)
+  if (props.trialSec > 0 && cur >= props.trialSec && !video.paused) {
+    video.pause()
+    emit('ended')
+  }
 }
+
+const onEnded = () => emit('ended')
 
 const onClick = () => emit('click')
 

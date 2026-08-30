@@ -21,12 +21,19 @@
             :controls="false"
             fit="cover"
             :muted="muted"
-            :autoplay="idx === current"
+            :autoplay="idx === current && !showTrial"
+            :trial-sec="item.need_vip ? item.preview_sec || 5 : 0"
             @click="togglePlay"
             @play="paused = false"
             @user-pause="paused = true"
+            @ended="idx === current && onTrialEnd(item)"
             @timeupdate="(cur, dur) => idx === current && onTime(cur, dur)"
           />
+          <div v-if="showTrial && idx === current && item.need_vip" class="trial-cover">
+            <h3>试看结束</h3>
+            <p>开通会员 全站视频免费看</p>
+            <button type="button" class="trial-vip" @click.stop="goVip">开通会员免费看</button>
+          </div>
           <button v-if="muted && idx === current" type="button" class="unmute" @click.stop="muted = false">
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 10v4h3.2L12 18V6L7.2 10H4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
@@ -34,7 +41,7 @@
             </svg>
             解除静音
           </button>
-          <button v-if="paused && idx === current" type="button" class="play-ico" @click.stop="togglePlay">
+          <button v-if="paused && idx === current && !showTrial" type="button" class="play-ico" @click.stop="togglePlay">
             <svg viewBox="0 0 64 64" fill="none">
               <path d="M24 18v28l24-14-24-14Z" fill="#fff" />
             </svg>
@@ -281,7 +288,15 @@ const playCurrent = async () => {
 }
 
 const togglePlay = () => {
+  if (showTrial.value) return
   players.get(current.value)?.toggle()
+}
+
+const showTrial = ref(false)
+const onTrialEnd = (item: DouyinItem) => {
+  if (!item.need_vip) return
+  showTrial.value = true
+  players.get(current.value)?.pause()
 }
 
 const onTime = (cur: number, dur: number) => {
@@ -303,6 +318,7 @@ const onScroll = () => {
   current.value = next
   currentTime.value = 0
   duration.value = 0
+  showTrial.value = false
   playCurrent()
 }
 
@@ -477,6 +493,44 @@ onMounted(() => {
   height: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+.trial-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.78);
+  }
+}
+
+.trial-vip {
+  margin-top: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7b4dff, #ff5c93);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 22px;
 }
 
 .stage {

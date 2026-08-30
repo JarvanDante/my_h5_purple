@@ -11,12 +11,19 @@
         ref="playerRef"
         :src="item.source_url"
         :poster="posterSrc"
+        :trial-sec="item.need_vip ? item.preview_sec || 5 : 0"
         @user-pause="onUserPause"
         @play="onPlayerPlay"
+        @ended="onTrialEnd"
         @native-fullscreen="toggleFs"
       />
       <span v-else class="no-src">暂无播放地址，请在媒资中心转码后回填</span>
-      <div v-if="showAd" class="ad-cover">
+      <div v-if="showTrial" class="trial-cover">
+        <h3>试看结束</h3>
+        <p>开通会员 全站视频免费看</p>
+        <button type="button" class="trial-vip" @click="goVip">开通会员免费看</button>
+      </div>
+      <div v-else-if="showAd" class="ad-cover">
         <span class="ad-placeholder">广告</span>
         <button type="button" class="ad-skip" @click="onAdAction">
           {{ adLeft > 0 ? `开通会员跳过广告：${adLeft}秒` : '开始播放' }}
@@ -100,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onActivated, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import CommentPanel from '@/components/CommentPanel.vue'
@@ -126,9 +133,10 @@ const tab = ref<'intro' | 'comment'>('intro')
 const commentCount = ref(0)
 const liked = ref(false)
 const collected = ref(false)
-const playerRef = ref<{ play: () => void } | null>(null)
+const playerRef = ref<{ play: () => void; pause: () => void } | null>(null)
 const showAd = ref(true)
 const showPauseAd = ref(false)
+const showTrial = ref(false)
 const isFs = ref(false)
 const adLeft = ref(5)
 let adTimer = 0
@@ -162,8 +170,15 @@ const onAdAction = () => {
 }
 
 const onUserPause = () => {
-  if (showAd.value) return
+  if (showAd.value || showTrial.value) return
   showPauseAd.value = true
+}
+
+const onTrialEnd = () => {
+  if (!item.value?.need_vip) return
+  showPauseAd.value = false
+  showTrial.value = true
+  playerRef.value?.pause()
 }
 
 const closePauseAd = () => {
@@ -301,6 +316,7 @@ const load = () => {
   collected.value = false
   commentCount.value = 0
   showPauseAd.value = false
+  showTrial.value = false
   startAdTimer()
   fetchVideoDetail(id)
     .then((data) => {
@@ -327,6 +343,9 @@ const load = () => {
 }
 
 watch(() => route.params.id, load, { immediate: true })
+onActivated(() => {
+  if (item.value?.need_vip) load()
+})
 onBeforeUnmount(() => {
   clearAdTimer()
   exitFs()
@@ -368,6 +387,44 @@ onBeforeUnmount(() => {
   z-index: 80;
   min-height: 100%;
   height: 100%;
+}
+
+.trial-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #fff;
+
+  h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.78);
+  }
+}
+
+.trial-vip {
+  margin-top: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #7b4dff, #ff5c93);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 22px;
 }
 
 .ad-cover {

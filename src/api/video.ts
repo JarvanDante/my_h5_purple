@@ -15,6 +15,8 @@ export type VideoItem = {
   up_avatar?: string
   followed?: boolean
   comment_count?: number
+  preview_sec?: number
+  need_vip?: boolean
 }
 
 export type VideoCategory = {
