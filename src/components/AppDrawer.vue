@@ -104,7 +104,7 @@ const go = (path: string) => {
   position: absolute;
   top: 0;
   right: 0;
-  width: min(58vw, 236px);
+  width: min(48vw, 196px);
   height: 100%;
   display: flex;
   flex-direction: column;
