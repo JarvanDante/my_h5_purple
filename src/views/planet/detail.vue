@@ -21,7 +21,7 @@
 
     <section class="comments">
       <div class="cmt-head">
-        <h3>评论 <em>({{ total }})</em></h3>
+        <h3>评论 <em>({{ displayCount }})</em></h3>
         <div class="sorts">
           <button type="button" :class="{ on: sort === 0 }" @click="setSort(0)">最新</button>
           <button type="button" :class="{ on: sort === 1 }" @click="setSort(1)">最热</button>
@@ -150,6 +150,8 @@ const goUser = (userId: number) => router.push(userPath(userId))
 const jumpSize = 15
 
 const displayName = (item: CommentItem) => item.nickname?.trim() || `用户${encodeId(item.user_id)}`
+const listedCount = (list: CommentItem[]) => list.reduce((sum, row) => sum + 1 + (row.replies?.length || 0), 0)
+const displayCount = computed(() => Math.max(total.value, post.value?.comment_count || 0))
 
 const loadComments = async () => {
   const id = post.value?.id || routeId(route.params.id)
@@ -159,7 +161,7 @@ const loadComments = async () => {
   const size = locating ? jumpSize : 40
   const c = await fetchComments(id, page, size, locating ? 0 : sort.value)
   comments.value = c.list || []
-  total.value = c.total || comments.value.length
+  total.value = Math.max(c.total || 0, listedCount(comments.value), post.value?.comment_count || 0)
 }
 
 const scrollToComment = async () => {

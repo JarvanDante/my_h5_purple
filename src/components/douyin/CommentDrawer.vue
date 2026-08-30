@@ -1,7 +1,8 @@
 <template>
   <Teleport to="body">
-    <div v-if="open" class="mask" @click="close">
-      <div class="sheet" @click.stop>
+    <Transition name="cmt-drawer">
+      <div v-if="open" class="mask" @click="close">
+        <div class="sheet" @click.stop>
         <i class="handle" />
         <header class="head">
           <h3>{{ count }} 条评论</h3>
@@ -71,7 +72,8 @@
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Transition>
   </Teleport>
 </template>
 
@@ -249,7 +251,7 @@ watch(
 .mask {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 1400;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: flex-end;
@@ -257,13 +259,32 @@ watch(
 
 .sheet {
   width: 100%;
-  max-height: 72vh;
+  max-height: 78vh;
   background: #111116;
   border-radius: 16px 16px 0 0;
   color: #f5f5f8;
   display: flex;
   flex-direction: column;
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  transform: translateY(0);
+}
+
+.cmt-drawer-enter-active,
+.cmt-drawer-leave-active {
+  transition: opacity 0.28s ease;
+
+  .sheet {
+    transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+.cmt-drawer-enter-from,
+.cmt-drawer-leave-to {
+  opacity: 0;
+
+  .sheet {
+    transform: translateY(100%);
+  }
 }
 
 .handle {

@@ -139,7 +139,8 @@ const load = async () => {
   try {
     const data = await fetchComments(props.contentId, 1, 40, sort.value, props.mediaType)
     comments.value = data.list || []
-    syncCount(data.total || comments.value.length)
+    const listed = comments.value.reduce((sum, row) => sum + 1 + (row.replies?.length || 0), 0)
+    syncCount(Math.max(data.total || 0, listed))
     if (focusId.value > 0) {
       await nextTick()
       document.getElementById(`comment-${focusId.value}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
