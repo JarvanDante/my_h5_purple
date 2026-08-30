@@ -7,10 +7,14 @@
         :sex="post.sex"
         :size="40"
         :fallback="name"
+        :vip="post.is_vip"
         @click.stop="onProfile"
       />
       <div class="user-meta" @click.stop="onProfile">
-        <strong>{{ name }}</strong>
+        <p class="name-line">
+          <strong>{{ name }}</strong>
+          <VipBadge :vip="post.is_vip" />
+        </p>
         <span>发布时间 {{ formatTime(post.created_at) }}</span>
       </div>
       <button
@@ -99,6 +103,7 @@ import { computed, ref } from 'vue'
 import { showImagePreview } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import type { PostItem } from '@/api/ops'
 import { resolveMediaSrc } from '@/utils/aesbnc'
@@ -216,12 +221,22 @@ const playVideo = () => {
   flex: 1;
   min-width: 0;
 
+  .name-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+  }
+
   strong {
-    display: block;
+    min-width: 0;
     font-size: 15px;
     font-weight: 700;
     color: #f2f2f5;
     line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   span {

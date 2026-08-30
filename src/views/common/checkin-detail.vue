@@ -2,9 +2,12 @@
   <div class="page-shell sub-page">
     <PageHeader title="签到明细" fallback="/checkin" />
     <section class="who">
-      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" />
+      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" :vip="user?.is_vip" />
       <div>
-        <strong>{{ user?.nickname || '用户' }}</strong>
+        <div class="name-row">
+          <strong>{{ user?.nickname || '用户' }}</strong>
+          <VipBadge :vip="user?.is_vip" />
+        </div>
         <div class="pills">
           <span>金币 {{ fmtNum(user?.balance) }}</span>
           <span>积分 {{ fmtNum(user?.credit) }}</span>
@@ -32,6 +35,7 @@
 import { computed, onMounted, ref } from 'vue'
 import PageHeader from '@/components/PageHeader.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import { fetchCheckinInfo, type CheckinRecord } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -75,8 +79,13 @@ onMounted(async () => {
   gap: 12px;
   margin: 12px 16px 8px;
 
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
   strong {
-    display: block;
     font-size: 16px;
     font-weight: 800;
   }

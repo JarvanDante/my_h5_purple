@@ -56,10 +56,12 @@
                 :sex="m.actor_sex"
                 :size="44"
                 :fallback="actorName(m)"
+                :vip="m.actor_is_vip"
               />
               <div class="body">
                 <div class="line">
                   <strong>{{ actorName(m) }}</strong>
+                  <VipBadge :vip="m.actor_is_vip" />
                   <em>{{ actionText(m) }}</em>
                 </div>
                 <p v-if="m.snippet">{{ m.snippet }}</p>
@@ -86,6 +88,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import PageHeader from '@/components/PageHeader.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import {
   fetchInteractMessages,
   fetchMessages,

@@ -5,11 +5,11 @@
     </PageHeader>
 
     <section class="profile">
-      <UserAvatar :src="avatarSrc" :sex="userStore.user?.sex" :size="52" />
+      <UserAvatar :src="avatarSrc" :sex="userStore.user?.sex" :size="52" :vip="isVip" />
       <div class="meta">
         <div class="name-row">
           <strong>{{ userStore.user?.nickname || '未登录' }}</strong>
-          <span v-if="isVip" class="vip-mark">VIP</span>
+          <VipBadge :vip="isVip" size="md" />
         </div>
         <p>{{ expireLabel }}</p>
       </div>
@@ -61,6 +61,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { buyVip, fetchVipPackages, type VipPackage } from '@/api/user'
 import { useUserStore } from '@/stores/user'
@@ -76,6 +77,7 @@ let timer = 0
 
 const avatarSrc = computed(() => mediaUrl(userStore.user?.img))
 const isVip = computed(() => {
+  if (userStore.user?.is_vip) return true
   const name = userStore.user?.group_name || ''
   if (!name || name === '普通用户') return false
   const end = Number(userStore.user?.group_end_time || 0)

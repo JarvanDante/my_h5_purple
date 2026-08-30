@@ -51,7 +51,7 @@
         <aside class="side">
           <div v-if="item.up_user_id" class="up">
             <button type="button" class="up-face" @click.stop="goUp(item)">
-              <UserAvatar :src="upAvatar(item)" :size="46" :sex="upSex(item)" :fallback="handle(item)" />
+              <UserAvatar :src="upAvatar(item)" :size="46" :sex="upSex(item)" :fallback="handle(item)" :vip="item.up_is_vip" />
             </button>
             <button v-if="showPlus(item)" type="button" class="plus" aria-label="关注" @click.stop="onFollow(item)">+</button>
           </div>
@@ -105,7 +105,10 @@
 
         <div class="info">
           <button type="button" class="vip" @click="goVip">开通会员 畅享完整版</button>
-          <p class="name" :class="{ link: item.up_user_id }" @click="item.up_user_id && goUp(item)">@{{ handle(item) }}</p>
+          <p class="name" :class="{ link: item.up_user_id }" @click="item.up_user_id && goUp(item)">
+            @{{ handle(item) }}
+            <VipBadge :vip="item.up_is_vip" />
+          </p>
           <p class="desc">{{ item.title }}</p>
           <p v-if="item.description" class="desc dim">{{ item.description }}</p>
           <div class="stats">
@@ -150,6 +153,7 @@ import { showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import CommentDrawer from '@/components/douyin/CommentDrawer.vue'
 import ShareSheet from '@/components/douyin/ShareSheet.vue'
 import type { DouyinItem } from '@/api/douyin'
@@ -706,6 +710,9 @@ onMounted(() => {
 }
 
 .name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin: 0 0 4px;
   font-size: 15px;
   font-weight: 700;

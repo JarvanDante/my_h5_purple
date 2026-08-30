@@ -13,6 +13,7 @@ export type VideoItem = {
   up_user_id?: number
   up_nickname?: string
   up_avatar?: string
+  up_is_vip?: boolean
   followed?: boolean
   comment_count?: number
   preview_sec?: number

@@ -27,8 +27,11 @@
             class="row"
             @click="goUser(u.id)"
           >
-            <UserAvatar :src="mediaUrl(u.img)" :sex="u.sex" :size="44" :fallback="u.nickname || '用'" />
-            <strong>{{ u.nickname || `用户${encodeId(u.id)}` }}</strong>
+            <UserAvatar :src="mediaUrl(u.img)" :sex="u.sex" :size="44" :fallback="u.nickname || '用'" :vip="u.is_vip" />
+            <span class="who">
+              <strong>{{ u.nickname || `用户${encodeId(u.id)}` }}</strong>
+              <VipBadge :vip="u.is_vip" />
+            </span>
             <span
               class="act"
               :class="{ on: isFollowed(u.id) }"
@@ -49,6 +52,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { fetchFans, fetchFollows, toggleFollow, type PublicUser } from '@/api/user'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -193,8 +197,15 @@ onMounted(load)
   flex-shrink: 0;
 }
 
-.row strong {
+.who {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row strong {
   min-width: 0;
   font-size: 15px;
   overflow: hidden;

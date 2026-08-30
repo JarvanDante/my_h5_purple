@@ -1,10 +1,10 @@
 <template>
   <article :id="domId" class="cmt" :class="{ nested, official, focus }">
-    <UserAvatar class="face" :src="avatar" :size="nested ? 28 : 36" :fallback="name" />
+    <UserAvatar class="face" :src="avatar" :size="nested ? 28 : 36" :fallback="name" :vip="item.is_vip" />
     <div class="body">
       <p class="who">
         <strong>{{ name }}</strong>
-        <i v-if="item.is_vip || official" class="vip" aria-label="VIP">◆</i>
+        <VipBadge :vip="item.is_vip" />
       </p>
       <p class="text">
         <em v-if="mention" class="at">@{{ mention }}:</em>{{ item.content }}
@@ -41,6 +41,7 @@ import { showImagePreview } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import type { CommentItem } from '@/api/ops'
 import { resolveMediaSrc } from '@/utils/aesbnc'
 import { encodeId } from '@/utils/idcrypt'
@@ -147,13 +148,6 @@ const preview = async () => {
     font-weight: 700;
     color: #c8c8d0;
   }
-}
-
-.vip {
-  font-style: normal;
-  font-size: 11px;
-  color: #f5c14a;
-  line-height: 1;
 }
 
 .text {

@@ -23,6 +23,7 @@
           <button type="button" @click="go(loggedIn ? '/me' : '/account/login')">
             <span class="nav-ico" v-html="iconUser" />
             <span class="nav-label">{{ loggedIn ? nickname : '登录 / 注册' }}</span>
+            <VipBadge :vip="loggedIn && userStore.user?.is_vip" />
           </button>
         </footer>
       </aside>
@@ -36,6 +37,7 @@ import { useRouter } from 'vue-router'
 import { useConfigStore } from '@/stores/config'
 import { useDrawerStore } from '@/stores/drawer'
 import { useUserStore } from '@/stores/user'
+import VipBadge from '@/components/VipBadge.vue'
 
 const router = useRouter()
 const drawer = useDrawerStore()

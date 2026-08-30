@@ -17,12 +17,12 @@
 
     <section class="profile">
       <button type="button" class="avatar-wrap" @click="onAvatar">
-        <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="58" />
+        <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="58" :vip="isVip" />
       </button>
       <div class="meta">
         <div class="name-row">
           <h1 @click="onName">{{ user?.nickname || '未登录' }}</h1>
-          <span class="vip-gem" :class="{ dim: !isVip }" v-html="iconGem" />
+          <VipBadge :vip="isVip" size="md" />
         </div>
         <button type="button" class="uid-line" @click="copyUid">
           ID {{ uid }}
@@ -109,6 +109,7 @@ import { showToast } from 'vant'
 import { fetchUnreadCount } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import { mediaUrl } from '@/utils/request'
 import { publicUid } from '@/utils/userid'
 
@@ -120,6 +121,7 @@ const user = computed(() => userStore.user)
 const uid = computed(() => publicUid(user.value) || '----')
 const avatarSrc = computed(() => mediaUrl(user.value?.img))
 const isVip = computed(() => {
+  if (user.value?.is_vip) return true
   const name = user.value?.group_name || ''
   if (!name || name === '普通用户') return false
   const end = Number(user.value?.group_end_time || 0)
@@ -197,8 +199,6 @@ const iconCrown =
   '<svg viewBox="0 0 24 24" fill="none"><path d="M4.5 16.5 6 8.5l6 5 6-5 1.5 8H4.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 8.5 8.2 5.8 12 8.2 15.8 5.8 18 8.5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>'
 const iconCoin =
   '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.2" stroke="currentColor" stroke-width="1.7"/><path d="M10.2 8.8h4.2c1 0 1.8.8 1.8 1.8s-.8 1.8-1.8 1.8H10.8v2.8h4.4M12 8.8V7.6M12 16.8v1.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>'
-const iconGem =
-  '<svg viewBox="0 0 24 24"><path d="M12 3.6 20 9.2 12 20.4 4 9.2 12 3.6Z" fill="url(#g)"/><defs><linearGradient id="g" x1="4" y1="4" x2="20" y2="20"><stop stop-color="#ffe08a"/><stop offset="1" stop-color="#ff9a3c"/></linearGradient></defs></svg>'
 
 const quicks = [
   { title: '我的购买', path: '/purchase', icon: iconBag },

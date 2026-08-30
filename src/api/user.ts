@@ -17,6 +17,7 @@ export type UserInfo = {
   follow: number
   has_password?: boolean
   has_parent?: boolean
+  is_vip?: boolean
   ext?: Record<string, unknown>
 }
 
@@ -125,6 +126,7 @@ export type PublicUser = {
   fans?: number
   follow?: number
   signature?: string
+  is_vip?: boolean
 }
 
 export function fetchUserHome(id: number) {

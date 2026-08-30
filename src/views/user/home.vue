@@ -3,9 +3,12 @@
     <PageHeader :title="name || '用户主页'" fallback="/planet" />
 
     <section v-if="user" class="head">
-      <UserAvatar :src="avatarSrc" :sex="user.sex" :size="52" :fallback="name" />
+      <UserAvatar :src="avatarSrc" :sex="user.sex" :size="52" :fallback="name" :vip="user.is_vip" />
       <div class="meta">
-        <strong>{{ name }}</strong>
+        <div class="name-row">
+          <strong>{{ name }}</strong>
+          <VipBadge :vip="user.is_vip" size="md" />
+        </div>
         <p>粉丝 {{ user.fans ?? 0 }}　关注 {{ user.follow ?? 0 }}</p>
       </div>
       <button
@@ -75,6 +78,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import UserAvatar from '@/components/UserAvatar.vue'
+import VipBadge from '@/components/VipBadge.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import PostCard from '@/components/PostCard.vue'
 import DouyinFeed from '@/components/douyin/DouyinFeed.vue'
@@ -215,11 +219,21 @@ onMounted(load)
   flex: 1;
   min-width: 0;
 
+  .name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
   strong {
-    display: block;
+    min-width: 0;
     font-size: 16px;
     font-weight: 700;
     color: #f5f5f8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   p {

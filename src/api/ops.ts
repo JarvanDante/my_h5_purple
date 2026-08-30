@@ -118,6 +118,7 @@ export type PostItem = {
   nickname?: string
   img?: string
   sex?: number
+  is_vip?: boolean
   title: string
   content: string
   pics: string[]
@@ -258,6 +259,7 @@ export type InteractItem = {
   actor_name: string
   actor_avatar: string
   actor_sex?: number
+  actor_is_vip?: boolean
   actor_count: number
   media_type: number
   content_id: number
