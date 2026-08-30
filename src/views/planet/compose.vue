@@ -38,11 +38,11 @@
       <div class="block">
         <p class="block-title">
           上传视频
-          <em>*最大600M以内</em>
+          <em>*最大{{ VIDEO_MAX_LABEL }}以内，请用可播放的 MP4</em>
         </p>
         <div class="media-grid">
           <div v-if="draft.videoUrl" class="thumb video">
-            <video :src="videoPreview || mediaUrl(draft.videoUrl)" muted />
+            <video :src="videoPreview || playMediaUrl(draft.videoUrl)" muted />
             <button type="button" class="del" @click="clearVideo">×</button>
           </div>
           <div v-else-if="videoUploading" class="thumb video uploading">
@@ -68,9 +68,10 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { createPost } from '@/api/ops'
 import { usePostDraftStore } from '@/stores/postDraft'
-import { formatFileSize, IMAGE_MAX_BYTES, VIDEO_MAX_BYTES } from '@/utils/fileSize'
+import { formatFileSize, IMAGE_MAX_BYTES } from '@/utils/fileSize'
+import { rejectBadVideo, VIDEO_MAX_LABEL } from '@/utils/videoUpload'
 import { uploadPostMedia } from '@/utils/storage-upload'
-import { mediaUrl, toastError } from '@/utils/request'
+import { playMediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
 const router = useRouter()
@@ -119,10 +120,7 @@ const onPickVideo = async (e: Event) => {
   const file = input.files?.[0]
   input.value = ''
   if (!file) return
-  if (file.size > VIDEO_MAX_BYTES) {
-    await rejectOversize('视频', file.size, '600M')
-    return
-  }
+  if (await rejectBadVideo(file)) return
   videoUploading.value = true
   videoPercent.value = 0
   try {
@@ -156,6 +154,10 @@ const submit = async () => {
   }
   if (!draft.pics.length) {
     showToast('请上传图片')
+    return
+  }
+  if (videoUploading.value) {
+    showToast('视频还在上传，请稍后再提交')
     return
   }
   busy.value = true
