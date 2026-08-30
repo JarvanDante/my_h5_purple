@@ -13,6 +13,19 @@
       @vip="go('/vip')"
     />
 
+    <div v-if="subTab" class="cat-pane">
+      <p v-if="catLoading" class="page-empty">加载中…</p>
+      <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
+      <PosterGrid
+        v-else
+        :items="catItems"
+        :cols="isCartoon ? 2 : 3"
+        :wide="isCartoon"
+        @select="open"
+      />
+    </div>
+
+    <template v-else>
     <HomeHero :items="banners" @select="open" />
     <NoticeMarquee />
 
@@ -62,6 +75,7 @@
         </div>
       </transition>
     </div>
+    </template>
   </div>
 </template>
 
@@ -76,10 +90,10 @@ import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
-import { fetchComicsCategories, fetchComicsModules, type ComicsItem } from '@/api/comics'
+import { fetchCartoonCategories, fetchCartoonList, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
+import { fetchComicsCategories, fetchComicsList, fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { fetchKingkongList } from '@/api/kingkong'
-import { fetchNovelCategories } from '@/api/novel'
+import { fetchNovelCategories, fetchNovelList, type NovelItem } from '@/api/novel'
 import { fetchVideoCategories } from '@/api/video'
 import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { useTabSlide } from '@/composables/useTabSlide'
@@ -109,33 +123,24 @@ const catsByChannel = ref<Record<string, SubCat[]>>({
 })
 const subTab = ref('')
 const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c) => c.name))
-
-const channelMedia = (name: string) => {
-  if (name === '动漫') return 'cartoon'
-  if (name === '小说') return 'novel'
-  if (name === '短剧') return 'video'
-  return 'comic'
-}
-
-const subListPath = (ch: string, cat?: SubCat) => {
-  const media = channelMedia(ch)
-  if (!cat) return `/list?media=${media}`
-  if (cat.kind === 1) return `/list?media=${media}&type=daily`
-  if (cat.kind === 2) return `/list?media=${media}&type=recommend`
-  if (cat.kind === 3) return `/list?media=${media}&type=rank`
-  return `/list?media=${media}&type=category&category=${encodeURIComponent(cat.name)}`
-}
+const catItems = ref<CoverItem[]>([])
+const catLoading = ref(false)
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
   subTab.value = ''
+  catItems.value = []
 }
 
 const selectSub = (name: string) => {
+  if (subTab.value === name) {
+    subTab.value = ''
+    catItems.value = []
+    return
+  }
   subTab.value = name
-  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
-  go(subListPath(channel.value, cat))
+  loadCatItems()
 }
 
 const loadSubCats = async () => {
@@ -225,6 +230,66 @@ const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => 
   mark: mark || (isRecent(c.created_at) ? 'new' : undefined),
   tone: c.id % 6,
 })
+
+const toNovelCover = (n: NovelItem): CoverItem => {
+  const ended = n.update_status === 2
+  return {
+    id: String(n.id),
+    title: n.title,
+    cover: mediaUrl(n.cover),
+    badge: ended ? '已完结' : `共${n.chapter_count || 0}章`,
+    statusTone: ended ? 'end' : 'chapter',
+    mark: isRecent(n.created_at) ? 'new' : undefined,
+    tone: n.id % 6,
+  }
+}
+
+const loadCatItems = async () => {
+  const name = subTab.value
+  if (!name) {
+    catItems.value = []
+    return
+  }
+  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
+  catLoading.value = true
+  try {
+    if (isComic.value) {
+      let sort = 2
+      let recommend = 0
+      let cate = ''
+      if (cat?.kind === 3) sort = 1
+      else if (cat?.kind === 2) {
+        sort = 0
+        recommend = 1
+      } else if (cat?.kind !== 1) {
+        cate = name
+      }
+      const data = await fetchComicsList(1, 36, '', cate, sort, recommend)
+      catItems.value = (data.list || []).map((c) => toComicCover(c))
+      return
+    }
+    if (isCartoon.value) {
+      let sort = 1
+      let cate = ''
+      if (cat?.kind === 2 || cat?.kind === 3) sort = 0
+      else if (cat?.kind !== 1) {
+        cate = name
+      }
+      const data = await fetchCartoonList(1, 36, '', cate, sort)
+      catItems.value = (data.list || []).map((c) => toCartoonCover(c))
+      return
+    }
+    const cate = !cat || cat.kind === 0 ? name : ''
+    const sort = cat?.kind === 3 ? 1 : 2
+    const data = await fetchNovelList(1, 36, '', cate, sort)
+    catItems.value = (data.list || []).map(toNovelCover)
+  } catch (err) {
+    toastError(err)
+    catItems.value = []
+  } finally {
+    catLoading.value = false
+  }
+}
 
 const banners = computed<CoverItem[]>(() => {
   const first = floors.value.find((f) => f.items.length)
@@ -364,6 +429,11 @@ watch(channel, () => {
   padding: 4px 0 20px;
   min-height: 60vh;
   background: #0b0b0d;
+}
+
+.cat-pane {
+  padding: 10px 0 20px;
+  min-height: 50vh;
 }
 
 .quick-strip {

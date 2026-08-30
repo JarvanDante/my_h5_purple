@@ -18,6 +18,13 @@
     <DouyinHome v-if="isDouyin" />
 
     <template v-else>
+    <div v-if="subTab" class="cat-pane">
+      <p v-if="catLoading" class="page-empty">加载中…</p>
+      <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」视频</p>
+      <PosterGrid v-else :items="catItems" :cols="2" wide @select="open" />
+    </div>
+
+    <template v-else>
     <section class="ad-rail-wrap">
       <AdSwipe :items="ads" />
     </section>
@@ -67,6 +74,7 @@
       </transition>
     </div>
     </template>
+    </template>
   </div>
 </template>
 
@@ -75,7 +83,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import { fetchKingkongList } from '@/api/kingkong'
-import { fetchVideoCategories, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
+import { fetchVideoCategories, fetchVideoList, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
 import AdSwipe from '@/components/AdSwipe.vue'
 import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
@@ -108,28 +116,24 @@ const catsByChannel = ref<Record<string, SubCat[]>>({
 })
 const subTab = ref('')
 const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c) => c.name))
-
-const channelMedia = (name: string) => (name === '抖音' ? 'douyin' : 'video')
-
-const subListPath = (ch: string, cat?: SubCat) => {
-  const media = channelMedia(ch)
-  if (!cat) return `/list?media=${media}`
-  if (cat.kind === 1) return `/list?media=${media}&type=daily`
-  if (cat.kind === 2) return `/list?media=${media}&type=recommend`
-  if (cat.kind === 3) return `/list?media=${media}&type=rank`
-  return `/list?media=${media}&type=category&category=${encodeURIComponent(cat.name)}`
-}
+const catItems = ref<CoverItem[]>([])
+const catLoading = ref(false)
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
   subTab.value = ''
+  catItems.value = []
 }
 
 const selectSub = (name: string) => {
+  if (subTab.value === name) {
+    subTab.value = ''
+    catItems.value = []
+    return
+  }
   subTab.value = name
-  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
-  go(subListPath(channel.value, cat))
+  loadCatItems()
 }
 
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
@@ -154,6 +158,31 @@ const toCover = (v: VideoItem, mark?: CoverItem['mark']): CoverItem => ({
   mark: mark || (isRecent(v.created_at) ? 'new' : undefined),
   tone: v.id % 6,
 })
+
+const loadCatItems = async () => {
+  const name = subTab.value
+  if (!name) {
+    catItems.value = []
+    return
+  }
+  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
+  catLoading.value = true
+  try {
+    let sort = 1
+    let cate = ''
+    if (cat?.kind === 2 || cat?.kind === 3) sort = 0
+    else if (cat?.kind !== 1) {
+      cate = name
+    }
+    const data = await fetchVideoList(1, 36, '', sort, cate)
+    catItems.value = (data.list || []).map((v) => toCover(v))
+  } catch (err) {
+    toastError(err)
+    catItems.value = []
+  } finally {
+    catLoading.value = false
+  }
+}
 
 const ads = computed<CoverItem[]>(() => {
   const live = floors.value.find((f) => f.items.length)?.items.slice(0, 6) || []
@@ -296,6 +325,11 @@ onMounted(() => {
   text-align: center;
   color: #6f6f78;
   font-size: 13px;
+}
+
+.cat-pane {
+  padding: 10px 0 20px;
+  min-height: 50vh;
 }
 
 .hero-mix {
