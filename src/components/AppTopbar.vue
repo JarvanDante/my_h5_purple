@@ -52,9 +52,10 @@ const goHome = () => {
   height: 32px;
   border: 0;
   padding: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   overflow: hidden;
-  background: linear-gradient(145deg, #ff8fb3, #ff5c93);
+  background: linear-gradient(145deg, #ff8fb3 0%, $primary-color 58%, $primary-color-deep 100%);
+  box-shadow: 0 0 12px rgba(255, 92, 147, 0.35);
 }
 
 .brand-img,
@@ -99,23 +100,28 @@ const goHome = () => {
 
 .menu-btn {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border: 0;
   padding: 0;
-  background: transparent;
+  border-radius: 10px;
+  background: $background-surface2;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .menu-btn i {
   display: block;
-  width: 18px;
-  height: 1.6px;
+  width: 16px;
+  height: 1.8px;
   border-radius: 2px;
-  background: #f2d27a;
+  background: $primary-color;
+}
+
+.menu-btn i:nth-child(2) {
+  width: 12px;
 }
 </style>

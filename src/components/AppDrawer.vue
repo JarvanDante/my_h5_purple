@@ -93,7 +93,7 @@ const go = (path: string) => {
   position: fixed;
   inset: 0;
   z-index: 1200;
-  background: rgba(0, 0, 0, 0.46);
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .drawer-panel {
@@ -104,8 +104,10 @@ const go = (path: string) => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #16141c;
-  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.35);
+  background:
+    radial-gradient(120% 60% at 100% 0%, rgba(255, 92, 147, 0.22), transparent 46%),
+    $background-page;
+  box-shadow: -16px 0 36px rgba(0, 0, 0, 0.45);
   animation: drawer-in 0.22s ease-out;
 }
 
@@ -113,31 +115,32 @@ const go = (path: string) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(12px + var(--app-header-top)) 14px 14px;
-  border-bottom: 1px solid rgba(242, 210, 122, 0.18);
+  padding: calc(12px + var(--app-header-top)) 16px 16px;
+  border-bottom: 1px solid rgba(255, 92, 147, 0.22);
 }
 
 .head-brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #f2d27a;
+  color: $text-color;
 }
 
 .head-mark {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: linear-gradient(145deg, #ff8fb3, #ff5c93);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #ff8fb3 0%, $primary-color 58%, $primary-color-deep 100%);
+  box-shadow: 0 0 12px rgba(255, 92, 147, 0.35);
   color: #fff;
   font-size: 16px;
   font-weight: 800;
-  line-height: 32px;
+  line-height: 34px;
   text-align: center;
 }
 
 .head-brand strong {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
@@ -146,48 +149,73 @@ const go = (path: string) => {
   width: 32px;
   height: 32px;
   border: 0;
-  background: transparent;
-  color: #f2d27a;
-  font-size: 26px;
+  border-radius: 10px;
+  background: $background-surface2;
+  color: $text-color-secondary;
+  font-size: 22px;
   line-height: 1;
 }
 
 .drawer-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 10px 8px;
+  padding: 12px 10px;
 }
 
-.drawer-nav button,
-.drawer-foot button {
+.drawer-nav button {
   width: 100%;
-  height: 48px;
+  height: 50px;
   border: 0;
+  border-radius: 12px;
   padding: 0 12px;
   background: transparent;
-  color: #f2d27a;
+  color: $text-color;
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 15px;
   font-weight: 600;
+
+  &:active {
+    background: $primary-soft;
+    color: $primary-color;
+  }
+}
+
+.drawer-foot button {
+  width: 100%;
+  height: 48px;
+  border: 1px solid rgba(255, 92, 147, 0.35);
+  border-radius: $radius-pill;
+  padding: 0 14px;
+  background: $primary-soft;
+  color: $primary-color;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .nav-ico {
-  width: 22px;
-  height: 22px;
-  color: #f2d27a;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: $background-surface2;
+  color: $primary-color;
   display: flex;
+  align-items: center;
+  justify-content: center;
 
   :deep(svg) {
-    width: 100%;
-    height: 100%;
+    width: 18px;
+    height: 18px;
   }
 }
 
 .drawer-foot {
-  padding: 8px 8px calc(12px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid rgba(242, 210, 122, 0.18);
+  padding: 10px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255, 92, 147, 0.16);
 }
 
 @keyframes drawer-in {
