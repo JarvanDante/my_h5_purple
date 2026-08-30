@@ -445,6 +445,13 @@ watch(
 }
 
 @media (min-width: $desktop-preview-min) {
+  .mask {
+    left: 50%;
+    width: 100%;
+    max-width: $phone-max-width;
+    transform: translateX(-50%);
+  }
+
   .sheet {
     max-width: $phone-max-width;
     margin: 0 auto;

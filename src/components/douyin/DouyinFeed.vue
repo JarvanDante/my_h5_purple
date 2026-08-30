@@ -442,6 +442,8 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .dy-feed {
   position: relative;
   flex: 1;
@@ -463,6 +465,15 @@ onMounted(() => {
   .unmute {
     top: 10px;
     right: 12px;
+  }
+}
+
+@media (min-width: $desktop-preview-min) {
+  .dy-feed.overlay {
+    left: 50%;
+    right: auto;
+    width: $phone-max-width;
+    transform: translateX(-50%);
   }
 }
 
