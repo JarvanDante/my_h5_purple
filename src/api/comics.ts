@@ -58,8 +58,14 @@ export function fetchComicsList(
 ) {
   const q = new URLSearchParams({ page: String(page), size: String(size) })
   if (keyword) q.set('keyword', keyword)
-  if (category) q.set('category', category)
-  if (tag) q.set('tag', tag)
+  if (category) {
+    q.set('category', category)
+    q.set('categories', category)
+  }
+  if (tag) {
+    q.set('tag', tag)
+    q.set('tags', tag)
+  }
   if (sort !== undefined) q.set('sort', String(sort))
   if (recommend) q.set('recommend', String(recommend))
   if (payType) q.set('pay_type', String(payType))

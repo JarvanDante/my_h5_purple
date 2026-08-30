@@ -50,6 +50,8 @@
               :key="floor.id"
               :title="floor.title"
               :sub="floor.sub"
+              :categories="floor.categories"
+              :tags="floor.tags"
               more
               @more="go(floor.more)"
             >
@@ -100,6 +102,7 @@ import { comicPath, videoPath } from '@/utils/idcrypt'
 import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
+import { moduleChips, moduleMorePath } from '@/utils/moduleFilter'
 
 defineOptions({ name: 'Comic' })
 
@@ -196,6 +199,8 @@ type FloorBlockItem = {
   id: number
   title: string
   sub: string
+  categories: string[]
+  tags: string[]
   layout: FloorLayout
   more: string
   empty: string
@@ -331,13 +336,8 @@ const moduleSub = (icon: number) => {
 
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
-const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categories?: string[] }) => {
-  const cat = mod.categories?.[0]
-  if (cat) return `/list?media=${media}&type=category&category=${encodeURIComponent(cat)}`
-  const tag = mod.tags?.[0]
-  if (tag) return `/list?media=${media}&tag=${encodeURIComponent(tag)}`
-  return `/list?media=${media}&type=daily`
-}
+const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categories?: string[] }) =>
+  moduleMorePath(media, mod)
 
 const loadComicFloors = async () => {
   try {
@@ -348,10 +348,13 @@ const loadComicFloors = async () => {
     }
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
+      const chips = moduleChips(mod)
       return {
         id: mod.id,
         title: mod.name,
         sub: moduleSub(mod.icon),
+        categories: chips.categories,
+        tags: chips.tags,
         layout: moduleLayout(mod.style),
         more: moduleMore('comic', mod),
         empty: `暂无「${mod.name}」漫画`,
@@ -373,10 +376,13 @@ const loadCartoonFloors = async () => {
     }
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
+      const chips = moduleChips(mod)
       return {
         id: mod.id,
         title: mod.name,
         sub: moduleSub(mod.icon),
+        categories: chips.categories,
+        tags: chips.tags,
         layout: moduleLayout(mod.style),
         more: moduleMore('cartoon', mod),
         empty: `暂无「${mod.name}」动漫`,

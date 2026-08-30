@@ -30,6 +30,7 @@ import { listTitles, type CoverItem } from '@/data/mock'
 import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
+import { splitNames } from '@/utils/moduleFilter'
 
 const route = useRoute()
 const router = useRouter()
@@ -42,8 +43,15 @@ const media = computed(() => {
   return 'comic'
 })
 const type = computed(() => String(route.query.type || ''))
-const category = computed(() => String(route.query.category || ''))
-const tag = computed(() => String(route.query.tag || ''))
+const categories = computed(() =>
+  [...new Set([...splitNames(route.query.categories), ...splitNames(route.query.category)])],
+)
+const tags = computed(() =>
+  [...new Set([...splitNames(route.query.tags), ...splitNames(route.query.tag)])],
+)
+const category = computed(() => categories.value.join(','))
+const tag = computed(() => tags.value.join(','))
+const dimTitle = computed(() => [...categories.value, ...tags.value].join(' · '))
 
 const videoTitles: Record<string, string> = {
   topic: '专题',
@@ -71,46 +79,27 @@ const cartoonTitles: Record<string, string> = {
 }
 
 const title = computed(() => {
-  if (media.value === 'video') {
-    return tag.value || category.value || videoTitles[type.value] || '相关视频'
-  }
-  if (media.value === 'douyin') {
-    return tag.value || category.value || douyinTitles[type.value] || '相关抖音'
-  }
-  if (media.value === 'cartoon') {
-    return tag.value || category.value || cartoonTitles[type.value] || '相关动漫'
-  }
-  if (media.value === 'novel') {
-    return tag.value || category.value || '相关小说'
-  }
-  if (tag.value) return tag.value
-  if (category.value) return category.value
+  if (dimTitle.value) return dimTitle.value
+  if (media.value === 'video') return videoTitles[type.value] || '相关视频'
+  if (media.value === 'douyin') return douyinTitles[type.value] || '相关抖音'
+  if (media.value === 'cartoon') return cartoonTitles[type.value] || '相关动漫'
+  if (media.value === 'novel') return '相关小说'
   return listTitles[type.value] || '列表'
 })
 
 const emptyText = computed(() => {
-  if (media.value === 'video') {
-    if (tag.value) return `暂无「${tag.value}」视频`
-    if (category.value) return `暂无「${category.value}」视频`
-    return '暂无相关视频'
-  }
-  if (media.value === 'douyin') {
-    if (tag.value) return `暂无「${tag.value}」抖音`
-    if (category.value) return `暂无「${category.value}」抖音`
-    return '暂无相关抖音'
-  }
-  if (media.value === 'cartoon') {
-    if (tag.value) return `暂无「${tag.value}」动漫`
-    if (category.value) return `暂无「${category.value}」动漫`
-    return '暂无相关动漫'
-  }
-  if (media.value === 'novel') {
-    if (category.value) return `暂无「${category.value}」小说`
-    return '暂无相关小说'
-  }
-  if (tag.value) return `暂无「${tag.value}」漫画`
-  if (category.value) return `暂无「${category.value}」漫画`
-  return '暂无相关漫画'
+  const kind =
+    media.value === 'video'
+      ? '视频'
+      : media.value === 'douyin'
+        ? '抖音'
+        : media.value === 'cartoon'
+          ? '动漫'
+          : media.value === 'novel'
+            ? '小说'
+            : '漫画'
+  if (dimTitle.value) return `暂无「${dimTitle.value}」${kind}`
+  return `暂无相关${kind}`
 })
 
 const pad = (n: number) => String(n).padStart(2, '0')

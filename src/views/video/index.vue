@@ -50,6 +50,8 @@
               :key="floor.id"
               :title="floor.title"
               :sub="floor.sub"
+              :categories="floor.categories"
+              :tags="floor.tags"
               more
               @more="go(floor.more)"
             >
@@ -97,6 +99,7 @@ import { formatDuration, isRecent } from '@/utils/format'
 import { videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
+import { moduleChips, moduleMorePath } from '@/utils/moduleFilter'
 
 defineOptions({ name: 'Video' })
 
@@ -139,6 +142,8 @@ type FloorBlockItem = {
   id: number
   title: string
   sub: string
+  categories: string[]
+  tags: string[]
   layout: FloorLayout
   more: string
   empty: string
@@ -207,13 +212,7 @@ const moduleSub = (icon: number) => {
 
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
-const moduleMore = (mod: VideoModule) => {
-  const cat = mod.categories?.[0]
-  if (cat) return `/list?media=video&type=category&category=${encodeURIComponent(cat)}`
-  const tag = mod.tags?.[0]
-  if (tag) return `/list?media=video&tag=${encodeURIComponent(tag)}`
-  return '/list?media=video&type=daily'
-}
+const moduleMore = (mod: VideoModule) => moduleMorePath('video', mod)
 
 type QuickItem = {
   key: string
@@ -278,10 +277,13 @@ const loadFloors = async () => {
     const mods = (await fetchVideoModules('video_home')).list || []
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
+      const chips = moduleChips(mod)
       return {
         id: mod.id,
         title: mod.name,
         sub: moduleSub(mod.icon),
+        categories: chips.categories,
+        tags: chips.tags,
         layout: moduleLayout(mod.style),
         more: moduleMore(mod),
         empty: `暂无「${mod.name}」视频`,

@@ -32,8 +32,14 @@ export function fetchVideoCategories() {
 export function fetchVideoList(page = 1, size = 20, keyword = '', sort = 0, category = '', tag = '') {
   const q = new URLSearchParams({ page: String(page), size: String(size), sort: String(sort) })
   if (keyword) q.set('keyword', keyword)
-  if (category) q.set('category', category)
-  if (tag) q.set('tag', tag)
+  if (category) {
+    q.set('category', category)
+    q.set('categories', category)
+  }
+  if (tag) {
+    q.set('tag', tag)
+    q.set('tags', tag)
+  }
   return request<{ list: VideoItem[]; total: number; page: number; size: number }>(`/video/list?${q}`)
 }
 
