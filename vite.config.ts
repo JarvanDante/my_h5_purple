@@ -19,6 +19,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5174,
+    allowedHosts: ['h5.panalow.cc'],
     proxy: {
       '/front': {
         target: process.env.VITE_DEV_PROXY_TARGET || 'http://my_service:8000',
