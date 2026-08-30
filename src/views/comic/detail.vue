@@ -62,35 +62,38 @@
         </button>
       </div>
 
-      <div class="scroll-body">
-        <template v-if="tab === 'detail'">
-          <section class="catalog">
-            <div class="catalog-head">
-              <h3>目录</h3>
-              <span>共{{ chapters.length }}话 ›</span>
-            </div>
-            <button
-              v-for="ch in chapters"
-              :key="ch.id"
-              type="button"
-              class="chapter"
-              :class="{ lock: !ch.playable }"
-              @click="openChapter(ch)"
-            >
-              <span class="ch-thumb">
-                <EncryptedImage v-if="cover" :src="cover" alt="" />
-              </span>
-              <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
-              <span v-if="ch.playable" class="watch">观看</span>
-              <span v-else class="ch-lock">锁</span>
-            </button>
-          </section>
-        </template>
-        <div v-else class="comment-hold">评论即将开放</div>
+      <div v-if="tab === 'detail'" class="scroll-body">
+        <section class="catalog">
+          <div class="catalog-head">
+            <h3>目录</h3>
+            <span>共{{ chapters.length }}话 ›</span>
+          </div>
+          <button
+            v-for="ch in chapters"
+            :key="ch.id"
+            type="button"
+            class="chapter"
+            :class="{ lock: !ch.playable }"
+            @click="openChapter(ch)"
+          >
+            <span class="ch-thumb">
+              <EncryptedImage v-if="cover" :src="cover" alt="" />
+            </span>
+            <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
+            <span v-if="ch.playable" class="watch">观看</span>
+            <span v-else class="ch-lock">锁</span>
+          </button>
+        </section>
       </div>
+      <CommentPanel
+        v-if="tab === 'comment' && item"
+        :content-id="item.id"
+        :media-type="COMMENT_MEDIA_COMICS"
+        @update:count="commentCount = $event"
+      />
     </div>
 
-    <div class="bottom-bar">
+    <div v-if="tab === 'detail'" class="bottom-bar">
       <button v-if="item?.need_pay" type="button" class="read-btn" @click="buy">购买整部</button>
       <button v-else type="button" class="read-btn" @click="startFirst">开始阅读</button>
     </div>
@@ -110,7 +113,9 @@ import {
   type ChapterItem,
   type ComicsDetail,
 } from '@/api/comics'
+import { COMMENT_MEDIA_COMICS, fetchComments } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
+import CommentPanel from '@/components/CommentPanel.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import { pushBrowse } from '@/utils/browseHistory'
 import { comicReadPath, routeId } from '@/utils/idcrypt'
@@ -123,7 +128,7 @@ const item = ref<ComicsDetail | null>(null)
 const chapters = ref<ChapterItem[]>([])
 const collected = ref(false)
 const tab = ref<'detail' | 'comment'>('detail')
-const commentCount = computed(() => 0)
+const commentCount = ref(0)
 
 const cover = computed(() => mediaUrl(item.value?.cover))
 const categories = computed(() => comicCategories(item.value || {}))
@@ -160,7 +165,21 @@ const load = async () => {
     tag: d.is_vip ? 'VIP' : 'Free',
     sub: d.chapter_count ? `共${d.chapter_count}话` : '',
   })
-  await loadFav()
+  if (route.query.tab === 'comment' || Number(route.query.comment) > 0) {
+    tab.value = 'comment'
+  }
+  await Promise.all([loadFav(), loadCommentCount()])
+}
+
+const loadCommentCount = async () => {
+  const id = item.value?.id || routeId(route.params.id)
+  if (!id) return
+  try {
+    const data = await fetchComments(id, 1, 1, 0, COMMENT_MEDIA_COMICS)
+    commentCount.value = data.total || 0
+  } catch {
+    commentCount.value = 0
+  }
 }
 
 const buy = async () => {

@@ -97,7 +97,7 @@ import {
 } from '@/api/ops'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { useUserStore } from '@/stores/user'
-import { encodeId, postPath } from '@/utils/idcrypt'
+import { comicPath, encodeId, postPath, videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const tabs = [
@@ -201,6 +201,14 @@ const openInteract = async (m: InteractItem) => {
         page: m.page || 1,
       }),
     )
+    return
+  }
+  if (m.media_type === 1 && m.content_id) {
+    router.push(`${videoPath(m.content_id)}?tab=comment`)
+    return
+  }
+  if (m.media_type === 4 && m.content_id) {
+    router.push(`${comicPath(m.content_id)}?tab=comment`)
     return
   }
   showToast(m.snippet || actionText(m))

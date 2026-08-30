@@ -8,9 +8,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdSwipe: typeof import('./src/components/AdSwipe.vue')['default']
+    AppDrawer: typeof import('./src/components/AppDrawer.vue')['default']
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
+    AppTopbar: typeof import('./src/components/AppTopbar.vue')['default']
     ChannelTab: typeof import('./src/components/ChannelTab.vue')['default']
     CommentDrawer: typeof import('./src/components/douyin/CommentDrawer.vue')['default']
+    CommentPanel: typeof import('./src/components/CommentPanel.vue')['default']
     CommentRow: typeof import('./src/components/CommentRow.vue')['default']
     CoverMosaic: typeof import('./src/components/CoverMosaic.vue')['default']
     DouyinFeed: typeof import('./src/components/douyin/DouyinFeed.vue')['default']
@@ -23,6 +26,7 @@ declare module 'vue' {
     HomeHero: typeof import('./src/components/home/HomeHero.vue')['default']
     LineIcon: typeof import('./src/components/LineIcon.vue')['default']
     MediaGrid: typeof import('./src/components/MediaGrid.vue')['default']
+    NoticeMarquee: typeof import('./src/components/home/NoticeMarquee.vue')['default']
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']
     PostCard: typeof import('./src/components/PostCard.vue')['default']
     PosterCard: typeof import('./src/components/home/PosterCard.vue')['default']

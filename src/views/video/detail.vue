@@ -1,5 +1,5 @@
 <template>
-  <div class="page-shell sub-page video-play">
+  <div class="page-shell sub-page video-play" :class="{ 'is-comment': tab === 'comment' }">
     <div class="player" :class="[`tone-${tone}`, { 'is-fs': isFs }]">
       <button type="button" class="back-btn" aria-label="返回" @click="back">
         <svg viewBox="0 0 24 24" fill="none">
@@ -33,7 +33,9 @@
 
     <div class="tab-row">
       <button type="button" class="tab" :class="{ active: tab === 'intro' }" @click="tab = 'intro'">简介</button>
-      <button type="button" class="tab" :class="{ active: tab === 'comment' }" @click="tab = 'comment'">评论</button>
+      <button type="button" class="tab" :class="{ active: tab === 'comment' }" @click="tab = 'comment'">
+        评论({{ commentCount }})
+      </button>
       <button type="button" class="line-btn" @click="soon('线路')">线路1</button>
     </div>
 
@@ -88,9 +90,12 @@
       </SectionPanel>
     </template>
 
-    <section v-else class="comment-box">
-      <p class="page-empty">暂无评论</p>
-    </section>
+    <CommentPanel
+      v-else-if="item"
+      :content-id="item.id"
+      :media-type="COMMENT_MEDIA_VIDEO"
+      @update:count="commentCount = $event"
+    />
   </div>
 </template>
 
@@ -98,9 +103,11 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import CommentPanel from '@/components/CommentPanel.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
+import { COMMENT_MEDIA_VIDEO } from '@/api/ops'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
 import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
 import { useUserStore } from '@/stores/user'
@@ -116,6 +123,7 @@ const userStore = useUserStore()
 const item = ref<VideoItem | null>(null)
 const recommends = ref<CoverItem[]>([])
 const tab = ref<'intro' | 'comment'>('intro')
+const commentCount = ref(0)
 const liked = ref(false)
 const collected = ref(false)
 const playerRef = ref<{ play: () => void } | null>(null)
@@ -288,14 +296,16 @@ const toggle = async (kind: 'like' | 'fav') => {
 const load = () => {
   const id = routeId(route.params.id)
   if (!id) return
-  tab.value = 'intro'
+  tab.value = route.query.tab === 'comment' || Number(route.query.comment) > 0 ? 'comment' : 'intro'
   liked.value = false
   collected.value = false
+  commentCount.value = 0
   showPauseAd.value = false
   startAdTimer()
   fetchVideoDetail(id)
     .then((data) => {
       item.value = data
+      commentCount.value = Number(data.comment_count || 0)
       pushBrowse({
         id: data.id,
         kind: 'video',
@@ -330,6 +340,15 @@ onBeforeUnmount(() => {
 .video-play {
   padding-bottom: 16px;
   background: $background-page;
+}
+
+.video-play.is-comment {
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: 0;
 }
 
 .player {
@@ -613,11 +632,8 @@ onBeforeUnmount(() => {
   }
 }
 
-.comment-box {
-  min-height: 160px;
-  margin: 12px 14px;
-  padding: 12px;
-  background: $background-surface2;
-  border-radius: $radius-card;
+.video-play.is-comment .player,
+.video-play.is-comment .tab-row {
+  flex-shrink: 0;
 }
 </style>

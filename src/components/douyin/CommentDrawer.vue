@@ -192,7 +192,7 @@ const onPick = async (e: Event) => {
   }
   try {
     await userStore.ensureLogin()
-    pic.value = await uploadPostMedia(file)
+    pic.value = (await uploadPostMedia(file, 'image')).url
   } catch (err) {
     toastError(err)
   }

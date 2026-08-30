@@ -150,6 +150,12 @@ export type CommentItem = {
   replies?: CommentItem[]
 }
 
+/** 评论 media_type，勿与收藏/付费编码混用（漫画评论是 4，不是 3）。 */
+export const COMMENT_MEDIA_VIDEO = 1
+export const COMMENT_MEDIA_POST = 2
+export const COMMENT_MEDIA_COMICS = 4
+export const COMMENT_MEDIA_NOVEL = 7
+
 export function fetchComments(contentId: number, page = 1, size = 20, sort = 0, mediaType = 2) {
   return request<{ list: CommentItem[]; total: number }>('/comment/list', {
     method: 'POST',
