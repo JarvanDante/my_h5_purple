@@ -1,6 +1,14 @@
 <template>
   <section v-if="items.length" class="home-hero">
-    <div ref="track" class="hero-track" @scroll.passive="onScroll">
+    <div
+      ref="track"
+      class="hero-track"
+      @scroll.passive="onScroll"
+      @touchstart.passive="pause"
+      @touchend.passive="resumeLater"
+      @mouseenter="pause"
+      @mouseleave="resumeLater"
+    >
       <button
         v-for="item in items"
         :key="item.id"
@@ -21,11 +29,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import type { CoverItem } from '@/data/mock'
 
-defineProps<{
+const props = defineProps<{
   items: CoverItem[]
 }>()
 
@@ -35,12 +43,68 @@ defineEmits<{
 
 const track = ref<HTMLElement>()
 const index = ref(0)
+let timer = 0
+let resumeTimer = 0
 
 const onScroll = () => {
   const el = track.value
   if (!el?.clientWidth) return
   index.value = Math.round(el.scrollLeft / el.clientWidth)
 }
+
+const goTo = (i: number) => {
+  const el = track.value
+  const n = props.items.length
+  if (!el?.clientWidth || n <= 1) return
+  const next = ((i % n) + n) % n
+  index.value = next
+  el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
+}
+
+const stop = () => {
+  window.clearInterval(timer)
+  timer = 0
+}
+
+const start = () => {
+  stop()
+  if (props.items.length <= 1) return
+  timer = window.setInterval(() => goTo(index.value + 1), 3000)
+}
+
+const pause = () => {
+  stop()
+  window.clearTimeout(resumeTimer)
+}
+
+const resumeLater = () => {
+  window.clearTimeout(resumeTimer)
+  resumeTimer = window.setTimeout(start, 3000)
+}
+
+const onHide = () => {
+  if (document.hidden) pause()
+  else start()
+}
+
+onMounted(() => {
+  start()
+  document.addEventListener('visibilitychange', onHide)
+})
+
+onUnmounted(() => {
+  pause()
+  document.removeEventListener('visibilitychange', onHide)
+})
+
+watch(
+  () => props.items.map((item) => item.id).join(','),
+  () => {
+    index.value = 0
+    track.value?.scrollTo({ left: 0, behavior: 'auto' })
+    start()
+  },
+)
 </script>
 
 <style scoped lang="scss">
