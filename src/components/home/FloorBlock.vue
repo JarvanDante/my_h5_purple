@@ -25,10 +25,9 @@ defineEmits<{
 
 <style scoped lang="scss">
 .floor-block {
-  margin: 0 12px 14px;
-  padding: 12px 0 14px;
-  background: #1c1c22;
-  border-radius: 14px;
+  margin: 0 0 16px;
+  padding: 4px 0 8px;
+  background: transparent;
 }
 
 .floor-head {

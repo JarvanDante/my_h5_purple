@@ -365,11 +365,10 @@ watch(channel, () => {
 }
 
 .quick-strip {
-  margin: 0 12px 14px;
+  margin: 4px 0 10px;
   height: 88px;
   padding: 0 6px;
-  background: #1c1c22;
-  border-radius: 14px;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -433,7 +432,7 @@ watch(channel, () => {
 }
 
 .comic-page .quick-strip {
-  background: #1c1c22;
+  background: transparent;
   box-shadow: none;
 }
 
