@@ -45,7 +45,8 @@ import { fetchShareInfo, reportShare } from '@/api/user'
 import type { DouyinItem } from '@/api/douyin'
 import { useConfigStore } from '@/stores/config'
 import { useUserStore } from '@/stores/user'
-import { encodeId, videoPath } from '@/utils/idcrypt'
+import { encodeId } from '@/utils/idcrypt'
+import { buildPromoText, buildPromoUrl, officialShareBase, promoSlogan } from '@/utils/promoShare'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const props = defineProps<{
@@ -62,6 +63,7 @@ const configStore = useConfigStore()
 const busy = ref(false)
 const cardEl = ref<HTMLElement | null>(null)
 const shareCode = ref('')
+const apiShareUrl = ref('')
 
 const appName = computed(() => configStore.appName || '漫隐')
 const slogan = computed(() => {
@@ -74,11 +76,7 @@ const cover = computed(() => mediaUrl(props.item?.cover_url))
 
 const code = computed(() => shareCode.value || encodeId(userStore.user?.id) || '')
 
-const shareBase = computed(() => {
-  const conf = String(configStore.shareUrl || '').trim().replace(/\/$/, '')
-  if (conf && !/example\.com/i.test(conf)) return conf
-  return location.origin.replace(/\/$/, '')
-})
+const shareBase = computed(() => officialShareBase(apiShareUrl.value || configStore.shareUrl))
 
 const officialHost = computed(() => {
   try {
@@ -88,17 +86,8 @@ const officialHost = computed(() => {
   }
 })
 
-const link = computed(() => {
-  const path = props.item?.id ? `${location.origin}${videoPath(props.item.id)}` : shareBase.value
-  if (!code.value) return path
-  try {
-    const url = new URL(path)
-    url.searchParams.set('code', code.value)
-    return url.toString()
-  } catch {
-    return `${path}${path.includes('?') ? '&' : '?'}code=${encodeURIComponent(code.value)}`
-  }
-})
+const link = computed(() => (code.value ? buildPromoUrl(shareBase.value, code.value) : shareBase.value))
+const copyText = computed(() => buildPromoText(promoSlogan(configStore.configs), link.value))
 
 const qrSrc = computed(() => {
   if (!link.value) return ''
@@ -113,6 +102,7 @@ const load = async () => {
     if (!configStore.loaded) await configStore.load().catch(() => undefined)
     const info = await fetchShareInfo().catch(() => null)
     shareCode.value = info?.share_code || encodeId(userStore.user?.id) || ''
+    apiShareUrl.value = info?.share_url || ''
   } catch (err) {
     toastError(err)
   }
@@ -122,7 +112,7 @@ const copyLink = async () => {
   if (!link.value) return
   busy.value = true
   try {
-    await navigator.clipboard.writeText(link.value)
+    await navigator.clipboard.writeText(copyText.value)
     await reportShare('link', 'douyin').catch(() => undefined)
     showToast('链接已复制')
   } catch {
@@ -264,6 +254,7 @@ watch(
   ([show]) => {
     if (!show) return
     shareCode.value = ''
+    apiShareUrl.value = ''
     load()
   },
 )

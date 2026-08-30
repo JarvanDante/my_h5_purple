@@ -280,6 +280,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   document.title = (to.meta.title as string | undefined) || 'Purple'
+  if (to.query.invite) rememberInviteCode(to.query.invite)
   if (to.query.code) rememberInviteCode(to.query.code)
   if (from.path) {
     useNavStore().setByRoute(to.path, from.path)

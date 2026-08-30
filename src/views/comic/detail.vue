@@ -227,14 +227,7 @@ const back = async () => {
   await router.replace('/comic')
 }
 
-const share = async () => {
-  try {
-    await navigator.clipboard.writeText(window.location.href)
-    showToast('链接已复制')
-  } catch {
-    showToast('复制失败')
-  }
-}
+const share = () => router.push('/invite')
 
 const onFav = async () => {
   if (!item.value) return
