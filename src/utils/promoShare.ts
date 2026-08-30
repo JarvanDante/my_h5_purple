@@ -9,11 +9,10 @@ export function buildPromoUrl(base: string, code: string) {
   try {
     const url = new URL(base)
     url.searchParams.set('invite', code)
-    url.searchParams.set('code', code)
     return url.toString()
   } catch {
     const sep = base.includes('?') ? '&' : '?'
-    return `${base}${sep}invite=${encodeURIComponent(code)}&code=${encodeURIComponent(code)}`
+    return `${base}${sep}invite=${encodeURIComponent(code)}`
   }
 }
 
