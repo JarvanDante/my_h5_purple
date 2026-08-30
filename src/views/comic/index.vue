@@ -14,6 +14,7 @@
     />
 
     <HomeHero :items="banners" @select="open" />
+    <NoticeMarquee />
 
     <div class="inner-slide">
       <transition :name="innerName">
@@ -69,6 +70,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
+import NoticeMarquee from '@/components/home/NoticeMarquee.vue'
 import PosterCard from '@/components/home/PosterCard.vue'
 import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'

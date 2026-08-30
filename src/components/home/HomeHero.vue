@@ -46,7 +46,7 @@ const onScroll = () => {
 <style scoped lang="scss">
 .home-hero {
   position: relative;
-  margin: 0 0 12px;
+  margin: 0;
 }
 
 .hero-track {
