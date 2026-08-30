@@ -102,7 +102,7 @@ defineEmits<{
 }
 
 .home-header--pack .channel-tabs {
-  gap: 18px;
+  gap: 26px;
 }
 
 .home-header--pack .channel-item {
@@ -125,13 +125,13 @@ defineEmits<{
   .sub-row {
     margin-top: 0;
     padding: 0;
-    height: 32px;
-    gap: 20px;
+    height: 40px;
+    gap: 22px;
   }
 
   .sub-item {
-    font-size: 13px;
-    line-height: 32px;
+    font-size: 15px;
+    line-height: 40px;
     padding: 0;
     letter-spacing: 0.02em;
 
@@ -171,7 +171,7 @@ defineEmits<{
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  gap: 16px;
+  gap: 26px;
   min-width: 0;
 }
 
@@ -190,14 +190,14 @@ defineEmits<{
   border: 0;
   background: transparent;
   color: $text-color-secondary;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 500;
   white-space: nowrap;
   padding: 0 0 3px;
 
   &.active {
     color: $primary-color;
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
   }
 }
@@ -226,7 +226,7 @@ defineEmits<{
   border: 0;
   background: transparent;
   color: $text-color-secondary;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 400;
   white-space: nowrap;
   padding: 0;
@@ -339,21 +339,21 @@ defineEmits<{
     align-items: flex-end;
     justify-content: center;
     height: 48px;
-    gap: 18px;
+    gap: 26px;
     overflow: visible;
   }
 
   .sub-row {
     margin-top: 0;
-    height: 34px;
+    height: 42px;
     padding: 0 4px 0 22px;
-    gap: 18px;
+    gap: 20px;
   }
 
   .sub-item {
     color: #9a9aa3;
-    font-size: 13px;
-    line-height: 34px;
+    font-size: 15px;
+    line-height: 42px;
 
     &.active {
       color: $primary-color;
