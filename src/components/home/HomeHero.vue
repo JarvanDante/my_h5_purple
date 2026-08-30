@@ -46,7 +46,7 @@ const onScroll = () => {
 <style scoped lang="scss">
 .home-hero {
   position: relative;
-  margin: 0 12px 14px;
+  margin: 0 0 12px;
 }
 
 .hero-track {
@@ -54,7 +54,7 @@ const onScroll = () => {
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
-  border-radius: 14px;
+  border-radius: 0;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 
@@ -67,10 +67,11 @@ const onScroll = () => {
   position: relative;
   flex: 0 0 100%;
   width: 100%;
-  height: 160px;
+  aspect-ratio: 16 / 7;
+  min-height: 148px;
   border: 0;
   padding: 0;
-  background: #1a1a20;
+  background: #141418;
   overflow: hidden;
   scroll-snap-align: start;
 
@@ -93,17 +94,17 @@ const onScroll = () => {
 }
 
 .hero-mask {
-  background: linear-gradient(180deg, transparent 48%, rgba(0, 0, 0, 0.72));
+  background: linear-gradient(180deg, transparent 56%, rgba(0, 0, 0, 0.55));
 }
 
 .hero-title {
   position: absolute;
   left: 14px;
-  right: 14px;
-  bottom: 14px;
+  right: 56px;
+  bottom: 12px;
   z-index: 1;
   color: #fff;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   text-align: left;
   overflow: hidden;
@@ -113,23 +114,24 @@ const onScroll = () => {
 
 .hero-dots {
   position: absolute;
-  right: 12px;
-  bottom: 10px;
+  left: 50%;
+  bottom: 8px;
   z-index: 2;
   display: flex;
-  gap: 4px;
+  gap: 5px;
+  transform: translateX(-50%);
 }
 
 .hero-dots i {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.35);
 
   &.on {
-    width: 12px;
+    width: 14px;
     border-radius: 999px;
-    background: #ff5c93;
+    background: #fff;
   }
 }
 </style>
