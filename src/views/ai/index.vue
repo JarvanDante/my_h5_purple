@@ -1,9 +1,7 @@
 <template>
   <div class="page-shell ai-home">
     <header class="ai-top">
-      <AppTopbar>
-        <div class="nav-title">AI智能创作</div>
-      </AppTopbar>
+      <AppTopbar title="AI智能创作" />
     </header>
     <header class="hero">
       <div class="hero-copy">
@@ -71,13 +69,6 @@ const open = (tool: { key: string; title: string }) => {
   z-index: 50;
   padding: var(--app-header-top) 12px 0;
   background: $background-page;
-}
-
-.nav-title {
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 48px;
 }
 
 .hero {

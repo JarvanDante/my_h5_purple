@@ -1,9 +1,7 @@
 <template>
   <div class="page-shell planet-page">
     <header class="planet-header">
-      <AppTopbar>
-        <div class="nav-title">社区</div>
-      </AppTopbar>
+      <AppTopbar title="社区" />
       <div class="channel-row">
         <div class="channel-tabs">
           <ChannelTab
@@ -233,13 +231,6 @@ onMounted(() => {
   z-index: 50;
   background: #0b0b0d;
   padding: var(--app-header-top) 8px 0 12px;
-}
-
-.nav-title {
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 48px;
 }
 
 .channel-row {

@@ -7,6 +7,7 @@
     <div class="top-center">
       <slot />
     </div>
+    <strong v-if="title" class="bar-title">{{ title }}</strong>
     <button type="button" class="menu-btn" aria-label="菜单" @click="drawer.show()">
       <i /><i /><i />
     </button>
@@ -19,6 +20,10 @@ import { useRouter } from 'vue-router'
 import { useConfigStore } from '@/stores/config'
 import { useDrawerStore } from '@/stores/drawer'
 import { mediaUrl } from '@/utils/request'
+
+defineProps<{
+  title?: string
+}>()
 
 const router = useRouter()
 const configStore = useConfigStore()
@@ -39,6 +44,7 @@ const goHome = () => {
 @use '@/styles/variables.scss' as *;
 
 .app-topbar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -96,6 +102,23 @@ const goHome = () => {
   > :deep(*) {
     width: 100%;
   }
+}
+
+.bar-title {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  max-width: calc(100% - 88px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  pointer-events: none;
 }
 
 .menu-btn {
