@@ -83,6 +83,7 @@ export type ComicsModule = {
   icon: number
   size: number
   tags: string[]
+  categories?: string[]
   items: ComicsItem[]
 }
 

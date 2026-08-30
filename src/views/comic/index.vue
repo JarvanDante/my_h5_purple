@@ -331,7 +331,9 @@ const moduleSub = (icon: number) => {
 
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
-const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[] }) => {
+const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categories?: string[] }) => {
+  const cat = mod.categories?.[0]
+  if (cat) return `/list?media=${media}&type=category&category=${encodeURIComponent(cat)}`
   const tag = mod.tags?.[0]
   if (tag) return `/list?media=${media}&tag=${encodeURIComponent(tag)}`
   return `/list?media=${media}&type=daily`
