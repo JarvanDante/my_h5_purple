@@ -2,7 +2,7 @@
   <div class="page-shell sub-page">
     <PageHeader title="签到明细" fallback="/checkin" />
     <section class="who">
-      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" :vip="user?.is_vip" />
+      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" />
       <div>
         <div class="name-row">
           <strong>{{ user?.nickname || '用户' }}</strong>

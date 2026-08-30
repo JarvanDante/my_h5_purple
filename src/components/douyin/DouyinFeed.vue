@@ -51,7 +51,7 @@
         <aside class="side">
           <div v-if="item.up_user_id" class="up">
             <button type="button" class="up-face" @click.stop="goUp(item)">
-              <UserAvatar :src="upAvatar(item)" :size="46" :sex="upSex(item)" :fallback="handle(item)" :vip="item.up_is_vip" />
+              <UserAvatar :src="upAvatar(item)" :size="46" :sex="upSex(item)" :fallback="handle(item)" />
             </button>
             <button v-if="showPlus(item)" type="button" class="plus" aria-label="关注" @click.stop="onFollow(item)">+</button>
           </div>

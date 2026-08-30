@@ -3,7 +3,7 @@
     <PageHeader :title="name || '用户主页'" fallback="/planet" />
 
     <section v-if="user" class="head">
-      <UserAvatar :src="avatarSrc" :sex="user.sex" :size="52" :fallback="name" :vip="user.is_vip" />
+      <UserAvatar :src="avatarSrc" :sex="user.sex" :size="52" :fallback="name" />
       <div class="meta">
         <div class="name-row">
           <strong>{{ name }}</strong>

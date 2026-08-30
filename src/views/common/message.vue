@@ -56,7 +56,6 @@
                 :sex="m.actor_sex"
                 :size="44"
                 :fallback="actorName(m)"
-                :vip="m.actor_is_vip"
               />
               <div class="body">
                 <div class="line">

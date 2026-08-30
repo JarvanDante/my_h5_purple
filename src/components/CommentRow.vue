@@ -1,6 +1,6 @@
 <template>
   <article :id="domId" class="cmt" :class="{ nested, official, focus }">
-    <UserAvatar class="face" :src="avatar" :size="nested ? 28 : 36" :fallback="name" :vip="item.is_vip" />
+    <UserAvatar class="face" :src="avatar" :size="nested ? 28 : 36" :fallback="name" />
     <div class="body">
       <p class="who">
         <strong>{{ name }}</strong>

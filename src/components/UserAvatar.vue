@@ -4,7 +4,6 @@
       <EncryptedImage v-if="src" :src="src" alt="" />
       <span v-else class="fallback">{{ fallbackText }}</span>
     </span>
-    <i v-if="vip" class="vip-mark" aria-label="VIP">V</i>
     <i v-if="sex === 1 || sex === 2" class="badge" :class="sex === 1 ? 'male' : 'female'" aria-hidden="true">
       <svg v-if="sex === 1" viewBox="0 0 24 24">
         <circle cx="10.2" cy="13.8" r="5.1" fill="none" stroke="currentColor" stroke-width="2.2" />
@@ -26,11 +25,10 @@ const props = withDefaults(
   defineProps<{
     src?: string
     sex?: number
-    vip?: boolean | number | null
     size?: number
     fallback?: string
   }>(),
-  { src: '', sex: 0, vip: false, size: 44, fallback: '' },
+  { src: '', sex: 0, size: 44, fallback: '' },
 )
 
 const wrapStyle = computed(() => ({
@@ -73,25 +71,6 @@ const fallbackText = computed(() => (props.fallback || '用').slice(0, 1))
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.vip-mark {
-  position: absolute;
-  left: -2px;
-  top: -2px;
-  z-index: 2;
-  min-width: 14px;
-  height: 14px;
-  padding: 0 3px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #ffe7a3 0%, #f5c14a 55%, #d9a227 100%);
-  color: #2a1604;
-  font-size: 8px;
-  font-weight: 800;
-  font-style: normal;
-  line-height: 14px;
-  text-align: center;
-  box-shadow: 0 0 0 1.4px #0b0b0d;
 }
 
 .badge {

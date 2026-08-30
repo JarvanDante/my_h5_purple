@@ -7,7 +7,6 @@
         :sex="post.sex"
         :size="40"
         :fallback="name"
-        :vip="post.is_vip"
         @click.stop="onProfile"
       />
       <div class="user-meta" @click.stop="onProfile">

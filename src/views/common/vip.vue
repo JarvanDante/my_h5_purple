@@ -5,7 +5,7 @@
     </PageHeader>
 
     <section class="profile">
-      <UserAvatar :src="avatarSrc" :sex="userStore.user?.sex" :size="52" :vip="isVip" />
+      <UserAvatar :src="avatarSrc" :sex="userStore.user?.sex" :size="52" />
       <div class="meta">
         <div class="name-row">
           <strong>{{ userStore.user?.nickname || '未登录' }}</strong>

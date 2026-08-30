@@ -17,7 +17,7 @@
 
     <section class="profile">
       <button type="button" class="avatar-wrap" @click="onAvatar">
-        <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="58" :vip="isVip" />
+        <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="58" />
       </button>
       <div class="meta">
         <div class="name-row">

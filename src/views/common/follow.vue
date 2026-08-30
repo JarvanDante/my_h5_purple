@@ -27,7 +27,7 @@
             class="row"
             @click="goUser(u.id)"
           >
-            <UserAvatar :src="mediaUrl(u.img)" :sex="u.sex" :size="44" :fallback="u.nickname || '用'" :vip="u.is_vip" />
+            <UserAvatar :src="mediaUrl(u.img)" :sex="u.sex" :size="44" :fallback="u.nickname || '用'" />
             <span class="who">
               <strong>{{ u.nickname || `用户${encodeId(u.id)}` }}</strong>
               <VipBadge :vip="u.is_vip" />

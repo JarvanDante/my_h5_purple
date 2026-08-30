@@ -3,7 +3,7 @@
     <PageHeader title="福利任务" />
 
     <section class="who">
-      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" :vip="user?.is_vip" />
+      <UserAvatar :src="avatarSrc" :sex="user?.sex" :size="48" />
       <div class="who-meta">
         <strong>ID {{ uid }}</strong>
         <div class="pills">
