@@ -6,6 +6,7 @@ export type CoverItem = {
   duration?: string
   views?: string
   cover?: string
+  href?: string
   labels?: string[]
   badge?: string
   mosaic?: boolean

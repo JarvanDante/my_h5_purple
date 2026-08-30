@@ -18,9 +18,7 @@
     <DouyinHome v-if="isDouyin" />
 
     <template v-else>
-    <section class="ad-rail-wrap">
-      <AdSwipe :items="ads" />
-    </section>
+    <HomeHero :items="banners" @select="openBanner" />
 
     <div class="inner-slide">
       <transition :name="innerName">
@@ -81,25 +79,26 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { showToast } from 'vant'
+import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
 import { fetchVideoCategories, fetchVideoList, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
-import AdSwipe from '@/components/AdSwipe.vue'
 import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'
+import HomeHero from '@/components/home/HomeHero.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { goKingkong, takeVideoChannel } from '@/utils/kingkongJump'
 import PosterCard from '@/components/home/PosterCard.vue'
 import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { videos, type CoverItem } from '@/data/mock'
+import type { CoverItem } from '@/data/mock'
 import { formatDuration, isRecent } from '@/utils/format'
 import { videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
 import { moduleChips, moduleMorePath } from '@/utils/moduleFilter'
+import { openPromoLink } from '@/utils/promoLink'
 
 defineOptions({ name: 'Video' })
 
@@ -187,10 +186,26 @@ const loadCatItems = async () => {
   }
 }
 
-const ads = computed<CoverItem[]>(() => {
-  const live = floors.value.find((f) => f.items.length)?.items.slice(0, 6) || []
-  return live.length ? live : videos.slice(0, 6)
-})
+const banners = ref<CoverItem[]>([])
+const loadBanners = async () => {
+  if (isDouyin.value) {
+    banners.value = []
+    return
+  }
+  try {
+    const data = await fetchBannerList('video')
+    banners.value = (data.list || []).map((b, i) => ({
+      id: `banner-${b.id}`,
+      title: b.title || '',
+      cover: mediaUrl(b.cover_url),
+      href: b.link,
+      tone: i % 6,
+    }))
+  } catch {
+    banners.value = []
+  }
+}
+const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 
 const emptyText = '暂无模块，请在子后台「视频模块」配置'
 
@@ -249,10 +264,6 @@ const searchHint = computed(() => videoSearchHint(isDouyin.value ? 'douyin' : 'v
 
 const go = (path: string) => router.push(path)
 const open = (item: CoverItem) => {
-  if (item.id.startsWith('v')) {
-    showToast('示例广告')
-    return
-  }
   router.push(videoPath(item.id))
 }
 
@@ -299,12 +310,14 @@ const loadFloors = async () => {
 watch(channel, () => {
   loadFloors()
   loadQuicks()
+  loadBanners()
 })
 
 onMounted(() => {
   loadSubCats()
   loadFloors()
   loadQuicks()
+  loadBanners()
 })
 </script>
 

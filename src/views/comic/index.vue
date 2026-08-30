@@ -13,7 +13,7 @@
       @vip="go('/vip')"
     />
 
-    <HomeHero :items="banners" @select="open" />
+    <HomeHero :items="banners" @select="openBanner" />
     <NoticeMarquee />
 
     <div class="inner-slide">
@@ -92,10 +92,12 @@ import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { fetchCartoonCategories, fetchCartoonList, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsCategories, fetchComicsList, fetchComicsModules, type ComicsItem } from '@/api/comics'
+import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
 import { fetchNovelCategories, fetchNovelList, type NovelItem } from '@/api/novel'
 import { fetchVideoCategories } from '@/api/video'
 import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
+import { openPromoLink } from '@/utils/promoLink'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -294,10 +296,27 @@ const loadCatItems = async () => {
   }
 }
 
-const banners = computed<CoverItem[]>(() => {
-  const first = floors.value.find((f) => f.items.length)
-  return first?.items.slice(0, 5) || []
+const bannerPos = computed(() => {
+  if (channel.value === '动漫') return 'cartoon'
+  if (channel.value === '小说') return 'novel'
+  return 'comics'
 })
+const banners = ref<CoverItem[]>([])
+const loadBanners = async () => {
+  try {
+    const data = await fetchBannerList(bannerPos.value)
+    banners.value = (data.list || []).map((b, i) => ({
+      id: `banner-${b.id}`,
+      title: b.title || '',
+      cover: mediaUrl(b.cover_url),
+      href: b.link,
+      tone: i % 6,
+    }))
+  } catch {
+    banners.value = []
+  }
+}
+const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
@@ -411,10 +430,12 @@ onMounted(() => {
   loadSubCats()
   loadFloors()
   loadQuicks()
+  loadBanners()
 })
 watch(channel, () => {
   loadFloors()
   loadQuicks()
+  loadBanners()
 })
 </script>
 
