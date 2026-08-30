@@ -42,6 +42,7 @@ export type VideoModule = {
   icon: number
   size: number
   tags: string[]
+  categories?: string[]
   items: VideoItem[]
 }
 

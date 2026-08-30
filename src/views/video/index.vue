@@ -208,6 +208,8 @@ const moduleSub = (icon: number) => {
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
 const moduleMore = (mod: VideoModule) => {
+  const cat = mod.categories?.[0]
+  if (cat) return `/list?media=video&type=category&category=${encodeURIComponent(cat)}`
   const tag = mod.tags?.[0]
   if (tag) return `/list?media=video&tag=${encodeURIComponent(tag)}`
   return '/list?media=video&type=daily'

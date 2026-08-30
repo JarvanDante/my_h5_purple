@@ -55,6 +55,7 @@ export type CartoonModule = {
   icon: number
   size: number
   tags: string[]
+  categories?: string[]
   items: CartoonItem[]
 }
 
