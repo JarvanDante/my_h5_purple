@@ -18,9 +18,15 @@
     <div class="inner-slide">
       <transition :name="innerName">
         <div :key="channel" class="floor-pane">
-          <section v-if="ready" class="quick-strip">
-            <button v-for="item in quicks" :key="item.label" type="button" class="quick-item" @click="go(item.path)">
-              <img class="quick-icon" :src="item.icon" :alt="item.label" />
+          <section v-if="ready && quicks.length" class="quick-strip">
+            <button
+              v-for="item in quicks"
+              :key="item.key"
+              type="button"
+              class="quick-item"
+              @click="onQuick(item)"
+            >
+              <EncryptedImage class="quick-icon" :src="item.icon" :alt="item.label" />
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -66,6 +72,7 @@ import HomeHero from '@/components/home/HomeHero.vue'
 import PosterCard from '@/components/home/PosterCard.vue'
 import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
+import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import classIcon from '@/assets/icons/mid/class.png'
 import dailyIcon from '@/assets/icons/mid/daily.png'
@@ -73,8 +80,10 @@ import hotIcon from '@/assets/icons/mid/hot.png'
 import rankIcon from '@/assets/icons/mid/rank.png'
 import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsCategories, fetchComicsModules, type ComicsItem } from '@/api/comics'
+import { fetchKingkongList } from '@/api/kingkong'
 import { fetchNovelCategories } from '@/api/novel'
 import { fetchVideoCategories } from '@/api/video'
+import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
 import { comicPath, videoPath } from '@/utils/idcrypt'
@@ -146,19 +155,63 @@ const loadSubCats = async () => {
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
 }
 
-const comicQuicks = [
-  { icon: classIcon, label: '专题', path: '/list?media=comic&type=topic' },
-  { icon: hotIcon, label: '热门', path: '/list?media=comic&type=hot' },
-  { icon: dailyIcon, label: '每日', path: '/list?media=comic&type=daily' },
-  { icon: rankIcon, label: '榜单', path: '/list?media=comic&type=rank' },
+type QuickItem = {
+  key: string
+  icon: string
+  label: string
+  path?: string
+  open_mode?: string
+  link?: string
+  position?: string
+}
+
+const fallbackQuicks = (media: 'comic' | 'cartoon'): QuickItem[] => [
+  { key: 'topic', icon: classIcon, label: '专题', path: `/list?media=${media}&type=topic` },
+  { key: 'hot', icon: hotIcon, label: '热门', path: `/list?media=${media}&type=hot` },
+  { key: 'daily', icon: dailyIcon, label: '每日', path: `/list?media=${media}&type=daily` },
+  { key: 'rank', icon: rankIcon, label: '榜单', path: `/list?media=${media}&type=rank` },
 ]
-const cartoonQuicks = [
-  { icon: classIcon, label: '专题', path: '/list?media=cartoon&type=topic' },
-  { icon: hotIcon, label: '热门', path: '/list?media=cartoon&type=hot' },
-  { icon: dailyIcon, label: '每日', path: '/list?media=cartoon&type=daily' },
-  { icon: rankIcon, label: '榜单', path: '/list?media=cartoon&type=rank' },
-]
-const quicks = computed(() => (isCartoon.value ? cartoonQuicks : comicQuicks))
+
+const quicks = ref<QuickItem[]>([])
+
+const loadQuicks = async () => {
+  if (!ready.value) {
+    quicks.value = []
+    return
+  }
+  const media = isCartoon.value ? 'cartoon' : 'comic'
+  const position = positionOfChannel(channel.value)
+  try {
+    const data = await fetchKingkongList(position)
+    const rows = data.list || []
+    if (rows.length) {
+      quicks.value = rows.map((r) => ({
+        key: `kk-${r.id}`,
+        icon: r.icon_url,
+        label: r.name,
+        open_mode: r.open_mode,
+        link: r.link,
+        position: r.position,
+      }))
+      return
+    }
+  } catch {
+    // 后台未配或接口失败时回落本地入口
+  }
+  quicks.value = fallbackQuicks(media)
+}
+
+const onQuick = (item: QuickItem) => {
+  if (item.path) {
+    go(item.path)
+    return
+  }
+  goKingkong(router, {
+    open_mode: item.open_mode || 'block',
+    link: item.link || '',
+    position: item.position || positionOfChannel(channel.value),
+  })
+}
 
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
 type FloorBlockItem = {
@@ -311,8 +364,12 @@ const loadFloors = () => {
 onMounted(() => {
   loadSubCats()
   loadFloors()
+  loadQuicks()
 })
-watch(channel, loadFloors)
+watch(channel, () => {
+  loadFloors()
+  loadQuicks()
+})
 </script>
 
 <style scoped lang="scss">
