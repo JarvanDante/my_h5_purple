@@ -25,7 +25,7 @@
       </template>
     </div>
 
-    <div v-if="floatAd" class="float-ad" @click.stop>
+    <div v-if="floatAd && !isVip" class="float-ad" @click.stop>
       <button type="button" class="float-x" aria-label="关闭" @click="floatAd = false">×</button>
       <div class="float-thumb" />
       <div class="float-body">
@@ -115,11 +115,14 @@ import {
   type ChapterItem,
 } from '@/api/comics'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { useUserStore } from '@/stores/user'
 import { comicPath, comicReadPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+const isVip = computed(() => userStore.isVip)
 const rootRef = ref<HTMLElement | null>(null)
 const chrome = ref(true)
 const empty = ref('加载中…')
@@ -144,7 +147,7 @@ const seq = computed(() => {
   return m ? Number(m[1]) : 1
 })
 const midAdIndex = computed(() => {
-  if (pics.value.length < 4) return -1
+  if (isVip.value || pics.value.length < 4) return -1
   return Math.floor(pics.value.length / 2) - 1
 })
 const sortedChapters = computed(() => {

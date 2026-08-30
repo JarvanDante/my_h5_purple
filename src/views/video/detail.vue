@@ -11,7 +11,7 @@
         ref="playerRef"
         :src="item.source_url"
         :poster="posterSrc"
-        :trial-sec="item.need_vip ? item.preview_sec || 5 : 0"
+        :trial-sec="!isVip && item.need_vip ? item.preview_sec || 5 : 0"
         @user-pause="onUserPause"
         @play="onPlayerPlay"
         @ended="onTrialEnd"
@@ -85,7 +85,7 @@
         </button>
       </section>
 
-      <section class="ad-row">
+      <section v-if="!isVip" class="ad-row">
         <div v-for="n in 5" :key="n" class="ad-slot">
           <span>广告</span>
         </div>
@@ -127,6 +127,7 @@ import { getToken, mediaUrl, toastError } from '@/utils/request'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const isVip = computed(() => userStore.isVip)
 const item = ref<VideoItem | null>(null)
 const recommends = ref<CoverItem[]>([])
 const tab = ref<'intro' | 'comment'>('intro')
@@ -134,7 +135,7 @@ const commentCount = ref(0)
 const liked = ref(false)
 const collected = ref(false)
 const playerRef = ref<{ play: () => void; pause: () => void } | null>(null)
-const showAd = ref(true)
+const showAd = ref(false)
 const showPauseAd = ref(false)
 const showTrial = ref(false)
 const isFs = ref(false)
@@ -147,6 +148,11 @@ const clearAdTimer = () => {
 }
 
 const startAdTimer = () => {
+  if (isVip.value) {
+    showAd.value = false
+    showPauseAd.value = false
+    return
+  }
   clearAdTimer()
   showAd.value = true
   adLeft.value = 5
@@ -170,12 +176,12 @@ const onAdAction = () => {
 }
 
 const onUserPause = () => {
-  if (showAd.value || showTrial.value) return
+  if (isVip.value || showAd.value || showTrial.value) return
   showPauseAd.value = true
 }
 
 const onTrialEnd = () => {
-  if (!item.value?.need_vip) return
+  if (isVip.value || !item.value?.need_vip) return
   showPauseAd.value = false
   showTrial.value = true
   playerRef.value?.pause()
@@ -310,7 +316,12 @@ const load = () => {
   commentCount.value = 0
   showPauseAd.value = false
   showTrial.value = false
-  startAdTimer()
+  if (isVip.value) {
+    showAd.value = false
+    clearAdTimer()
+  } else {
+    startAdTimer()
+  }
   fetchVideoDetail(id)
     .then((data) => {
       item.value = data
@@ -335,6 +346,13 @@ const load = () => {
     .catch(toastError)
 }
 
+watch(isVip, (vip) => {
+  if (!vip) return
+  showAd.value = false
+  showPauseAd.value = false
+  showTrial.value = false
+  clearAdTimer()
+})
 watch(() => route.params.id, load, { immediate: true })
 onActivated(() => {
   if (item.value?.need_vip) load()

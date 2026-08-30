@@ -18,7 +18,7 @@
       </div>
     </header>
 
-    <section class="ad-strip">
+    <section v-if="!userStore.isVip" class="ad-strip">
       <article v-for="n in 4" :key="n" class="ad-card">
         <div class="ad-cover" />
         <p class="ad-title">广告位</p>

@@ -28,12 +28,14 @@ import { fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, type VideoItem } from '@/api/video'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
+import { useUserStore } from '@/stores/user'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 import { splitNames } from '@/utils/moduleFilter'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const items = ref<CoverItem[]>([])
 const loading = ref(true)
 
@@ -159,7 +161,7 @@ const toComicCover = (c: ComicsItem): CoverItem => {
 }
 
 const withAds = (list: CoverItem[], cols: number) =>
-  interleaveAds(list, makeEmptyAds(estimateAdCount(list.length, cols)), cols)
+  userStore.isVip ? list : interleaveAds(list, makeEmptyAds(estimateAdCount(list.length, cols)), cols)
 
 const open = (item: CoverItem) => {
   if (item.isAd) return
@@ -224,6 +226,9 @@ const load = async () => {
 }
 
 watch(() => [media.value, type.value, category.value, tag.value], load, { immediate: true })
+watch(() => userStore.isVip, (vip) => {
+  if (vip) items.value = items.value.filter((row) => !row.isAd)
+})
 </script>
 
 <style scoped lang="scss">

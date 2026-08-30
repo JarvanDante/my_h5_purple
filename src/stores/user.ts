@@ -25,6 +25,15 @@ export const useUserStore = defineStore('user', () => {
   const ready = ref(false)
   const sessionOff = ref(readSessionOff())
   const loggedIn = computed(() => Boolean(user.value?.id))
+  const isVip = computed(() => {
+    const u = user.value
+    if (!u) return false
+    if (u.is_vip) return true
+    const name = u.group_name || ''
+    if (!name || name === '普通用户') return false
+    const end = Number(u.group_end_time || 0)
+    return !end || end * 1000 > Date.now()
+  })
 
   const setSessionOff = (off: boolean) => {
     sessionOff.value = off
@@ -103,6 +112,7 @@ export const useUserStore = defineStore('user', () => {
     user,
     ready,
     loggedIn,
+    isVip,
     sessionOff,
     ensureLogin,
     loginAccount,
