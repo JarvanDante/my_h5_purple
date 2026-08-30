@@ -1,6 +1,9 @@
 <template>
   <div class="page-shell planet-page">
     <header class="planet-header">
+      <AppTopbar>
+        <div class="nav-title">社区</div>
+      </AppTopbar>
       <div class="channel-row">
         <div class="channel-tabs">
           <ChannelTab
@@ -59,6 +62,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import AppTopbar from '@/components/AppTopbar.vue'
 import ChannelTab from '@/components/ChannelTab.vue'
 import PostCard from '@/components/PostCard.vue'
 import LineIcon from '@/components/LineIcon.vue'
@@ -229,7 +233,13 @@ onMounted(() => {
   z-index: 50;
   background: #0b0b0d;
   padding: var(--app-header-top) 8px 0 12px;
-  border-bottom: 1px solid rgba(255, 92, 147, 0.55);
+}
+
+.nav-title {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 48px;
 }
 
 .channel-row {

@@ -3,7 +3,7 @@
     class="home-header home-header--pack"
     :class="{ 'home-header--single': !subTabs.length, 'home-header--dark': dark }"
   >
-    <div class="channel-row">
+    <AppTopbar>
       <div class="channel-tabs">
         <template v-if="dark">
           <ChannelTab
@@ -26,8 +26,7 @@
           <span class="channel-text">{{ item }}</span>
         </button>
       </div>
-      <button v-if="!dark" type="button" class="checkin-btn" @click="$emit('checkin')">🎁 签到</button>
-    </div>
+    </AppTopbar>
 
     <div v-if="subTabs.length" class="sub-row">
       <button
@@ -62,6 +61,7 @@
 </template>
 
 <script setup lang="ts">
+import AppTopbar from '@/components/AppTopbar.vue'
 import ChannelTab from '@/components/ChannelTab.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import signIcon from '@/assets/icons/sign.png'
@@ -101,13 +101,8 @@ defineEmits<{
   padding: var(--app-header-top) 12px 12px;
 }
 
-.home-header--pack .channel-row {
-  height: 48px;
-  min-height: 48px;
-}
-
 .home-header--pack .channel-tabs {
-  gap: 20px;
+  gap: 18px;
 }
 
 .home-header--pack .channel-item {
@@ -150,7 +145,6 @@ defineEmits<{
   }
 }
 
-.channel-row,
 .sub-row,
 .search-row {
   position: relative;
@@ -324,9 +318,8 @@ defineEmits<{
   background: $background-page;
   padding: var(--app-header-top) 12px 8px;
 
-  .channel-row {
-    height: 46px;
-    min-height: 46px;
+  :deep(.app-topbar) {
+    position: relative;
     overflow: visible;
 
     &::after {
@@ -344,11 +337,10 @@ defineEmits<{
 
   .channel-tabs {
     align-items: flex-end;
-    height: 46px;
-    gap: 26px;
-    padding-left: 22px;
-    overflow-x: auto;
-    overflow-y: hidden;
+    justify-content: center;
+    height: 48px;
+    gap: 18px;
+    overflow: visible;
   }
 
   .sub-row {

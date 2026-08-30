@@ -92,7 +92,7 @@ import { mediaUrl, toastError } from '@/utils/request'
 defineOptions({ name: 'Comic' })
 
 const router = useRouter()
-const channels = ['漫画', '动漫', '小说', '短剧']
+const channels = ['漫画', '动漫', '小说']
 const channelSlide = useTabSlide(channels)
 const channel = computed(() => channelSlide.current.value)
 const innerName = ref('tab-left')

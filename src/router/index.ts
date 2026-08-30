@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
     path: '/planet',
     name: 'Planet',
     component: () => import('@/views/planet/index.vue'),
-    meta: { title: '星球', tabbar: true },
+    meta: { title: '社区', tabbar: true },
   },
   {
     path: '/ai',

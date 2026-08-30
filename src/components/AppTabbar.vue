@@ -45,7 +45,7 @@ const router = useRouter()
 const tabs = [
   { key: 'comic', path: '/comic', label: '二次元' },
   { key: 'video', path: '/video', label: '视频' },
-  { key: 'planet', path: '/planet', label: '星球' },
+  { key: 'planet', path: '/planet', label: '社区' },
   { key: 'ai', path: '/ai', label: 'AI' },
   { key: 'me', path: '/me', label: '我的' },
 ] as const

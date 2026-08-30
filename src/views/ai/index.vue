@@ -1,8 +1,12 @@
 <template>
   <div class="page-shell ai-home">
+    <header class="ai-top">
+      <AppTopbar>
+        <div class="nav-title">AI智能创作</div>
+      </AppTopbar>
+    </header>
     <header class="hero">
       <div class="hero-copy">
-        <h1>AI智能创作</h1>
         <button type="button" class="works-link" @click="router.push('/ai/works')">查看我的AI作品 ›</button>
       </div>
     </header>
@@ -29,6 +33,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import AppTopbar from '@/components/AppTopbar.vue'
 import { showToast } from 'vant'
 import { aiTools } from '@/data/mock'
 
@@ -60,9 +65,24 @@ const open = (tool: { key: string; title: string }) => {
   padding-bottom: calc(#{$tabbar-height} + 16px + env(safe-area-inset-bottom, 0px));
 }
 
+.ai-top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: var(--app-header-top) 12px 0;
+  background: $background-page;
+}
+
+.nav-title {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 48px;
+}
+
 .hero {
-  margin: 0 12px 14px;
-  padding: calc(18px + var(--app-header-top)) 16px 20px;
+  margin: 8px 12px 14px;
+  padding: 16px 16px 20px;
   border-radius: 18px;
   background:
     radial-gradient(120% 140% at 20% 0%, rgba(255, 92, 147, 0.55), transparent 55%),

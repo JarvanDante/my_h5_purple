@@ -11,6 +11,7 @@
           </transition>
         </router-view>
       </div>
+      <AppDrawer />
       <AppTabbar v-if="showTabbar" />
     </div>
   </div>
@@ -20,8 +21,10 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
+import { useDrawerStore } from '@/stores/drawer'
 import { useConfigStore } from '@/stores/config'
 import { TAB_PATHS, tabIndex, useNavStore } from '@/stores/nav'
+import AppDrawer from '@/components/AppDrawer.vue'
 import AppTabbar from '@/components/AppTabbar.vue'
 
 const route = useRoute()
@@ -30,6 +33,7 @@ const appStore = useAppStore()
 const navStore = useNavStore()
 const cacheViews = computed(() => appStore.cacheViews)
 const transitionName = computed(() => navStore.transitionName)
+const drawerStore = useDrawerStore()
 const showTabbar = computed(() => route.meta.tabbar === true)
 const configStore = useConfigStore()
 const maintenance = computed(() => configStore.maintenance)
@@ -54,7 +58,7 @@ const onTouchStart = (e: TouchEvent) => {
 }
 
 const onTouchEnd = (e: TouchEvent) => {
-  if (!showTabbar.value || inHScroll(e.target)) return
+  if (!showTabbar.value || drawerStore.open || inHScroll(e.target)) return
   const dx = e.changedTouches[0].clientX - startX
   const dy = e.changedTouches[0].clientY - startY
   if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy)) return
