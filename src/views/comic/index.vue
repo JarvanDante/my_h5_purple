@@ -74,10 +74,6 @@ import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
-import classIcon from '@/assets/icons/mid/class.png'
-import dailyIcon from '@/assets/icons/mid/daily.png'
-import hotIcon from '@/assets/icons/mid/hot.png'
-import rankIcon from '@/assets/icons/mid/rank.png'
 import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsCategories, fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { fetchKingkongList } from '@/api/kingkong'
@@ -159,18 +155,10 @@ type QuickItem = {
   key: string
   icon: string
   label: string
-  path?: string
-  open_mode?: string
-  link?: string
-  position?: string
+  open_mode: string
+  link: string
+  position: string
 }
-
-const fallbackQuicks = (media: 'comic' | 'cartoon'): QuickItem[] => [
-  { key: 'topic', icon: classIcon, label: '专题', path: `/list?media=${media}&type=topic` },
-  { key: 'hot', icon: hotIcon, label: '热门', path: `/list?media=${media}&type=hot` },
-  { key: 'daily', icon: dailyIcon, label: '每日', path: `/list?media=${media}&type=daily` },
-  { key: 'rank', icon: rankIcon, label: '榜单', path: `/list?media=${media}&type=rank` },
-]
 
 const quicks = ref<QuickItem[]>([])
 
@@ -179,38 +167,23 @@ const loadQuicks = async () => {
     quicks.value = []
     return
   }
-  const media = isCartoon.value ? 'cartoon' : 'comic'
-  const position = positionOfChannel(channel.value)
   try {
-    const data = await fetchKingkongList(position)
-    const rows = data.list || []
-    if (rows.length) {
-      quicks.value = rows.map((r) => ({
-        key: `kk-${r.id}`,
-        icon: r.icon_url,
-        label: r.name,
-        open_mode: r.open_mode,
-        link: r.link,
-        position: r.position,
-      }))
-      return
-    }
+    const data = await fetchKingkongList(positionOfChannel(channel.value))
+    quicks.value = (data.list || []).map((r) => ({
+      key: `kk-${r.id}`,
+      icon: r.icon_url,
+      label: r.name,
+      open_mode: r.open_mode,
+      link: r.link,
+      position: r.position,
+    }))
   } catch {
-    // 后台未配或接口失败时回落本地入口
+    quicks.value = []
   }
-  quicks.value = fallbackQuicks(media)
 }
 
 const onQuick = (item: QuickItem) => {
-  if (item.path) {
-    go(item.path)
-    return
-  }
-  goKingkong(router, {
-    open_mode: item.open_mode || 'block',
-    link: item.link || '',
-    position: item.position || positionOfChannel(channel.value),
-  })
+  goKingkong(router, item)
 }
 
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'

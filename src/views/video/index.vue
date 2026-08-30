@@ -27,19 +27,13 @@
         <div :key="channel" class="inner-pane">
           <section v-if="quicks.length" class="quick-strip">
             <button
-              v-for="item in quicks.slice(0, 8)"
+              v-for="item in quicks"
               :key="item.key"
               type="button"
               class="quick-item"
               @click="onQuick(item)"
             >
-              <EncryptedImage
-                v-if="item.icon"
-                class="quick-icon"
-                :src="item.icon"
-                :alt="item.label"
-              />
-              <span v-else class="quick-icon">{{ item.emoji }}</span>
+              <EncryptedImage class="quick-icon" :src="item.icon" :alt="item.label" />
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -195,42 +189,32 @@ const moduleMore = (mod: VideoModule) => {
 type QuickItem = {
   key: string
   label: string
-  icon?: string
-  emoji?: string
-  path?: string
-  open_mode?: string
-  link?: string
-  position?: string
+  icon: string
+  open_mode: string
+  link: string
+  position: string
 }
 
-const fallbackQuicks: QuickItem[] = [
-  { key: 'vip', emoji: '👑', label: '抢先看', path: '/vip' },
-  { key: 'live', emoji: '▶️', label: '直播', path: '' },
-  { key: 'topic', emoji: '📍', label: '专题', path: '/list?media=video&type=topic' },
-  { key: 'coin', emoji: '💰', label: '金币专区', path: '/wallet' },
-]
-const quicks = ref<QuickItem[]>(fallbackQuicks)
+const quicks = ref<QuickItem[]>([])
 
 const loadQuicks = async () => {
-  if (isDouyin.value) return
+  if (isDouyin.value) {
+    quicks.value = []
+    return
+  }
   try {
     const data = await fetchKingkongList('movie')
-    const rows = data.list || []
-    if (rows.length) {
-      quicks.value = rows.map((r) => ({
-        key: `kk-${r.id}`,
-        label: r.name,
-        icon: r.icon_url,
-        open_mode: r.open_mode,
-        link: r.link,
-        position: r.position,
-      }))
-      return
-    }
+    quicks.value = (data.list || []).map((r) => ({
+      key: `kk-${r.id}`,
+      label: r.name,
+      icon: r.icon_url,
+      open_mode: r.open_mode,
+      link: r.link,
+      position: r.position,
+    }))
   } catch {
-    // 后台未配时回落本地入口
+    quicks.value = []
   }
-  quicks.value = fallbackQuicks
 }
 
 const searchHint = computed(() => videoSearchHint(isDouyin.value ? 'douyin' : 'video'))
@@ -245,19 +229,7 @@ const open = (item: CoverItem) => {
 }
 
 const onQuick = (item: QuickItem) => {
-  if (item.path) {
-    go(item.path)
-    return
-  }
-  if (item.open_mode || item.link) {
-    goKingkong(router, {
-      open_mode: item.open_mode || 'block',
-      link: item.link || '',
-      position: item.position || 'movie',
-    })
-    return
-  }
-  showToast(`${item.label} 稍后接入`)
+  goKingkong(router, item)
 }
 
 const loadSubCats = async () => {
