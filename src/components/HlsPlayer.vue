@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { showToast } from 'vant'
+import { mediaUrl } from '@/utils/request'
 
 const props = withDefaults(
   defineProps<{
@@ -86,7 +87,8 @@ const tryPlay = async () => {
   }
 }
 
-const attach = async (url: string) => {
+const attach = async (raw: string) => {
+  const url = mediaUrl(raw)
   const video = el.value
   if (!video || !url) return
   ignorePause = true

@@ -181,7 +181,7 @@ const load = async () => {
   page.value = 1
   const data = await readChapter(chapterId.value)
   title.value = data.title
-  pics.value = data.pics || []
+  pics.value = (data.pics || []).map((p) => ({ ...p, url: mediaUrl(p.url) }))
   if (!pics.value.length) empty.value = '本章暂无图片'
   const comicId = routeId(route.params.id)
   if (comicId) {

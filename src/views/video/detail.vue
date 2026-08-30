@@ -9,7 +9,7 @@
       <HlsPlayer
         v-if="item?.source_url"
         ref="playerRef"
-        :src="item.source_url"
+        :src="mediaUrl(item.source_url)"
         :poster="posterSrc"
         :trial-sec="!isVip && item.need_vip ? item.preview_sec || 5 : 0"
         @user-pause="onUserPause"

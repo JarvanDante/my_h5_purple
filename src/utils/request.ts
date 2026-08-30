@@ -55,11 +55,19 @@ export function toastError(err: unknown) {
   showToast(msg)
 }
 
+/** 本机播放网关改成同域 /hls，CF / HTTPS 才能走到 Vite 反代。 */
+const LOCAL_PLAY = /^https?:\/\/(?:127\.0\.0\.1|localhost|host\.docker\.internal):8006(?=\/|$)/i
+
+export function rewritePlayGateway(url: string) {
+  return url.replace(LOCAL_PLAY, '')
+}
+
 /** 相对路径走同域 /static（开发由 Vite 代理到 my_service）。 */
 export function mediaUrl(path?: string) {
   if (!path) return ''
-  if (/^(https?:)?\/\//i.test(path) || path.startsWith('data:') || path.startsWith('blob:')) return path
-  return path.startsWith('/') ? path : `/${path}`
+  const next = rewritePlayGateway(path)
+  if (/^(https?:)?\/\//i.test(next) || next.startsWith('data:') || next.startsWith('blob:')) return next
+  return next.startsWith('/') ? next : `/${next}`
 }
 
 function uploadFailMessage(text: string, status: number) {

@@ -1,4 +1,6 @@
 /** 对齐公司 AesUtil::decryptRaw: AES-128-ECB + PKCS7。默认与后端 image_aes.key 相同。 */
+import { mediaUrl } from '@/utils/request'
+
 const DEFAULT_KEY = 'dafb787c76b5ce8a'
 
 function resolveKey() {
@@ -182,6 +184,7 @@ const blobCache = new Map<string, string>()
 export async function resolveMediaSrc(url?: string) {
   if (!url) return ''
   if (url.startsWith('blob:') || url.startsWith('data:')) return url
+  url = mediaUrl(url)
   if (looksLikePlainImage(url) && !isEncryptedMedia(url)) return url
   if (!isEncryptedMedia(url)) return url
   const hit = blobCache.get(url)
