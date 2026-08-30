@@ -246,7 +246,7 @@ onMounted(() => {
   display: flex;
   align-items: flex-end;
   gap: 4px;
-  height: 44px;
+  height: 48px;
 }
 
 .channel-tabs {
@@ -254,7 +254,7 @@ onMounted(() => {
   min-width: 0;
   display: flex;
   align-items: flex-end;
-  height: 44px;
+  height: 48px;
   gap: 22px;
   padding-left: 10px;
   overflow-x: auto;
@@ -269,7 +269,7 @@ onMounted(() => {
 
 .search-btn {
   width: 40px;
-  height: 44px;
+  height: 48px;
   border: 0;
   background: transparent;
   color: #d5d5dc;

@@ -321,18 +321,6 @@ defineEmits<{
   :deep(.app-topbar) {
     position: relative;
     overflow: visible;
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1px;
-      pointer-events: none;
-      background: rgba(255, 92, 147, 0.55);
-      box-shadow: 0 0 10px rgba(255, 92, 147, 0.28);
-    }
   }
 
   .channel-tabs {
@@ -346,18 +334,33 @@ defineEmits<{
   .sub-row {
     margin-top: 0;
     height: 42px;
-    padding: 0 4px 0 22px;
-    gap: 20px;
+    padding: 0 4px 0 16px;
+    gap: 18px;
   }
 
   .sub-item {
-    color: #9a9aa3;
+    position: relative;
+    color: #8a8a94;
     font-size: 15px;
+    font-weight: 400;
     line-height: 42px;
+    padding: 0 2px;
 
     &.active {
-      color: $primary-color;
+      color: #fff;
       font-weight: 700;
+
+      &::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 8px;
+        width: 16px;
+        height: 3px;
+        border-radius: 2px;
+        background: $primary-color;
+        transform: translateX(-50%);
+      }
     }
   }
 
