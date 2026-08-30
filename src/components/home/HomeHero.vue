@@ -4,14 +4,15 @@
       ref="track"
       class="hero-track"
       @scroll.passive="onScroll"
+      @scrollend="settleClone"
       @touchstart.passive="pause"
       @touchend.passive="resumeLater"
       @mouseenter="pause"
       @mouseleave="resumeLater"
     >
       <button
-        v-for="item in items"
-        :key="item.id"
+        v-for="(item, i) in slides"
+        :key="`${item.id}-${i}`"
         type="button"
         class="hero-slide"
         @click="$emit('select', item)"
@@ -23,13 +24,13 @@
       </button>
     </div>
     <div v-if="items.length > 1" class="hero-dots">
-      <i v-for="(_, i) in items" :key="i" :class="{ on: i === index }" />
+      <i v-for="(_, i) in items" :key="i" :class="{ on: i === dotIndex }" />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import type { CoverItem } from '@/data/mock'
 
@@ -43,22 +44,56 @@ defineEmits<{
 
 const track = ref<HTMLElement>()
 const index = ref(0)
+const slides = computed(() =>
+  props.items.length > 1 ? [...props.items, props.items[0]] : props.items,
+)
+const dotIndex = computed(() => {
+  const n = props.items.length
+  if (!n) return 0
+  return index.value >= n ? 0 : index.value
+})
+
 let timer = 0
 let resumeTimer = 0
+let snapTimer = 0
+let jumping = false
 
 const onScroll = () => {
   const el = track.value
-  if (!el?.clientWidth) return
+  if (jumping || !el?.clientWidth) return
   index.value = Math.round(el.scrollLeft / el.clientWidth)
 }
 
-const goTo = (i: number) => {
+const snapHome = () => {
+  const el = track.value
+  if (!el) return
+  jumping = true
+  el.style.scrollSnapType = 'none'
+  el.style.scrollBehavior = 'auto'
+  el.scrollTo({ left: 0, behavior: 'auto' })
+  index.value = 0
+  requestAnimationFrame(() => {
+    el.style.scrollSnapType = ''
+    el.style.scrollBehavior = ''
+    jumping = false
+  })
+}
+
+const settleClone = () => {
+  if (props.items.length > 1 && index.value >= props.items.length) snapHome()
+}
+
+const goNext = () => {
   const el = track.value
   const n = props.items.length
-  if (!el?.clientWidth || n <= 1) return
-  const next = ((i % n) + n) % n
+  if (jumping || !el?.clientWidth || n <= 1) return
+  const next = index.value >= n ? 1 : index.value + 1
   index.value = next
   el.scrollTo({ left: next * el.clientWidth, behavior: 'smooth' })
+  if (next >= n) {
+    window.clearTimeout(snapTimer)
+    snapTimer = window.setTimeout(settleClone, 420)
+  }
 }
 
 const stop = () => {
@@ -69,7 +104,7 @@ const stop = () => {
 const start = () => {
   stop()
   if (props.items.length <= 1) return
-  timer = window.setInterval(() => goTo(index.value + 1), 3000)
+  timer = window.setInterval(goNext, 3000)
 }
 
 const pause = () => {
@@ -79,7 +114,10 @@ const pause = () => {
 
 const resumeLater = () => {
   window.clearTimeout(resumeTimer)
-  resumeTimer = window.setTimeout(start, 3000)
+  resumeTimer = window.setTimeout(() => {
+    settleClone()
+    start()
+  }, 3000)
 }
 
 const onHide = () => {
@@ -94,6 +132,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   pause()
+  window.clearTimeout(snapTimer)
   document.removeEventListener('visibilitychange', onHide)
 })
 
