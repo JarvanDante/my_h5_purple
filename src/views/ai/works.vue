@@ -1,7 +1,7 @@
 <template>
   <div class="page-shell sub-page works-page">
     <PageHeader title="我的作品" fallback="/ai">
-      <button type="button" class="pill" @click="router.push('/ai/faceswap')">去创作</button>
+      <button type="button" class="pill" @click="router.push(createPath)">去创作</button>
     </PageHeader>
 
     <nav class="tabs">
@@ -35,19 +35,20 @@
         </div>
       </button>
     </section>
-    <p v-else class="empty">还没有作品，去换一张脸试试</p>
+    <p v-else class="empty">{{ emptyText }}</p>
     <p v-if="list.length" class="end">没有更多了</p>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { showImagePreview, showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import {
   AI_BIZ_FACE_SWAP,
+  AI_BIZ_UNDRESS,
   fetchAiTasks,
   isTaskRunning,
   taskResultUrl,
@@ -70,19 +71,32 @@ const tabs = [
 ]
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const active = ref('face')
 const list = ref<AiTask[]>([])
 let pollTimer = 0
 
+const bizOf = (key: string) => {
+  if (key === 'face') return AI_BIZ_FACE_SWAP
+  if (key === 'undress') return AI_BIZ_UNDRESS
+  return 0
+}
+
+const createPath = computed(() => (active.value === 'undress' ? '/ai/undress' : '/ai/faceswap'))
+const emptyText = computed(() =>
+  active.value === 'undress' ? '还没有作品，去上传一张照片试试' : '还没有作品，去换一张脸试试',
+)
+
 const coverOf = (item: AiTask) => taskResultUrl(item) || item.input_url || ''
 
 const pick = (tab: { key: string; label: string }) => {
-  if (tab.key !== 'face') {
+  if (!bizOf(tab.key)) {
     showToast(`${tab.label} 稍后接入`)
     return
   }
   active.value = tab.key
+  load().catch((err) => toastError(err))
 }
 
 const preview = async (item: AiTask) => {
@@ -93,7 +107,12 @@ const preview = async (item: AiTask) => {
 }
 
 const load = async () => {
-  const data = await fetchAiTasks(AI_BIZ_FACE_SWAP, 1, 40)
+  const biz = bizOf(active.value)
+  if (!biz) {
+    list.value = []
+    return
+  }
+  const data = await fetchAiTasks(biz, 1, 40)
   list.value = data.list || []
   const running = list.value.some((item) => isTaskRunning(item.status))
   if (running && !pollTimer) {
@@ -108,6 +127,8 @@ const load = async () => {
 }
 
 onMounted(async () => {
+  const tab = String(route.query.tab || '')
+  if (bizOf(tab)) active.value = tab
   try {
     if (!userStore.loggedIn) await userStore.ensureLogin()
     await load()

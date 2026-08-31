@@ -41,6 +41,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'AI图片换脸' },
   },
   {
+    path: '/ai/undress',
+    name: 'AiUndress',
+    component: () => import('@/views/ai/undress.vue'),
+    meta: { title: 'AI一键去衣' },
+  },
+  {
     path: '/ai/works',
     name: 'AiWorks',
     component: () => import('@/views/ai/works.vue'),

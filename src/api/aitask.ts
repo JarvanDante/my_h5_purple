@@ -1,6 +1,7 @@
 import { request } from '@/utils/request'
 
 export const AI_BIZ_FACE_SWAP = 1
+export const AI_BIZ_UNDRESS = 2
 
 export type AiTask = {
   id: number

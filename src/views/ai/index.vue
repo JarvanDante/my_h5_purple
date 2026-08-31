@@ -52,6 +52,10 @@ const open = (tool: { key: string; title: string }) => {
     router.push('/ai/faceswap')
     return
   }
+  if (tool.key === 'undress') {
+    router.push('/ai/undress')
+    return
+  }
   showToast(`${tool.title} 稍后接入`)
 }
 </script>

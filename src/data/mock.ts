@@ -47,7 +47,7 @@ export const posts = [
 export const aiTools = [
   { key: 'i2v', title: 'AI图生视频', desc: '一键成片，动态呈现' },
   { key: 'face', title: 'AI图片换脸', desc: '上传照片快速生成' },
-  { key: 'undress', title: 'AI一键去衣', desc: '智能成图，稍后接入' },
+  { key: 'undress', title: 'AI一键去衣', desc: '上传照片智能成图' },
   { key: 'draw', title: 'AI绘画', desc: '一句话出图，风格自选' },
   { key: 'novel', title: 'AI小说创作', desc: '按设定生成章节' },
   { key: 'dress', title: 'AI换装', desc: '换套造型，稍后接入' },
