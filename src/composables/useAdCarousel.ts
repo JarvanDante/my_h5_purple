@@ -2,8 +2,8 @@ import { computed, nextTick, onUnmounted, watch, type Ref } from 'vue'
 import type { AdItem } from '@/api/ads'
 import { useAdsStore } from '@/stores/ads'
 
-const INTERVAL_MS = 4000
-const SLIDE_MS = 4000
+const HOLD_MS = 3000
+const SLIDE_MS = 1000
 
 export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdItem[]>, enabled: Ref<boolean>) {
   const adsStore = useAdsStore()
@@ -64,7 +64,7 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
     sliding = false
   }
 
-  const scheduleNext = (delay = INTERVAL_MS) => {
+  const scheduleNext = (delay = HOLD_MS) => {
     window.clearTimeout(slideTimer)
     slideTimer = 0
     if (list.value.length <= 1 || !enabled.value) return
@@ -91,12 +91,12 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
       const n = list.value.length
       if (next >= n) {
         adsStore.impression(list.value[0])
-        snapHome(() => scheduleNext(0))
+        snapHome(() => scheduleNext())
         return
       }
       el.style.scrollSnapType = ''
       adsStore.impression(list.value[next])
-      scheduleNext(0)
+      scheduleNext()
     }
     anim = requestAnimationFrame(step)
   }
