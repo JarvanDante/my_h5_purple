@@ -1,38 +1,42 @@
 <template>
-  <div v-if="visible && ad" class="ad-popup" @click.self="close">
+  <div v-if="visible && ad" class="ad-popup" @click.stop>
     <div class="box">
-      <AdImage :ad="ad" />
-      <button type="button" class="x" aria-label="关闭" @click="close">×</button>
+      <AdImage :key="ad.creative_id" :ad="ad" />
+      <button type="button" class="x" aria-label="关闭" @click.stop="close">×</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { AD_SLOT } from '@/api/ads'
+import { computed, onMounted, ref, watch } from 'vue'
+import { AD_SLOT, type AdItem } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
 const adsStore = useAdsStore()
 const visible = ref(false)
-const ad = ref(adsStore.firstOf(AD_SLOT.popup))
+const queue = ref<AdItem[]>([])
+const ad = computed(() => queue.value[0])
 
 const tryShow = () => {
-  if (adsStore.splashOpen || visible.value) return
-  const hit = adsStore.firstOf(AD_SLOT.popup)
-  if (!hit) return
-  ad.value = hit
+  if (adsStore.splashOpen) return
+  if (!queue.value.length) {
+    visible.value = false
+    adsStore.popupOpen = false
+    return
+  }
   visible.value = true
   adsStore.popupOpen = true
 }
 
 const close = () => {
-  visible.value = false
-  adsStore.popupOpen = false
+  queue.value = queue.value.slice(1)
+  tryShow()
 }
 
 onMounted(async () => {
-  await adsStore.load(AD_SLOT.popup, 3)
+  await adsStore.load(AD_SLOT.popup, 10)
+  queue.value = [...adsStore.listOf(AD_SLOT.popup)]
   tryShow()
 })
 
@@ -45,11 +49,13 @@ watch(
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .ad-popup {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  z-index: 70;
-  background: rgba(0, 0, 0, 0.62);
+  z-index: 1100;
+  background: rgba(0, 0, 0, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,5 +84,15 @@ watch(
   color: #fff;
   font-size: 20px;
   line-height: 1;
+}
+
+@media (min-width: $desktop-preview-min) {
+  .ad-popup {
+    left: 50%;
+    right: auto;
+    width: 100%;
+    max-width: $phone-max-width;
+    transform: translateX(-50%);
+  }
 }
 </style>
