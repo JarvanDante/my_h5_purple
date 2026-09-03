@@ -1,5 +1,6 @@
 <template>
   <div class="cmt-panel">
+    <AdBanner class="cmt-ad" />
     <section class="comments">
       <div class="cmt-head">
         <h3>评论 <em>({{ total }})</em></h3>
@@ -77,6 +78,7 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue'
 import { showToast } from 'vant'
+import AdBanner from '@/components/AdBanner.vue'
 import CommentRow from '@/components/CommentRow.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import { addComment, fetchComments, likeComment, type CommentItem } from '@/api/ops'
@@ -296,6 +298,11 @@ watch(
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 12px 16px 24px;
+}
+
+.cmt-ad {
+  flex-shrink: 0;
+  margin: 8px 12px 4px;
 }
 
 .cmt-head {
