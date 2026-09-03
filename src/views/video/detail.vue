@@ -117,6 +117,8 @@ import MediaGrid from '@/components/MediaGrid.vue'
 import SectionPanel from '@/components/SectionPanel.vue'
 import { COMMENT_MEDIA_VIDEO } from '@/api/ops'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
+import { fetchCartoonList } from '@/api/cartoon'
+import { fetchDouyinList } from '@/api/douyin'
 import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
 import { useAdsStore } from '@/stores/ads'
 import { useUserStore } from '@/stores/user'
@@ -338,17 +340,24 @@ const load = () => {
         cover: data.cover_url,
         tag: '视频',
       })
-      return loadMarks()
+      return Promise.all([loadMarks(), loadRecommends(data)])
     })
     .catch(toastError)
-  fetchVideoList(1, 8, '', 1)
-    .then((data) => {
-      recommends.value = (data.list || [])
-        .filter((v) => v.id !== id)
-        .slice(0, 6)
-        .map(toCover)
-    })
-    .catch(toastError)
+}
+
+const loadRecommends = async (v: VideoItem) => {
+  const kind = v.kind ?? 0
+  const fetchList = kind === 2 ? fetchCartoonList : kind === 3 ? fetchDouyinList : fetchVideoList
+  try {
+    const data = await fetchList(1, 8, '', 1)
+    recommends.value = (data.list || [])
+      .filter((row) => row.id !== v.id)
+      .slice(0, 6)
+      .map(toCover)
+  } catch (err) {
+    toastError(err)
+    recommends.value = []
+  }
 }
 
 watch(isVip, (vip) => {

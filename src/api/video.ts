@@ -6,6 +6,7 @@ export type VideoItem = {
   description: string
   cover_url: string
   source_url: string
+  kind?: number // 0视频 2动漫 3抖音
   category?: string
   categories?: string[]
   duration: number
