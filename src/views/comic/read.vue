@@ -65,6 +65,15 @@
       </div>
     </footer>
 
+    <div v-if="vipPromptOpen" class="vip-mask" @click.stop>
+      <div class="vip-pop">
+        <button type="button" class="vip-x" aria-label="关闭" @click.stop="vipPromptOpen = false">×</button>
+        <h3>开通VIP 畅看全集</h3>
+        <p>免广告 · 无限观看</p>
+        <button type="button" class="vip-go" @click.stop="goVip">立即充值</button>
+      </div>
+    </div>
+
     <div v-if="catalogOpen" class="drawer-mask" @click.stop="catalogOpen = false">
       <aside class="drawer" @click.stop>
         <div class="drawer-head">
@@ -120,6 +129,7 @@ const userStore = useUserStore()
 const isVip = computed(() => userStore.isVip)
 const needVip = ref(false)
 const showVipGate = computed(() => !isVip.value && needVip.value)
+const vipPromptOpen = ref(false)
 const rootRef = ref<HTMLElement | null>(null)
 const chrome = ref(true)
 const empty = ref('加载中…')
@@ -266,9 +276,14 @@ const back = () => {
   router.replace(comicPath(routeId(route.params.id)))
 }
 
+watch(isVip, (vip) => {
+  if (vip) vipPromptOpen.value = false
+})
+
 watch(
   chapterId,
   () => {
+    vipPromptOpen.value = !isVip.value
     load().catch((err) => {
       const msg = err instanceof Error ? err.message : '无法阅读'
       empty.value = msg
@@ -391,6 +406,63 @@ h1 {
     font-size: 14px;
     font-weight: 700;
   }
+}
+
+.vip-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.vip-pop {
+  position: relative;
+  width: min(78vw, 300px);
+  padding: 32px 22px 24px;
+  border-radius: 14px;
+  background: #16161c;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: #8c8c9c;
+    font-size: 13px;
+  }
+}
+
+.vip-x {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.vip-go {
+  height: 40px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #ff5c93, #ff8a5c);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .bar {
