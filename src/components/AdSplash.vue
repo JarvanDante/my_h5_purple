@@ -11,12 +11,10 @@
       </div>
     </div>
     <form class="gate" @submit.prevent="onEnter" @click.stop>
-      <p class="gate-title">安全验证</p>
       <button type="button" class="pic" :disabled="picBusy" @click.stop="loadCaptcha">
         <img v-if="image" :src="image" alt="验证码" />
         <span v-else>{{ picBusy ? '加载中' : '点击刷新' }}</span>
       </button>
-      <p class="gate-hint">看不清？点图换一张</p>
       <input
         v-model="code"
         type="text"
@@ -292,51 +290,37 @@ onUnmounted(() => {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  width: min(248px, calc(100% - 56px));
-  padding: 16px 14px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 16px;
-  background: rgba(12, 10, 16, 0.92);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(18px);
+  gap: 10px;
+  width: min(220px, calc(100% - 64px));
+  padding: 12px;
+  border: 1px solid $primary-soft;
+  border-radius: $radius-card;
+  background: rgba(28, 28, 34, 0.94);
+  box-shadow: $shadow-card;
   transform: translate(-50%, -50%);
-}
-
-.gate-title {
-  margin: 0 0 2px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-align: center;
-}
-
-.gate-hint {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 11px;
-  line-height: 1;
-  text-align: center;
 }
 
 .gate input {
   width: 100%;
-  height: 44px;
-  border: 1px solid rgba(255, 92, 147, 0.38);
-  border-radius: 12px;
+  height: 42px;
+  border: 1px solid $search-border;
+  border-radius: $radius-thumb;
   padding: 0 12px;
-  background: #191920;
-  color: #fff;
-  font-size: 18px;
+  background: $background-page;
+  color: $text-color;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 8px;
+  letter-spacing: 6px;
   text-align: center;
 
+  &:focus {
+    border-color: $primary-color;
+    outline: none;
+  }
+
   &::placeholder {
-    color: rgba(255, 255, 255, 0.42);
-    font-size: 14px;
+    color: $text-color-muted;
+    font-size: 13px;
     font-weight: 500;
     letter-spacing: 0;
   }
@@ -347,13 +331,13 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 72px;
+  height: 64px;
   border: 0;
-  border-radius: 12px;
+  border-radius: $radius-thumb;
   padding: 0;
   overflow: hidden;
-  background: #f4f0e8;
-  color: #6e6e78;
+  background: #fff;
+  color: $text-color-muted;
   font-size: 12px;
 
   &:disabled {
@@ -365,7 +349,6 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: #f4f0e8;
   }
 }
 
