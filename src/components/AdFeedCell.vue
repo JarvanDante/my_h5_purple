@@ -40,7 +40,7 @@ const list = computed(() => {
   return start ? [...raw.slice(start), ...raw.slice(0, start)] : raw
 })
 const enabled = computed(() => list.value.length > 0)
-const { slides, current, onScroll, settleClone } = useAdCarousel(track, list, enabled, true)
+const { slides, current, onScroll, settleClone } = useAdCarousel(track, list, enabled, true, true)
 
 onMounted(() => {
   adsStore.load(AD_SLOT.feed, 10)
@@ -59,11 +59,12 @@ onMounted(() => {
 
 .hero-track {
   display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
   scroll-behavior: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;

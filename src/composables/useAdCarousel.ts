@@ -10,11 +10,23 @@ export function useAdCarousel(
   list: Ref<AdItem[]>,
   enabled: Ref<boolean>,
   reverse: MaybeRefOrGetter<boolean> = false,
+  vertical: MaybeRefOrGetter<boolean> = false,
 ) {
   const adsStore = useAdsStore()
   const index = { value: 0 }
   const scrollIndex = { value: 0 }
   const isReverse = () => toValue(reverse)
+  const isVertical = () => toValue(vertical)
+  const pageSize = (el: HTMLElement) => (isVertical() ? el.clientHeight : el.clientWidth)
+  const pagePos = (el: HTMLElement) => (isVertical() ? el.scrollTop : el.scrollLeft)
+  const scrollToPage = (el: HTMLElement, page: number) => {
+    const px = page * pageSize(el)
+    el.scrollTo(isVertical() ? { top: px, left: 0, behavior: 'auto' } : { left: px, top: 0, behavior: 'auto' })
+  }
+  const setPagePos = (el: HTMLElement, px: number) => {
+    if (isVertical()) el.scrollTop = px
+    else el.scrollLeft = px
+  }
 
   const slides = computed(() => {
     const src = list.value
@@ -44,16 +56,17 @@ export function useAdCarousel(
   const atClone = () => {
     const el = track.value
     const n = list.value.length
-    if (!el?.clientWidth || n <= 1) return false
-    if (isReverse()) return el.scrollLeft <= 4
-    return el.scrollLeft >= n * el.clientWidth - 4
+    if (!el || !pageSize(el) || n <= 1) return false
+    const pos = pagePos(el)
+    if (isReverse()) return pos <= 4
+    return pos >= n * pageSize(el) - 4
   }
 
   const onScroll = () => {
     const el = track.value
-    if (sliding || jumping || !el?.clientWidth) return
+    if (sliding || jumping || !el || !pageSize(el)) return
     const n = list.value.length
-    const i = Math.round(el.scrollLeft / el.clientWidth)
+    const i = Math.round(pagePos(el) / pageSize(el))
     scrollIndex.value = i
     index.value = listIndexFromScroll(n && i >= n ? n : i)
   }
@@ -67,7 +80,7 @@ export function useAdCarousel(
     el.style.scrollSnapType = 'none'
     el.style.scrollBehavior = 'auto'
     const home = homeScroll()
-    el.scrollTo({ left: home * el.clientWidth, behavior: 'auto' })
+    scrollToPage(el, home)
     scrollIndex.value = home
     index.value = 0
     requestAnimationFrame(() => {
@@ -99,16 +112,16 @@ export function useAdCarousel(
 
   const scrollToIndex = (next: number) => {
     const el = track.value
-    if (!el?.clientWidth) return
+    if (!pageSize(el)) return
     window.cancelAnimationFrame(anim)
     sliding = true
-    const from = el.scrollLeft
-    const to = next * el.clientWidth
+    const from = pagePos(el)
+    const to = next * pageSize(el)
     const started = performance.now()
     el.style.scrollSnapType = 'none'
     const step = (now: number) => {
       const t = Math.min(1, (now - started) / SLIDE_MS)
-      el.scrollLeft = from + (to - from) * easeInOut(t)
+      setPagePos(el, from + (to - from) * easeInOut(t))
       if (t < 1) {
         anim = requestAnimationFrame(step)
         return
@@ -130,7 +143,7 @@ export function useAdCarousel(
   const goNext = () => {
     const el = track.value
     const n = list.value.length
-    if (sliding || jumping || !el?.clientWidth || n <= 1 || !enabled.value) return
+    if (sliding || jumping || !el || !pageSize(el) || n <= 1 || !enabled.value) return
     const next = isReverse() ? scrollIndex.value - 1 : Math.min(scrollIndex.value, n - 1) + 1
     scrollIndex.value = next
     scrollToIndex(next)
@@ -143,13 +156,13 @@ export function useAdCarousel(
     index.value = 0
     await nextTick()
     const el = track.value
-    if (el?.clientWidth) el.scrollTo({ left: home * el.clientWidth, behavior: 'auto' })
+    if (el && pageSize(el)) scrollToPage(el, home)
     if (list.value.length) adsStore.impression(list.value[0])
     scheduleNext()
   }
 
   watch(
-    () => [enabled.value, isReverse(), list.value.map((a) => a.creative_id).join(',')],
+    () => [enabled.value, isReverse(), isVertical(), list.value.map((a) => a.creative_id).join(',')],
     () => {
       if (enabled.value && list.value.length) start()
       else stop()
