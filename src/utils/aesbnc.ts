@@ -146,7 +146,9 @@ function isMinioObjectUrl(url: string) {
 }
 
 export function fetchMediaUrl(url: string) {
-  if (isMinioObjectUrl(url) && isEncryptedMedia(url)) {
+  if (url.startsWith('/front/v1/media/object')) return url
+  // my-storage / my-media 桶不对浏览器开放，明文 gif/png 也要同域代读。
+  if (isMinioObjectUrl(url)) {
     return `/front/v1/media/object?u=${encodeURIComponent(url)}`
   }
   return url
@@ -185,8 +187,8 @@ export async function resolveMediaSrc(url?: string) {
   if (!url) return ''
   if (url.startsWith('blob:') || url.startsWith('data:')) return url
   url = mediaUrl(url)
-  if (looksLikePlainImage(url) && !isEncryptedMedia(url)) return url
-  if (!isEncryptedMedia(url)) return url
+  if (looksLikePlainImage(url) && !isEncryptedMedia(url)) return fetchMediaUrl(url)
+  if (!isEncryptedMedia(url)) return fetchMediaUrl(url)
   const hit = blobCache.get(url)
   if (hit) return hit
   const res = await fetch(fetchMediaUrl(url))
