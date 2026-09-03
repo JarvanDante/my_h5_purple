@@ -11,6 +11,12 @@
       </div>
     </div>
     <form class="gate" @submit.prevent="onEnter" @click.stop>
+      <p class="gate-title">安全验证</p>
+      <button type="button" class="pic" :disabled="picBusy" @click.stop="loadCaptcha">
+        <img v-if="image" :src="image" alt="验证码" />
+        <span v-else>{{ picBusy ? '加载中' : '点击刷新' }}</span>
+      </button>
+      <p class="gate-hint">看不清？点图换一张</p>
       <input
         v-model="code"
         type="text"
@@ -20,10 +26,6 @@
         spellcheck="false"
         placeholder="请输入验证码"
       />
-      <button type="button" class="pic" :disabled="picBusy" @click.stop="loadCaptcha">
-        <img v-if="image" :src="image" alt="验证码" />
-        <span v-else>{{ picBusy ? '加载中' : '点击刷新' }}</span>
-      </button>
     </form>
     <button
       type="button"
@@ -286,46 +288,73 @@ onUnmounted(() => {
 .gate {
   position: absolute;
   left: 50%;
-  top: 42%;
+  top: 50%;
   z-index: 2;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 8px;
-  width: min(300px, calc(100% - 48px));
-  padding: 10px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.55);
+  width: min(248px, calc(100% - 56px));
+  padding: 16px 14px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  background: rgba(12, 10, 16, 0.92);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(18px);
   transform: translate(-50%, -50%);
 }
 
-.gate input {
-  flex: 1;
-  min-width: 0;
-  height: 40px;
-  border: 0;
-  border-radius: 10px;
-  padding: 0 12px;
-  background: rgba(255, 255, 255, 0.12);
+.gate-title {
+  margin: 0 0 2px;
   color: #fff;
-  font-size: 15px;
-  letter-spacing: 3px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.gate-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  line-height: 1;
+  text-align: center;
+}
+
+.gate input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid rgba(255, 92, 147, 0.38);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #191920;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  text-align: center;
 
   &::placeholder {
-    color: rgba(255, 255, 255, 0.55);
+    color: rgba(255, 255, 255, 0.42);
+    font-size: 14px;
+    font-weight: 500;
     letter-spacing: 0;
   }
 }
 
 .pic {
-  flex: 0 0 108px;
-  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 72px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 0;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 11px;
+  background: #f4f0e8;
+  color: #6e6e78;
+  font-size: 12px;
 
   &:disabled {
     opacity: 0.7;
@@ -335,7 +364,8 @@ onUnmounted(() => {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: #f4f0e8;
   }
 }
 
