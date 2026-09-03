@@ -10,10 +10,25 @@
         <AdImage :ad="item" :mark="false" />
       </div>
     </div>
+    <form class="gate" @submit.prevent="onEnter" @click.stop>
+      <input
+        v-model="code"
+        type="text"
+        maxlength="4"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+        placeholder="请输入验证码"
+      />
+      <button type="button" class="pic" :disabled="picBusy" @click.stop="loadCaptcha">
+        <img v-if="image" :src="image" alt="验证码" />
+        <span v-else>{{ picBusy ? '加载中' : '点击刷新' }}</span>
+      </button>
+    </form>
     <button
       type="button"
       class="enter"
-      :disabled="left > 0"
+      :disabled="left > 0 || busy"
       @click.stop="onEnter"
     >
       {{ left > 0 ? `${left}s` : '进入' }}
@@ -23,9 +38,12 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { showToast } from 'vant'
+import { fetchCaptcha, verifyCaptcha } from '@/api/captcha'
 import { AD_SLOT, type AdItem } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
+import { toastError } from '@/utils/request'
 
 const HOLD_MS = 2000
 const SLIDE_MS = 1000
@@ -37,6 +55,11 @@ const visible = ref(false)
 const left = ref(5)
 const list = ref<AdItem[]>([])
 const index = ref(0)
+const captchaId = ref('')
+const image = ref('')
+const code = ref('')
+const busy = ref(false)
+const picBusy = ref(false)
 
 const slides = computed(() =>
   list.value.length > 1 ? [...list.value, list.value[0]] : list.value,
@@ -147,9 +170,46 @@ const close = () => {
   window.cancelAnimationFrame(anim)
 }
 
-const onEnter = () => {
-  if (left.value > 0) return
-  close()
+const loadCaptcha = async () => {
+  if (picBusy.value) return
+  picBusy.value = true
+  try {
+    const data = await fetchCaptcha()
+    captchaId.value = data.id
+    image.value = data.image
+    code.value = ''
+  } catch (err) {
+    captchaId.value = ''
+    image.value = ''
+    toastError(err)
+  } finally {
+    picBusy.value = false
+  }
+}
+
+const onEnter = async () => {
+  if (left.value > 0 || busy.value) return
+  const text = code.value.trim()
+  if (!text) {
+    showToast('请输入验证码')
+    return
+  }
+  if (!captchaId.value) {
+    showToast('请先刷新验证码')
+    await loadCaptcha()
+    return
+  }
+  busy.value = true
+  try {
+    await verifyCaptcha(captchaId.value, text)
+    close()
+  } catch (err) {
+    toastError(err)
+    code.value = ''
+    await loadCaptcha()
+  } finally {
+    busy.value = false
+  }
 }
 
 onMounted(async () => {
@@ -173,6 +233,7 @@ onMounted(async () => {
   }, 1000)
   await nextTick()
   scheduleNext()
+  loadCaptcha()
 })
 
 onUnmounted(() => {
@@ -219,6 +280,62 @@ onUnmounted(() => {
   :deep(.ad-image) {
     width: 100%;
     height: 100%;
+  }
+}
+
+.gate {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(300px, calc(100% - 48px));
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  transform: translate(-50%, -50%);
+}
+
+.gate input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 3px;
+
+  &::placeholder {
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 0;
+  }
+}
+
+.pic {
+  flex: 0 0 108px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+
+  &:disabled {
+    opacity: 0.7;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 }
 
