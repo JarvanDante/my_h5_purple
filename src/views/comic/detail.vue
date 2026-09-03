@@ -76,9 +76,7 @@
             :class="{ lock: !ch.playable }"
             @click="openChapter(ch)"
           >
-            <span class="ch-thumb">
-              <EncryptedImage v-if="cover" :src="cover" alt="" />
-            </span>
+            <span class="ch-thumb" :style="coverSrc ? { backgroundImage: `url(${coverSrc})` } : undefined" />
             <span class="ch-name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
             <span v-if="ch.playable" class="watch">观看</span>
             <span v-else class="ch-lock">锁</span>
@@ -117,6 +115,7 @@ import { COMMENT_MEDIA_COMICS, fetchComments } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
 import CommentPanel from '@/components/CommentPanel.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
 import { pushBrowse } from '@/utils/browseHistory'
 import { comicReadPath, routeId } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
@@ -131,6 +130,7 @@ const tab = ref<'detail' | 'comment'>('detail')
 const commentCount = ref(0)
 
 const cover = computed(() => mediaUrl(item.value?.cover))
+const coverSrc = useEncryptedSrc(cover)
 const categories = computed(() => comicCategories(item.value || {}))
 const tags = computed(() => (item.value?.tags || []).filter(Boolean))
 const favCount = computed(() => Number(item.value?.like_count || 0))
@@ -599,14 +599,9 @@ h1 {
   border-radius: 6px;
   overflow: hidden;
   background: #24242e;
+  background-size: cover;
+  background-position: center;
   flex-shrink: 0;
-
-  :deep(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
 }
 
 .ch-name {

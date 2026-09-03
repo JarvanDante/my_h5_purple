@@ -182,6 +182,7 @@ export function decryptBnc(buf: ArrayBuffer) {
 }
 
 const blobCache = new Map<string, string>()
+const inflight = new Map<string, Promise<string>>()
 
 export async function resolveMediaSrc(url?: string) {
   if (!url) return ''
@@ -191,11 +192,21 @@ export async function resolveMediaSrc(url?: string) {
   if (!isEncryptedMedia(url)) return fetchMediaUrl(url)
   const hit = blobCache.get(url)
   if (hit) return hit
-  const res = await fetch(fetchMediaUrl(url))
-  if (!res.ok) throw new Error('图片加载失败')
-  const plain = decryptBnc(await res.arrayBuffer())
-  const blob = new Blob([plain], { type: sniffType(plain) })
-  const obj = URL.createObjectURL(blob)
-  blobCache.set(url, obj)
-  return obj
+  const pending = inflight.get(url)
+  if (pending) return pending
+  const task = (async () => {
+    try {
+      const res = await fetch(fetchMediaUrl(url))
+      if (!res.ok) throw new Error('图片加载失败')
+      const plain = decryptBnc(await res.arrayBuffer())
+      const blob = new Blob([plain], { type: sniffType(plain) })
+      const obj = URL.createObjectURL(blob)
+      blobCache.set(url, obj)
+      return obj
+    } finally {
+      inflight.delete(url)
+    }
+  })()
+  inflight.set(url, task)
+  return task
 }

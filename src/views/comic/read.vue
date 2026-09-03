@@ -94,9 +94,7 @@
             :class="{ current: ch.id === chapterId, lock: !ch.playable }"
             @click="openChapter(ch)"
           >
-            <span class="thumb">
-              <EncryptedImage v-if="cover" :src="cover" alt="" />
-            </span>
+            <span class="thumb" :style="coverSrc ? { backgroundImage: `url(${coverSrc})` } : undefined" />
             <span class="name">第{{ String(ch.seq).padStart(2, '0') }}话</span>
             <span class="go" :class="{ last: ch.id === chapterId }">
               {{ ch.id === chapterId ? '上次' : ch.playable ? '观看' : '锁' }}
@@ -119,6 +117,7 @@ import {
   type ChapterItem,
 } from '@/api/comics'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
 import { useUserStore } from '@/stores/user'
 import { comicPath, comicReadPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -137,6 +136,7 @@ const pics = ref<{ url: string }[]>([])
 const title = ref('')
 const comicTitle = ref('')
 const cover = ref('')
+const coverSrc = useEncryptedSrc(cover)
 const chapters = ref<ChapterItem[]>([])
 const catalogOpen = ref(false)
 const page = ref(1)
@@ -617,14 +617,9 @@ h1 {
   border-radius: 4px;
   overflow: hidden;
   background: #f1ecee;
+  background-size: cover;
+  background-position: center;
   flex-shrink: 0;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
 }
 
 .name {
