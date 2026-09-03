@@ -1,16 +1,29 @@
-import { computed, nextTick, onUnmounted, watch, type Ref } from 'vue'
+import { computed, nextTick, onUnmounted, toValue, watch, type MaybeRefOrGetter, type Ref } from 'vue'
 import type { AdItem } from '@/api/ads'
 import { useAdsStore } from '@/stores/ads'
 
 const HOLD_MS = 3000
 const SLIDE_MS = 1000
 
-export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdItem[]>, enabled: Ref<boolean>) {
+export function useAdCarousel(
+  track: Ref<HTMLElement | undefined>,
+  list: Ref<AdItem[]>,
+  enabled: Ref<boolean>,
+  reverse: MaybeRefOrGetter<boolean> = false,
+) {
   const adsStore = useAdsStore()
   const index = { value: 0 }
-  const slides = computed(() =>
-    list.value.length > 1 ? [...list.value, list.value[0]] : list.value,
-  )
+  const scrollIndex = { value: 0 }
+  const isReverse = () => toValue(reverse)
+
+  const slides = computed(() => {
+    const src = list.value
+    if (src.length <= 1) return src
+    if (!isReverse()) return [...src, src[0]]
+    return [src[0], ...[...src].reverse()]
+  })
+
+  const current = computed(() => list.value[index.value] || list.value[0])
 
   let slideTimer = 0
   let anim = 0
@@ -19,10 +32,20 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
 
   const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
 
+  const homeScroll = () => (isReverse() && list.value.length > 1 ? list.value.length : 0)
+
+  const listIndexFromScroll = (pos: number) => {
+    const n = list.value.length
+    if (!n) return 0
+    if (!isReverse()) return pos >= n ? 0 : pos
+    return pos === 0 ? 0 : (n - pos + n) % n
+  }
+
   const atClone = () => {
     const el = track.value
     const n = list.value.length
     if (!el?.clientWidth || n <= 1) return false
+    if (isReverse()) return el.scrollLeft <= 4
     return el.scrollLeft >= n * el.clientWidth - 4
   }
 
@@ -31,7 +54,8 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
     if (sliding || jumping || !el?.clientWidth) return
     const n = list.value.length
     const i = Math.round(el.scrollLeft / el.clientWidth)
-    index.value = n && i >= n ? n - 1 : i
+    scrollIndex.value = i
+    index.value = listIndexFromScroll(n && i >= n ? n : i)
   }
 
   const snapHome = (then?: () => void) => {
@@ -42,7 +66,9 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
     window.cancelAnimationFrame(anim)
     el.style.scrollSnapType = 'none'
     el.style.scrollBehavior = 'auto'
-    el.scrollTo({ left: 0, behavior: 'auto' })
+    const home = homeScroll()
+    el.scrollTo({ left: home * el.clientWidth, behavior: 'auto' })
+    scrollIndex.value = home
     index.value = 0
     requestAnimationFrame(() => {
       el.style.scrollSnapType = ''
@@ -89,13 +115,13 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
       }
       sliding = false
       const n = list.value.length
-      if (next >= n) {
-        adsStore.impression(list.value[0])
+      index.value = listIndexFromScroll(next)
+      adsStore.impression(list.value[index.value])
+      if ((!isReverse() && next >= n) || (isReverse() && next <= 0)) {
         snapHome(() => scheduleNext())
         return
       }
       el.style.scrollSnapType = ''
-      adsStore.impression(list.value[next])
       scheduleNext()
     }
     anim = requestAnimationFrame(step)
@@ -105,23 +131,25 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
     const el = track.value
     const n = list.value.length
     if (sliding || jumping || !el?.clientWidth || n <= 1 || !enabled.value) return
-    const cur = Math.min(index.value, n - 1)
-    const next = cur + 1
-    if (next < n) index.value = next
+    const next = isReverse() ? scrollIndex.value - 1 : Math.min(scrollIndex.value, n - 1) + 1
+    scrollIndex.value = next
     scrollToIndex(next)
   }
 
   const start = async () => {
     stop()
+    const home = homeScroll()
+    scrollIndex.value = home
     index.value = 0
     await nextTick()
-    track.value?.scrollTo({ left: 0, behavior: 'auto' })
+    const el = track.value
+    if (el?.clientWidth) el.scrollTo({ left: home * el.clientWidth, behavior: 'auto' })
     if (list.value.length) adsStore.impression(list.value[0])
     scheduleNext()
   }
 
   watch(
-    () => [enabled.value, list.value.map((a) => a.creative_id).join(',')],
+    () => [enabled.value, isReverse(), list.value.map((a) => a.creative_id).join(',')],
     () => {
       if (enabled.value && list.value.length) start()
       else stop()
@@ -131,5 +159,5 @@ export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdI
 
   onUnmounted(stop)
 
-  return { slides, onScroll, settleClone }
+  return { slides, current, onScroll, settleClone }
 }

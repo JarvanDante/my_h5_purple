@@ -1,20 +1,25 @@
 <template>
   <div class="media-grid" :class="[cols, { wide, poster, mosaic: mosaicMode }]">
-    <article v-for="item in items" :key="`${item.isAd ? 'ad' : 'm'}-${item.id}`" class="card" @click="$emit('select', item)">
-      <div class="thumb" :class="`tone-${item.tone}`">
-        <CoverMosaic v-if="item.mosaic && item.cover && !item.isAd" :src="item.cover" />
+    <article
+      v-for="item in items"
+      :key="`${item.isAd ? 'ad' : 'm'}-${item.id}`"
+      class="card"
+      @click="item.isAd ? undefined : $emit('select', item)"
+    >
+      <AdFeedCell v-if="item.isAd" :offset="adOffset(item)" />
+      <div v-else class="thumb" :class="`tone-${item.tone}`">
+        <CoverMosaic v-if="item.mosaic && item.cover" :src="item.cover" />
         <EncryptedImage v-else-if="item.cover" :src="item.cover" alt="" />
-        <span v-if="item.isAd" class="ad-mark">广告</span>
-        <span v-else-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
-        <p v-if="!wide && !poster && !item.mosaic && !item.isAd" class="cover-title ellipsis">{{ item.title }}</p>
-        <span v-if="item.duration && !item.isAd" class="duration">{{ item.duration }}</span>
+        <span v-if="item.tag" class="badge" :class="item.tag === 'VIP' ? 'vip' : 'free'">{{ item.tag }}</span>
+        <p v-if="!wide && !poster && !item.mosaic" class="cover-title ellipsis">{{ item.title }}</p>
+        <span v-if="item.duration" class="duration">{{ item.duration }}</span>
       </div>
-      <p v-if="item.mosaic || item.isAd || poster" class="card-title ellipsis">{{ item.title }}</p>
+      <p v-if="!item.isAd && (item.mosaic || poster)" class="card-title ellipsis">{{ item.title }}</p>
       <p v-if="item.badge && !item.isAd" class="foot-badge">{{ item.badge }}</p>
       <p v-else-if="item.labels?.length" class="labels">
         <span v-for="lb in item.labels" :key="lb">{{ lb }}</span>
       </p>
-      <p v-if="wide" class="card-title ellipsis">{{ item.title }}</p>
+      <p v-if="wide && !item.isAd" class="card-title ellipsis">{{ item.title }}</p>
       <p v-if="!item.mosaic && (item.sub || item.views)" class="foot">
         <span v-if="item.sub" class="meta ellipsis">{{ item.sub }}</span>
         <span v-if="item.views" class="chip">{{ item.views }}</span>
@@ -25,6 +30,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import AdFeedCell from '@/components/AdFeedCell.vue'
 import CoverMosaic from '@/components/CoverMosaic.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import type { CoverItem } from '@/data/mock'
@@ -37,6 +43,15 @@ const props = defineProps<{
 }>()
 
 const mosaicMode = computed(() => props.items.some((item) => item.mosaic))
+
+const adOffset = (item: CoverItem) => {
+  let n = 0
+  for (const row of props.items) {
+    if (row === item) return n
+    if (row.isAd) n += 1
+  }
+  return 0
+}
 
 defineEmits<{
   select: [item: CoverItem]
@@ -67,6 +82,27 @@ defineEmits<{
 .card {
   min-width: 0;
   max-width: 100%;
+}
+
+.card :deep(.feed-cell .thumb) {
+  height: 132px;
+}
+
+.cols-2 .card :deep(.feed-cell .thumb) {
+  height: auto;
+  aspect-ratio: 3 / 4;
+}
+
+.wide.cols-2 .card :deep(.feed-cell .thumb) {
+  aspect-ratio: 16 / 9;
+}
+
+.poster.cols-2 .card :deep(.feed-cell .thumb) {
+  aspect-ratio: 170 / 227;
+}
+
+.cols-3 .card :deep(.feed-cell .thumb) {
+  height: 150px;
 }
 
 .thumb {

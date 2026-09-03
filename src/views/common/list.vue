@@ -202,7 +202,7 @@ const open = (item: CoverItem) => {
 const load = async () => {
   loading.value = true
   try {
-    const rawFeed = await adsStore.load(AD_SLOT.feed, 8)
+    const rawFeed = await adsStore.load(AD_SLOT.feed, 10)
     rawFeed.forEach((a) => adsStore.impression(a))
     const feedAds = rawFeed.map(toAdCover)
     if (media.value === 'video' || media.value === 'douyin') {
