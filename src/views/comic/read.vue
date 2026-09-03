@@ -23,7 +23,9 @@
         <button type="button" @click.stop="goVip">开通会员</button>
       </div>
       <template v-for="(pic, i) in pics" :key="pic.url + i">
-        <EncryptedImage :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
+        <div class="pic" :data-index="i">
+          <EncryptedImage :src="pic.url" lazy :root="rootRef" alt="" draggable="false" />
+        </div>
         <div v-if="i === midVipIndex && showVipGate" class="vip-gate">
           <h3>开通VIP 畅看全集</h3>
           <p>免广告 · 无限观看</p>
@@ -366,15 +368,20 @@ h1 {
   color: #9aa;
 }
 
-.pic,
-:deep(.pic) {
+.pic {
   display: block;
   width: 100%;
-  height: auto;
-  object-fit: contain;
   user-select: none;
   -webkit-user-drag: none;
   background: #111;
+
+  :deep(img),
+  :deep(.enc-lazy) {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
 }
 
 .vip-gate {
