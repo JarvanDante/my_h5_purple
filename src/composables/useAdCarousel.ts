@@ -2,8 +2,8 @@ import { computed, nextTick, onUnmounted, watch, type Ref } from 'vue'
 import type { AdItem } from '@/api/ads'
 import { useAdsStore } from '@/stores/ads'
 
-const INTERVAL_MS = 1500
-const SLIDE_MS = 1500
+const INTERVAL_MS = 2500
+const SLIDE_MS = 2500
 
 export function useAdCarousel(track: Ref<HTMLElement | undefined>, list: Ref<AdItem[]>, enabled: Ref<boolean>) {
   const adsStore = useAdsStore()
