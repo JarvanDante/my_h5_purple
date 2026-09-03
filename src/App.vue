@@ -15,7 +15,7 @@
       <AppTabbar v-if="showTabbar" />
       <AdSplash />
       <AdPopup />
-      <AdFloat />
+      <AdFloat v-if="showFloatAd" />
     </div>
   </div>
 </template>
@@ -41,6 +41,7 @@ const cacheViews = computed(() => appStore.cacheViews)
 const transitionName = computed(() => navStore.transitionName)
 const drawerStore = useDrawerStore()
 const showTabbar = computed(() => route.meta.tabbar === true)
+const showFloatAd = computed(() => route.name !== 'ComicRead')
 const configStore = useConfigStore()
 const maintenance = computed(() => configStore.maintenance)
 const appName = computed(() => configStore.appName)

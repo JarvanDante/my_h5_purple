@@ -16,11 +16,18 @@
     </header>
 
     <div ref="rootRef" class="scroll" @click="toggleChrome">
-      <p v-if="!pics.length" class="empty">{{ empty }}</p>
+      <p v-if="!pics.length && !showVipGate" class="empty">{{ empty }}</p>
+      <div v-else-if="!pics.length && showVipGate" class="vip-gate">
+        <h3>开通VIP 畅看全集</h3>
+        <p>免广告 · 无限观看</p>
+        <button type="button" @click.stop="goVip">开通会员</button>
+      </div>
       <template v-for="(pic, i) in pics" :key="pic.url + i">
         <EncryptedImage :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
-        <div v-if="i === midAdIndex && midAd" class="page-ad">
-          <AdImage :ad="midAd" />
+        <div v-if="i === midVipIndex && showVipGate" class="vip-gate">
+          <h3>开通VIP 畅看全集</h3>
+          <p>免广告 · 无限观看</p>
+          <button type="button" @click.stop="goVip">开通会员</button>
         </div>
       </template>
     </div>
@@ -102,10 +109,7 @@ import {
   readChapter,
   type ChapterItem,
 } from '@/api/comics'
-import { AD_SLOT } from '@/api/ads'
-import AdImage from '@/components/AdImage.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
-import { useAdsStore } from '@/stores/ads'
 import { useUserStore } from '@/stores/user'
 import { comicPath, comicReadPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -113,9 +117,9 @@ import { mediaUrl, toastError } from '@/utils/request'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
-const adsStore = useAdsStore()
 const isVip = computed(() => userStore.isVip)
-const midAd = computed(() => (isVip.value ? undefined : adsStore.firstOf(AD_SLOT.banner)))
+const needVip = ref(false)
+const showVipGate = computed(() => !isVip.value && needVip.value)
 const rootRef = ref<HTMLElement | null>(null)
 const chrome = ref(true)
 const empty = ref('加载中…')
@@ -138,8 +142,8 @@ const seq = computed(() => {
   const m = title.value.match(/第\s*(\d+)\s*话/)
   return m ? Number(m[1]) : 1
 })
-const midAdIndex = computed(() => {
-  if (isVip.value || pics.value.length < 4) return -1
+const midVipIndex = computed(() => {
+  if (!showVipGate.value || pics.value.length < 4) return -1
   return Math.floor(pics.value.length / 2) - 1
 })
 const sortedChapters = computed(() => {
@@ -171,7 +175,6 @@ const load = async () => {
   empty.value = '加载中…'
   pics.value = []
   page.value = 1
-  adsStore.load(AD_SLOT.banner, 3)
   const data = await readChapter(chapterId.value)
   title.value = data.title
   pics.value = (data.pics || []).map((p) => ({ ...p, url: mediaUrl(p.url) }))
@@ -180,10 +183,11 @@ const load = async () => {
   if (comicId) {
     const [cat, detail] = await Promise.all([
       fetchComicsChapters(comicId),
-      cover.value ? Promise.resolve(null) : fetchComicsDetail(comicId).catch(() => null),
+      fetchComicsDetail(comicId).catch(() => null),
     ])
     chapters.value = cat.list || []
     comicTitle.value = cat.title || detail?.title || ''
+    needVip.value = Boolean(detail?.need_vip || detail?.is_vip)
     if (detail?.cover) cover.value = mediaUrl(detail.cover)
   }
   await bindObserver()
@@ -235,12 +239,21 @@ const toggleAuto = () => {
 
 const openChapter = (ch: ChapterItem) => {
   if (!ch.playable) {
+    if (needVip.value) {
+      goVip()
+      return
+    }
     showToast('请先解锁该话')
     return
   }
   catalogOpen.value = false
   stopAuto()
   router.replace(comicReadPath(routeId(route.params.id), ch.id))
+}
+
+const goVip = () => {
+  stopAuto()
+  router.push('/vip')
 }
 
 const back = () => {
@@ -257,7 +270,9 @@ watch(
   chapterId,
   () => {
     load().catch((err) => {
-      empty.value = err instanceof Error ? err.message : '无法阅读'
+      const msg = err instanceof Error ? err.message : '无法阅读'
+      empty.value = msg
+      if (/会员|VIP|开通/i.test(msg)) needVip.value = true
       toastError(err)
     })
   },
@@ -347,14 +362,34 @@ h1 {
   background: #111;
 }
 
-.page-ad {
-  margin: 10px 16px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: #1c1c22;
+.vip-gate {
+  margin: 16px;
+  padding: 28px 20px;
+  border-radius: 12px;
+  background: #16161c;
+  text-align: center;
 
-  :deep(.ad-image) {
-    aspect-ratio: 16 / 5;
+  h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: #8c8c9c;
+    font-size: 13px;
+  }
+
+  button {
+    height: 40px;
+    padding: 0 28px;
+    border: 0;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #ff5c93, #ff8a5c);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
   }
 }
 
