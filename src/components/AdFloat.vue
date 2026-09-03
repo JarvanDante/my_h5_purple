@@ -14,9 +14,9 @@ import { useAdsStore } from '@/stores/ads'
 const KEY = 'h5_ad_float_closed'
 const adsStore = useAdsStore()
 const closed = ref(sessionStorage.getItem(KEY) === '1')
-const ad = computed(() => (adsStore.hidden ? undefined : adsStore.firstOf(AD_SLOT.float)))
+const ad = computed(() => adsStore.firstOf(AD_SLOT.float))
 const visible = computed(
-  () => !closed.value && !adsStore.hidden && !adsStore.splashOpen && !adsStore.popupOpen && !!ad.value,
+  () => !closed.value && !adsStore.splashOpen && !adsStore.popupOpen && !!ad.value,
 )
 
 const close = () => {

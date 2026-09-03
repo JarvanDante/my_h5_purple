@@ -84,7 +84,7 @@
       </button>
     </section>
 
-    <AdIconGrid v-if="!isVip" />
+    <AdIconGrid />
 
     <section class="quick">
       <button v-for="item in quicks" :key="item.title" type="button" @click="onQuick(item)">

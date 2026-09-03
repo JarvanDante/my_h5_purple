@@ -10,10 +10,9 @@ export const useAdsStore = defineStore('ads', () => {
   const splashOpen = ref(false)
   const popupOpen = ref(false)
   const userStore = useUserStore()
-  const hidden = computed(() => userStore.isVip)
+  const hidePlayer = computed(() => userStore.isVip)
 
   const load = async (slot: string, limit = 10) => {
-    if (hidden.value) return []
     if (cache.value[slot]) return cache.value[slot]
     try {
       const data = await fetchAds(slot, limit)
@@ -50,5 +49,5 @@ export const useAdsStore = defineStore('ads', () => {
     }).catch(() => {})
   }
 
-  return { cache, splashOpen, popupOpen, hidden, load, listOf, firstOf, impression, click }
+  return { cache, splashOpen, popupOpen, hidePlayer, load, listOf, firstOf, impression, click }
 })

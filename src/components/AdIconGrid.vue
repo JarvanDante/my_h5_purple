@@ -13,7 +13,7 @@ import { useAdsStore } from '@/stores/ads'
 const props = withDefaults(defineProps<{ limit?: number }>(), { limit: 15 })
 const adsStore = useAdsStore()
 const list = computed(() =>
-  adsStore.hidden ? [] : adsStore.listOf(AD_SLOT.icon).slice(0, props.limit),
+  adsStore.listOf(AD_SLOT.icon).slice(0, props.limit),
 )
 
 onMounted(() => {

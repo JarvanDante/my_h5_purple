@@ -13,13 +13,12 @@ import { AD_SLOT } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
-const KEY = 'h5_ad_popup_done'
 const adsStore = useAdsStore()
 const visible = ref(false)
 const ad = ref(adsStore.firstOf(AD_SLOT.popup))
 
 const tryShow = () => {
-  if (adsStore.hidden || adsStore.splashOpen || sessionStorage.getItem(KEY) === '1') return
+  if (adsStore.splashOpen || visible.value) return
   const hit = adsStore.firstOf(AD_SLOT.popup)
   if (!hit) return
   ad.value = hit
@@ -30,7 +29,6 @@ const tryShow = () => {
 const close = () => {
   visible.value = false
   adsStore.popupOpen = false
-  sessionStorage.setItem(KEY, '1')
 }
 
 onMounted(async () => {

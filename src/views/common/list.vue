@@ -30,7 +30,6 @@ import { AD_SLOT, type AdItem } from '@/api/ads'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { interleaveAds } from '@/utils/interleaveAds'
 import { useAdsStore } from '@/stores/ads'
-import { useUserStore } from '@/stores/user'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { openPromoLink } from '@/utils/promoLink'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -38,7 +37,6 @@ import { splitNames } from '@/utils/moduleFilter'
 
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
 const adsStore = useAdsStore()
 const items = ref<CoverItem[]>([])
 const loading = ref(true)
@@ -177,7 +175,7 @@ const toComicCover = (c: ComicsItem): CoverItem => {
 }
 
 const withAds = (list: CoverItem[], cols: number, ads: CoverItem[]) => {
-  if (userStore.isVip || !ads.length) return list
+  if (!ads.length) return list
   return interleaveAds(list, ads, cols)
 }
 
@@ -204,7 +202,7 @@ const open = (item: CoverItem) => {
 const load = async () => {
   loading.value = true
   try {
-    const rawFeed = userStore.isVip ? [] : await adsStore.load(AD_SLOT.feed, 8)
+    const rawFeed = await adsStore.load(AD_SLOT.feed, 8)
     rawFeed.forEach((a) => adsStore.impression(a))
     const feedAds = rawFeed.map(toAdCover)
     if (media.value === 'video' || media.value === 'douyin') {
@@ -258,9 +256,6 @@ const load = async () => {
 }
 
 watch(() => [media.value, type.value, category.value, tag.value], load, { immediate: true })
-watch(() => userStore.isVip, (vip) => {
-  if (vip) items.value = items.value.filter((row) => !row.isAd)
-})
 </script>
 
 <style scoped lang="scss">

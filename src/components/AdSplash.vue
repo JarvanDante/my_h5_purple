@@ -13,7 +13,6 @@ import { AD_SLOT } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
-const KEY = 'h5_ad_splash_done'
 const adsStore = useAdsStore()
 const visible = ref(false)
 const left = ref(3)
@@ -23,11 +22,9 @@ let timer = 0
 const close = () => {
   visible.value = false
   adsStore.splashOpen = false
-  sessionStorage.setItem(KEY, '1')
 }
 
 onMounted(async () => {
-  if (adsStore.hidden || sessionStorage.getItem(KEY) === '1') return
   await adsStore.load(AD_SLOT.splash, 3)
   const hit = adsStore.firstOf(AD_SLOT.splash)
   if (!hit) return

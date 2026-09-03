@@ -87,7 +87,7 @@
         </button>
       </section>
 
-      <AdIconGrid v-if="!isVip" :limit="5" />
+      <AdIconGrid :limit="5" />
 
       <SectionPanel title="精彩推荐">
         <p v-if="!recommends.length" class="page-empty">暂无更多视频</p>
