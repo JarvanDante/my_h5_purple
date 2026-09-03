@@ -14,7 +14,6 @@
     />
 
     <HomeHero :items="banners" @select="openBanner" />
-    <AdBanner />
     <NoticeMarquee />
 
     <div class="inner-slide">
