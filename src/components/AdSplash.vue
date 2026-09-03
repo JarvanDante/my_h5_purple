@@ -27,8 +27,8 @@ import { AD_SLOT, type AdItem } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
-const INTERVAL_MS = 1500
-const SLIDE_MS = 1500
+const HOLD_MS = 2000
+const SLIDE_MS = 1000
 
 const adsStore = useAdsStore()
 adsStore.splashOpen = true
@@ -108,12 +108,12 @@ const scrollToIndex = (next: number) => {
     const n = list.value.length
     if (next >= n) {
       adsStore.impression(list.value[0])
-      snapHome(() => scheduleNext(0))
+      snapHome(() => scheduleNext())
       return
     }
     el.style.scrollSnapType = ''
     adsStore.impression(list.value[next])
-    scheduleNext(0)
+    scheduleNext()
   }
   anim = requestAnimationFrame(step)
 }
@@ -133,7 +133,7 @@ const stopSlide = () => {
   slideTimer = 0
 }
 
-const scheduleNext = (delay = INTERVAL_MS) => {
+const scheduleNext = (delay = HOLD_MS) => {
   stopSlide()
   if (list.value.length <= 1 || !visible.value) return
   slideTimer = window.setTimeout(goNext, delay)
