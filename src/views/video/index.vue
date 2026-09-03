@@ -19,7 +19,6 @@
 
     <template v-else>
     <HomeHero :items="banners" @select="openBanner" />
-    <AdBanner />
 
     <div class="inner-slide">
       <transition :name="innerName">
