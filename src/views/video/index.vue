@@ -44,30 +44,31 @@
           </div>
 
           <template v-else-if="floors.length">
-            <FloorBlock
-              v-for="floor in floors"
-              :key="floor.id"
-              :title="floor.title"
-              :sub="floor.sub"
-              :categories="floor.categories"
-              :tags="floor.tags"
-              more
-              @more="go(floor.more)"
-            >
-              <p v-if="!floor.items.length" class="page-empty">{{ floor.empty }}</p>
-              <PosterRail v-else-if="floor.layout === 'rail'" :items="floor.items" @select="open" />
-              <PosterRail v-else-if="floor.layout === 'wide-rail'" :items="floor.items" wide @select="open" />
-              <PosterGrid v-else-if="floor.layout === 'grid-2'" :items="floor.items" :cols="2" @select="open" />
-              <PosterGrid v-else-if="floor.layout === 'wide-grid'" :items="floor.items" :cols="2" wide @select="open" />
-              <div v-else-if="floor.layout === 'hero-mix'" class="hero-mix">
-                <PosterCard v-if="floor.items[0]" class="hero-mix-main" :item="floor.items[0]" wide @select="open" />
-                <PosterGrid :items="floor.items.slice(1)" :cols="2" wide @select="open" />
-              </div>
-              <div v-else-if="floor.layout === 'one-wide'" class="one-wide">
-                <PosterCard :item="floor.items[0]" wide @select="open" />
-              </div>
-              <PosterGrid v-else :items="floor.items" @select="open" />
-            </FloorBlock>
+            <template v-for="(floor, i) in floors" :key="floor.id">
+              <FloorBlock
+                :title="floor.title"
+                :sub="floor.sub"
+                :categories="floor.categories"
+                :tags="floor.tags"
+                more
+                @more="go(floor.more)"
+              >
+                <p v-if="!floor.items.length" class="page-empty">{{ floor.empty }}</p>
+                <PosterRail v-else-if="floor.layout === 'rail'" :items="floor.items" @select="open" />
+                <PosterRail v-else-if="floor.layout === 'wide-rail'" :items="floor.items" wide @select="open" />
+                <PosterGrid v-else-if="floor.layout === 'grid-2'" :items="floor.items" :cols="2" @select="open" />
+                <PosterGrid v-else-if="floor.layout === 'wide-grid'" :items="floor.items" :cols="2" wide @select="open" />
+                <div v-else-if="floor.layout === 'hero-mix'" class="hero-mix">
+                  <PosterCard v-if="floor.items[0]" class="hero-mix-main" :item="floor.items[0]" wide @select="open" />
+                  <PosterGrid :items="floor.items.slice(1)" :cols="2" wide @select="open" />
+                </div>
+                <div v-else-if="floor.layout === 'one-wide'" class="one-wide">
+                  <PosterCard :item="floor.items[0]" wide @select="open" />
+                </div>
+                <PosterGrid v-else :items="floor.items" @select="open" />
+              </FloorBlock>
+              <AdBanner v-if="i < floors.length - 1" :index="i + 1" />
+            </template>
           </template>
           <p v-else class="page-empty">{{ emptyText }}</p>
         </div>

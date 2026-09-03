@@ -10,8 +10,20 @@ import { AD_SLOT } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
+const props = withDefaults(
+  defineProps<{
+    index?: number
+  }>(),
+  { index: 0 },
+)
+
 const adsStore = useAdsStore()
-const ad = computed(() => (adsStore.hidden ? undefined : adsStore.firstOf(AD_SLOT.banner)))
+const ad = computed(() => {
+  if (adsStore.hidden) return undefined
+  const list = adsStore.listOf(AD_SLOT.banner)
+  if (!list.length) return undefined
+  return list[props.index % list.length]
+})
 
 onMounted(() => {
   adsStore.load(AD_SLOT.banner, 6)
