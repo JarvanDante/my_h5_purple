@@ -19,6 +19,7 @@
 
     <template v-else>
     <HomeHero :items="banners" @select="openBanner" />
+    <NoticeMarquee />
 
     <div class="inner-slide">
       <transition :name="innerName">
@@ -88,6 +89,7 @@ import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
+import NoticeMarquee from '@/components/home/NoticeMarquee.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { goKingkong, takeVideoChannel } from '@/utils/kingkongJump'
 import PosterCard from '@/components/home/PosterCard.vue'
