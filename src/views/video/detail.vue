@@ -347,9 +347,13 @@ const load = () => {
 
 const loadRecommends = async (v: VideoItem) => {
   const kind = v.kind ?? 0
-  const fetchList = kind === 2 ? fetchCartoonList : kind === 3 ? fetchDouyinList : fetchVideoList
   try {
-    const data = await fetchList(1, 8, '', 1)
+    const data =
+      kind === 2
+        ? await fetchCartoonList(1, 8, '', '', 1)
+        : kind === 3
+          ? await fetchDouyinList(1, 8, '', 1)
+          : await fetchVideoList(1, 8, '', 1)
     recommends.value = (data.list || [])
       .filter((row) => row.id !== v.id)
       .slice(0, 6)
