@@ -1,15 +1,13 @@
 <template>
   <div v-if="visible && list.length" class="ad-splash" @click.stop>
-    <div class="viewport">
-      <div
-        class="track"
-        :class="{ anim: sliding }"
-        :style="{ transform: `translate3d(${-index * 100}%, 0, 0)` }"
-        @transitionend="onSlideEnd"
-      >
-        <div v-for="(item, i) in slides" :key="`${item.creative_id}-${i}`" class="slide">
-          <AdImage :ad="item" :mark="false" />
-        </div>
+    <div
+      ref="track"
+      class="hero-track"
+      @scroll.passive="onScroll"
+      @scrollend="settleClone"
+    >
+      <div v-for="(item, i) in slides" :key="`${item.creative_id}-${i}`" class="hero-slide">
+        <AdImage :ad="item" :mark="false" />
       </div>
     </div>
     <button
@@ -24,55 +22,133 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { AD_SLOT, type AdItem } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
+const INTERVAL_MS = 1000
+const SLIDE_MS = 1000
+
 const adsStore = useAdsStore()
+const track = ref<HTMLElement>()
 const visible = ref(false)
 const left = ref(5)
 const list = ref<AdItem[]>([])
 const index = ref(0)
-const sliding = ref(true)
+
+const slides = computed(() =>
+  list.value.length > 1 ? [...list.value, list.value[0]] : list.value,
+)
+
 let countTimer = 0
 let slideTimer = 0
+let anim = 0
+let jumping = false
+let sliding = false
 
-const slides = computed(() => {
-  if (list.value.length <= 1) return list.value
-  return [...list.value, list.value[0]]
-})
+const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
+
+const atClone = () => {
+  const el = track.value
+  const n = list.value.length
+  if (!el?.clientWidth || n <= 1) return false
+  return el.scrollLeft >= n * el.clientWidth - 4
+}
+
+const onScroll = () => {
+  const el = track.value
+  if (sliding || jumping || !el?.clientWidth) return
+  const n = list.value.length
+  const i = Math.round(el.scrollLeft / el.clientWidth)
+  index.value = n && i >= n ? n - 1 : i
+}
+
+const snapHome = (then?: () => void) => {
+  const el = track.value
+  if (!el) return
+  jumping = true
+  sliding = false
+  window.cancelAnimationFrame(anim)
+  el.style.scrollSnapType = 'none'
+  el.style.scrollBehavior = 'auto'
+  el.scrollTo({ left: 0, behavior: 'auto' })
+  index.value = 0
+  requestAnimationFrame(() => {
+    el.style.scrollSnapType = ''
+    el.style.scrollBehavior = ''
+    jumping = false
+    then?.()
+  })
+}
+
+const settleClone = () => {
+  if (sliding || jumping) return
+  if (atClone()) snapHome()
+}
+
+const scrollToIndex = (next: number) => {
+  const el = track.value
+  if (!el?.clientWidth) return
+  window.cancelAnimationFrame(anim)
+  sliding = true
+  const from = el.scrollLeft
+  const to = next * el.clientWidth
+  const started = performance.now()
+  el.style.scrollSnapType = 'none'
+  const step = (now: number) => {
+    const t = Math.min(1, (now - started) / SLIDE_MS)
+    el.scrollLeft = from + (to - from) * easeInOut(t)
+    if (t < 1) {
+      anim = requestAnimationFrame(step)
+      return
+    }
+    sliding = false
+    const n = list.value.length
+    if (next >= n) {
+      adsStore.impression(list.value[0])
+      snapHome(() => scheduleNext(0))
+      return
+    }
+    el.style.scrollSnapType = ''
+    adsStore.impression(list.value[next])
+    scheduleNext(0)
+  }
+  anim = requestAnimationFrame(step)
+}
+
+const goNext = () => {
+  const el = track.value
+  const n = list.value.length
+  if (sliding || jumping || !el?.clientWidth || n <= 1) return
+  const cur = Math.min(index.value, n - 1)
+  const next = cur + 1
+  if (next < n) index.value = next
+  scrollToIndex(next)
+}
+
+const stopSlide = () => {
+  window.clearTimeout(slideTimer)
+  slideTimer = 0
+}
+
+const scheduleNext = (delay = INTERVAL_MS) => {
+  stopSlide()
+  if (list.value.length <= 1 || !visible.value) return
+  slideTimer = window.setTimeout(goNext, delay)
+}
 
 const close = () => {
   visible.value = false
   adsStore.splashOpen = false
   window.clearInterval(countTimer)
-  window.clearInterval(slideTimer)
+  stopSlide()
+  window.cancelAnimationFrame(anim)
 }
 
 const onEnter = () => {
   if (left.value > 0) return
   close()
-}
-
-const onSlideEnd = () => {
-  if (list.value.length <= 1 || index.value < list.value.length) return
-  sliding.value = false
-  index.value = 0
-  requestAnimationFrame(() => {
-    sliding.value = true
-  })
-}
-
-const startSlide = () => {
-  if (list.value.length <= 1) return
-  slideTimer = window.setInterval(() => {
-    if (index.value >= list.value.length) return
-    sliding.value = true
-    index.value += 1
-    const cur = list.value[index.value % list.value.length]
-    adsStore.impression(cur)
-  }, 500)
 }
 
 onMounted(async () => {
@@ -91,12 +167,14 @@ onMounted(async () => {
     }
     left.value -= 1
   }, 1000)
-  startSlide()
+  await nextTick()
+  scheduleNext()
 })
 
 onUnmounted(() => {
   window.clearInterval(countTimer)
-  window.clearInterval(slideTimer)
+  stopSlide()
+  window.cancelAnimationFrame(anim)
   adsStore.splashOpen = false
 })
 </script>
@@ -112,26 +190,27 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.viewport {
+.hero-track {
+  display: flex;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-}
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 
-.track {
-  display: flex;
-  height: 100%;
-  will-change: transform;
-
-  &.anim {
-    transition: transform 0.35s ease-out;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 
-.slide {
+.hero-slide {
   flex: 0 0 100%;
   width: 100%;
   height: 100%;
+  scroll-snap-align: start;
 
   :deep(.ad-image) {
     width: 100%;
