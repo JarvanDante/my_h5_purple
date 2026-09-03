@@ -11,6 +11,9 @@ export type CoverItem = {
   badge?: string
   mosaic?: boolean
   isAd?: boolean
+  adCampaignId?: string
+  adCreativeId?: string
+  adSlot?: string
   mark?: 'new' | 'hot'
   statusTone?: 'chapter' | 'end'
   tone: number

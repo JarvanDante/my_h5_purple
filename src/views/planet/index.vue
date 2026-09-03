@@ -18,13 +18,7 @@
       </div>
     </header>
 
-    <section v-if="!userStore.isVip" class="ad-strip">
-      <article v-for="n in 4" :key="n" class="ad-card">
-        <div class="ad-cover" />
-        <p class="ad-title">广告位</p>
-        <span class="ad-tag">广告</span>
-      </article>
-    </section>
+    <AdBanner />
 
     <div class="inner-slide">
       <transition :name="name">
@@ -60,6 +54,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import AdBanner from '@/components/AdBanner.vue'
 import AppTopbar from '@/components/AppTopbar.vue'
 import ChannelTab from '@/components/ChannelTab.vue'
 import PostCard from '@/components/PostCard.vue'

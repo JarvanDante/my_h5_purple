@@ -19,22 +19,10 @@
       <p v-if="!pics.length" class="empty">{{ empty }}</p>
       <template v-for="(pic, i) in pics" :key="pic.url + i">
         <EncryptedImage :src="pic.url" class="pic" alt="" :data-index="i" draggable="false" />
-        <div v-if="i === midAdIndex" class="page-ad">
-          <span>广告</span>
+        <div v-if="i === midAdIndex && midAd" class="page-ad">
+          <AdImage :ad="midAd" />
         </div>
       </template>
-    </div>
-
-    <div v-if="floatAd && !isVip" class="float-ad" @click.stop>
-      <button type="button" class="float-x" aria-label="关闭" @click="floatAd = false">×</button>
-      <div class="float-thumb" />
-      <div class="float-body">
-        <div class="float-txt">
-          <b>广告位预留</b>
-          <p>开通会员可关闭广告</p>
-        </div>
-        <button type="button" class="float-vip" @click="goVip">VIP去广告</button>
-      </div>
     </div>
 
     <footer v-show="chrome" class="bar" @click.stop>
@@ -114,7 +102,10 @@ import {
   readChapter,
   type ChapterItem,
 } from '@/api/comics'
+import { AD_SLOT } from '@/api/ads'
+import AdImage from '@/components/AdImage.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { useAdsStore } from '@/stores/ads'
 import { useUserStore } from '@/stores/user'
 import { comicPath, comicReadPath, routeId } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -122,7 +113,9 @@ import { mediaUrl, toastError } from '@/utils/request'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const adsStore = useAdsStore()
 const isVip = computed(() => userStore.isVip)
+const midAd = computed(() => (isVip.value ? undefined : adsStore.firstOf(AD_SLOT.banner)))
 const rootRef = ref<HTMLElement | null>(null)
 const chrome = ref(true)
 const empty = ref('加载中…')
@@ -135,7 +128,6 @@ const catalogOpen = ref(false)
 const page = ref(1)
 const auto = ref(false)
 const asc = ref(false)
-const floatAd = ref(true)
 let observer: IntersectionObserver | null = null
 let autoTimer = 0
 
@@ -179,6 +171,7 @@ const load = async () => {
   empty.value = '加载中…'
   pics.value = []
   page.value = 1
+  adsStore.load(AD_SLOT.banner, 3)
   const data = await readChapter(chapterId.value)
   title.value = data.title
   pics.value = (data.pics || []).map((p) => ({ ...p, url: mediaUrl(p.url) }))
@@ -238,10 +231,6 @@ const toggleAuto = () => {
     }
     el.scrollBy({ top: 2 })
   }, 16)
-}
-
-const goVip = () => {
-  router.push('/vip')
 }
 
 const openChapter = (ch: ChapterItem) => {
@@ -359,91 +348,14 @@ h1 {
 }
 
 .page-ad {
-  height: 120px;
   margin: 10px 16px;
   border-radius: 10px;
-  background: #cde4ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #5a6a80;
-  font-size: 13px;
-  font-weight: 600;
-}
+  overflow: hidden;
+  background: #1c1c22;
 
-.float-ad {
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 118px;
-  z-index: 9;
-  height: 96px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(18, 16, 22, 0.9);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.float-thumb {
-  width: 72px;
-  height: 72px;
-  flex-shrink: 0;
-  border-radius: 8px;
-  background: #ffe3b8;
-}
-
-.float-body {
-  flex: 1;
-  min-width: 0;
-  height: 72px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-right: 28px;
-}
-
-.float-txt {
-  min-width: 0;
-
-  b {
-    display: block;
-    font-size: 15px;
-    font-weight: 700;
+  :deep(.ad-image) {
+    aspect-ratio: 16 / 5;
   }
-
-  p {
-    margin-top: 4px;
-    font-size: 12px;
-    color: #f5a6c4;
-  }
-}
-
-.float-x {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  font-size: 16px;
-  line-height: 22px;
-}
-
-.float-vip {
-  align-self: flex-end;
-  border: 0;
-  height: 28px;
-  padding: 0 12px;
-  border-radius: 14px;
-  background: #ffb07a;
-  color: #3a2418;
-  font-size: 12px;
-  font-weight: 700;
 }
 
 .bar {

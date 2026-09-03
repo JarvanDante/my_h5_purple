@@ -26,18 +26,34 @@ import { fetchComicsList, comicCategories, type ComicsItem } from '@/api/comics'
 import { fetchNovelList, type NovelItem } from '@/api/novel'
 import { fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, type VideoItem } from '@/api/video'
+import { AD_SLOT, type AdItem } from '@/api/ads'
 import { listTitles, type CoverItem } from '@/data/mock'
-import { estimateAdCount, interleaveAds, makeEmptyAds } from '@/utils/interleaveAds'
+import { interleaveAds } from '@/utils/interleaveAds'
+import { useAdsStore } from '@/stores/ads'
 import { useUserStore } from '@/stores/user'
 import { comicPath, videoPath } from '@/utils/idcrypt'
+import { openPromoLink } from '@/utils/promoLink'
 import { mediaUrl, toastError } from '@/utils/request'
 import { splitNames } from '@/utils/moduleFilter'
 
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const adsStore = useAdsStore()
 const items = ref<CoverItem[]>([])
 const loading = ref(true)
+
+const toAdCover = (a: AdItem, i: number): CoverItem => ({
+  id: `ad-${a.creative_id}-${i}`,
+  title: a.title || '广告',
+  cover: mediaUrl(a.media_url),
+  href: a.link_url,
+  isAd: true,
+  adCampaignId: a.campaign_id,
+  adCreativeId: a.creative_id,
+  adSlot: a.slot_code,
+  tone: i % 6,
+})
 
 const media = computed(() => {
   const m = String(route.query.media || '')
@@ -160,11 +176,24 @@ const toComicCover = (c: ComicsItem): CoverItem => {
   }
 }
 
-const withAds = (list: CoverItem[], cols: number) =>
-  userStore.isVip ? list : interleaveAds(list, makeEmptyAds(estimateAdCount(list.length, cols)), cols)
+const withAds = (list: CoverItem[], cols: number, ads: CoverItem[]) => {
+  if (userStore.isVip || !ads.length) return list
+  return interleaveAds(list, ads, cols)
+}
 
 const open = (item: CoverItem) => {
-  if (item.isAd) return
+  if (item.isAd) {
+    adsStore.click({
+      campaign_id: item.adCampaignId || '',
+      creative_id: item.adCreativeId || '',
+      title: item.title,
+      media_url: item.cover || '',
+      link_url: item.href || '',
+      slot_code: item.adSlot || AD_SLOT.feed,
+    })
+    openPromoLink(router, item.href)
+    return
+  }
   if (media.value === 'video' || media.value === 'cartoon' || media.value === 'douyin') {
     router.push(videoPath(item.id))
     return
@@ -175,6 +204,9 @@ const open = (item: CoverItem) => {
 const load = async () => {
   loading.value = true
   try {
+    const rawFeed = userStore.isVip ? [] : await adsStore.load(AD_SLOT.feed, 8)
+    rawFeed.forEach((a) => adsStore.impression(a))
+    const feedAds = rawFeed.map(toAdCover)
     if (media.value === 'video' || media.value === 'douyin') {
       let sort = 1
       let cate = ''
@@ -185,7 +217,7 @@ const load = async () => {
       }
       const fetchList = media.value === 'douyin' ? fetchDouyinList : fetchVideoList
       const data = await fetchList(1, 40, '', sort, cate, tag.value)
-      items.value = withAds((data.list || []).map(toVideoCover), 2)
+      items.value = withAds((data.list || []).map(toVideoCover), 2, feedAds)
       return
     }
     if (media.value === 'cartoon') {
@@ -197,12 +229,12 @@ const load = async () => {
         sort = 1
       }
       const data = await fetchCartoonList(1, 40, '', cate, sort, tag.value)
-      items.value = withAds((data.list || []).map(toCartoonCover), 2)
+      items.value = withAds((data.list || []).map(toCartoonCover), 2, feedAds)
       return
     }
     if (media.value === 'novel') {
       const data = await fetchNovelList(1, 40, '', category.value, 2)
-      items.value = withAds((data.list || []).map(toNovelCover), 3)
+      items.value = withAds((data.list || []).map(toNovelCover), 3, feedAds)
       return
     }
     let sort = 2
@@ -217,7 +249,7 @@ const load = async () => {
       sort = 2
     }
     const data = await fetchComicsList(1, 40, '', cate, sort, recommend, tag.value)
-    items.value = withAds((data.list || []).map(toComicCover), 3)
+    items.value = withAds((data.list || []).map(toComicCover), 3, feedAds)
   } catch (err) {
     toastError(err)
   } finally {

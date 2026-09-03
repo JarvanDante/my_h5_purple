@@ -13,6 +13,9 @@
       </div>
       <AppDrawer />
       <AppTabbar v-if="showTabbar" />
+      <AdSplash />
+      <AdPopup />
+      <AdFloat />
     </div>
   </div>
 </template>
@@ -24,6 +27,9 @@ import { useAppStore } from '@/stores/app'
 import { useDrawerStore } from '@/stores/drawer'
 import { useConfigStore } from '@/stores/config'
 import { TAB_PATHS, tabIndex, useNavStore } from '@/stores/nav'
+import AdFloat from '@/components/AdFloat.vue'
+import AdPopup from '@/components/AdPopup.vue'
+import AdSplash from '@/components/AdSplash.vue'
 import AppDrawer from '@/components/AppDrawer.vue'
 import AppTabbar from '@/components/AppTabbar.vue'
 

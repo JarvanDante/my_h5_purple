@@ -19,6 +19,7 @@
 
     <template v-else>
     <HomeHero :items="banners" @select="openBanner" />
+    <AdBanner />
 
     <div class="inner-slide">
       <transition :name="innerName">
@@ -82,6 +83,7 @@ import { useRouter } from 'vue-router'
 import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
 import { fetchVideoCategories, fetchVideoList, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
+import AdBanner from '@/components/AdBanner.vue'
 import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'

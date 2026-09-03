@@ -7,6 +7,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AdBanner: typeof import('./src/components/AdBanner.vue')['default']
+    AdFloat: typeof import('./src/components/AdFloat.vue')['default']
+    AdIconGrid: typeof import('./src/components/AdIconGrid.vue')['default']
+    AdImage: typeof import('./src/components/AdImage.vue')['default']
+    AdPopup: typeof import('./src/components/AdPopup.vue')['default']
+    AdSplash: typeof import('./src/components/AdSplash.vue')['default']
     AdSwipe: typeof import('./src/components/AdSwipe.vue')['default']
     AppDrawer: typeof import('./src/components/AppDrawer.vue')['default']
     AppTabbar: typeof import('./src/components/AppTabbar.vue')['default']
@@ -39,5 +45,6 @@ declare module 'vue' {
     UserAvatar: typeof import('./src/components/UserAvatar.vue')['default']
     VanSwipe: typeof import('vant/es')['Swipe']
     VanSwipeItem: typeof import('vant/es')['SwipeItem']
+    VipBadge: typeof import('./src/components/VipBadge.vue')['default']
   }
 }

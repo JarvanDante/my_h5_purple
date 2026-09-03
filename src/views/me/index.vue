@@ -84,6 +84,8 @@
       </button>
     </section>
 
+    <AdIconGrid v-if="!isVip" />
+
     <section class="quick">
       <button v-for="item in quicks" :key="item.title" type="button" @click="onQuick(item)">
         <span class="q-icon" v-html="item.icon" />
@@ -106,6 +108,7 @@
 import { computed, onActivated, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import AdIconGrid from '@/components/AdIconGrid.vue'
 import { fetchUnreadCount } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
 import UserAvatar from '@/components/UserAvatar.vue'

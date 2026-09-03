@@ -15,9 +15,7 @@
       @share="onShare"
     />
 
-    <section class="ad-slot" aria-hidden="true">
-      <span>同城约会</span>
-    </section>
+    <AdBanner />
 
     <section class="comments">
       <div class="cmt-head">
@@ -96,6 +94,7 @@
 import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import AdBanner from '@/components/AdBanner.vue'
 import CommentRow from '@/components/CommentRow.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'

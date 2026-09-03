@@ -14,6 +14,7 @@
     />
 
     <HomeHero :items="banners" @select="openBanner" />
+    <AdBanner />
     <NoticeMarquee />
 
     <div class="inner-slide">
@@ -82,6 +83,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import AdBanner from '@/components/AdBanner.vue'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
 import NoticeMarquee from '@/components/home/NoticeMarquee.vue'

@@ -24,7 +24,8 @@
         <button type="button" class="trial-vip" @click="goVip">开通会员免费看</button>
       </div>
       <div v-else-if="showAd" class="ad-cover">
-        <span class="ad-placeholder">广告</span>
+        <AdImage v-if="playerAd" :ad="playerAd" :mark="false" />
+        <span v-else class="ad-placeholder">广告</span>
         <button type="button" class="ad-skip" @click="onAdAction">
           {{ adLeft > 0 ? `开通会员跳过广告：${adLeft}秒` : '开始播放' }}
         </button>
@@ -32,7 +33,8 @@
       <div v-else-if="showPauseAd" class="pause-ad">
         <div class="pause-ad-box">
           <button type="button" class="pause-ad-close" aria-label="关闭" @click="closePauseAd">×</button>
-          <span>广告</span>
+          <AdImage v-if="playerAd" :ad="playerAd" />
+          <span v-else>广告</span>
           <button type="button" class="pause-ad-vip" @click="goVip">VIP去广告</button>
         </div>
       </div>
@@ -85,11 +87,7 @@
         </button>
       </section>
 
-      <section v-if="!isVip" class="ad-row">
-        <div v-for="n in 5" :key="n" class="ad-slot">
-          <span>广告</span>
-        </div>
-      </section>
+      <AdIconGrid v-if="!isVip" :limit="5" />
 
       <SectionPanel title="精彩推荐">
         <p v-if="!recommends.length" class="page-empty">暂无更多视频</p>
@@ -110,6 +108,9 @@
 import { computed, onActivated, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
+import { AD_SLOT } from '@/api/ads'
+import AdIconGrid from '@/components/AdIconGrid.vue'
+import AdImage from '@/components/AdImage.vue'
 import CommentPanel from '@/components/CommentPanel.vue'
 import HlsPlayer from '@/components/HlsPlayer.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
@@ -117,6 +118,7 @@ import SectionPanel from '@/components/SectionPanel.vue'
 import { COMMENT_MEDIA_VIDEO } from '@/api/ops'
 import { COLLECT_FAV, COLLECT_LIKE, fetchCollectList, MEDIA_VIDEO, operateCollect } from '@/api/collect'
 import { fetchVideoDetail, fetchVideoList, type VideoItem } from '@/api/video'
+import { useAdsStore } from '@/stores/ads'
 import { useUserStore } from '@/stores/user'
 import type { CoverItem } from '@/data/mock'
 import { routeId, videoPath } from '@/utils/idcrypt'
@@ -127,7 +129,9 @@ import { getToken, mediaUrl, toastError } from '@/utils/request'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const adsStore = useAdsStore()
 const isVip = computed(() => userStore.isVip)
+const playerAd = computed(() => (isVip.value ? undefined : adsStore.firstOf(AD_SLOT.player)))
 const item = ref<VideoItem | null>(null)
 const recommends = ref<CoverItem[]>([])
 const tab = ref<'intro' | 'comment'>('intro')
@@ -153,6 +157,7 @@ const startAdTimer = () => {
     showPauseAd.value = false
     return
   }
+  adsStore.load(AD_SLOT.player, 3)
   clearAdTimer()
   showAd.value = true
   adLeft.value = 5
@@ -448,6 +453,11 @@ onBeforeUnmount(() => {
   justify-content: center;
 }
 
+.ad-cover :deep(.ad-image) {
+  position: absolute;
+  inset: 0;
+}
+
 .ad-placeholder {
   color: rgba(255, 255, 255, 0.35);
   font-size: 14px;
@@ -483,6 +493,7 @@ onBeforeUnmount(() => {
   aspect-ratio: 16 / 10;
   background: #3a3a40;
   border-radius: 6px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -491,6 +502,11 @@ onBeforeUnmount(() => {
   color: rgba(255, 255, 255, 0.4);
   font-size: 13px;
   pointer-events: auto;
+}
+
+.pause-ad-box :deep(.ad-image) {
+  position: absolute;
+  inset: 0;
 }
 
 .player.is-fs .pause-ad {
@@ -503,6 +519,8 @@ onBeforeUnmount(() => {
 }
 
 .pause-ad-vip {
+  position: relative;
+  z-index: 1;
   border: 0;
   border-radius: 999px;
   background: $primary-color;
