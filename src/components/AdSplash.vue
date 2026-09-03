@@ -27,8 +27,8 @@ import { AD_SLOT, type AdItem } from '@/api/ads'
 import AdImage from '@/components/AdImage.vue'
 import { useAdsStore } from '@/stores/ads'
 
-const INTERVAL_MS = 1000
-const SLIDE_MS = 1000
+const INTERVAL_MS = 1500
+const SLIDE_MS = 1500
 
 const adsStore = useAdsStore()
 const track = ref<HTMLElement>()
