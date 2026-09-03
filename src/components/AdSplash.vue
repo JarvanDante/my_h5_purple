@@ -31,6 +31,7 @@ const INTERVAL_MS = 1500
 const SLIDE_MS = 1500
 
 const adsStore = useAdsStore()
+adsStore.splashOpen = true
 const track = ref<HTMLElement>()
 const visible = ref(false)
 const left = ref(5)
@@ -154,7 +155,10 @@ const onEnter = () => {
 onMounted(async () => {
   await adsStore.load(AD_SLOT.splash, 10)
   const hits = adsStore.listOf(AD_SLOT.splash)
-  if (!hits.length) return
+  if (!hits.length) {
+    adsStore.splashOpen = false
+    return
+  }
   list.value = hits
   visible.value = true
   adsStore.splashOpen = true
@@ -185,7 +189,7 @@ onUnmounted(() => {
 .ad-splash {
   position: fixed;
   inset: 0;
-  z-index: 1100;
+  z-index: 1120;
   background: #0b0b0d;
   overflow: hidden;
 }

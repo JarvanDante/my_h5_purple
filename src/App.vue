@@ -13,8 +13,8 @@
       </div>
       <AppDrawer />
       <AppTabbar v-if="showTabbar" />
-      <AdSplash />
       <AdPopup />
+      <AdSplash />
       <AdFloat v-if="showFloatAd" />
     </div>
   </div>
