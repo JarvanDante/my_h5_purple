@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useNavStore } from '@/stores/nav'
+import { rememberChannel } from '@/utils/channel'
 import { rememberInviteCode } from '@/utils/invite'
 
 const routes: RouteRecordRaw[] = [
@@ -288,6 +289,8 @@ router.beforeEach((to, from, next) => {
   document.title = (to.meta.title as string | undefined) || 'Purple'
   if (to.query.invite) rememberInviteCode(to.query.invite)
   if (to.query.code) rememberInviteCode(to.query.code)
+  if (to.query.channel) rememberChannel(to.query.channel)
+  if (to.query.channel_code) rememberChannel(to.query.channel_code)
   if (from.path) {
     useNavStore().setByRoute(to.path, from.path)
   }
