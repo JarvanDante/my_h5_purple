@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { bindInviteCode, fetchUserInfo, login, loginByAccount, logout as logoutApi, type UserInfo } from '@/api/user'
-import { peekChannel, takeChannel } from '@/utils/channel'
 import { peekInviteCode, takeInviteCode } from '@/utils/invite'
 import { setToken } from '@/utils/request'
 
@@ -53,17 +52,6 @@ export const useUserStore = defineStore('user', () => {
     takeInviteCode()
   }
 
-  const applyChannel = async () => {
-    const name = peekChannel()
-    if (!name || !user.value?.id) return
-    try {
-      await bindInviteCode(`channel://${name}`)
-    } catch {
-      // 已绑定或参数无效时丢掉，避免每次登录重试
-    }
-    takeChannel()
-  }
-
   const ensureLogin = async () => {
     if (sessionOff.value) {
       ready.value = true
@@ -73,13 +61,11 @@ export const useUserStore = defineStore('user', () => {
       device_id: deviceId(),
       device_type: 'h5',
       device_version: '0.1.0',
-      channel: peekChannel() || undefined,
     })
     setToken(data.token)
     user.value = data.user
     ready.value = true
     await applyInvite()
-    await applyChannel()
     return data.user
   }
 
@@ -96,7 +82,6 @@ export const useUserStore = defineStore('user', () => {
     user.value = data.user
     ready.value = true
     await applyInvite()
-    await applyChannel()
     return data.user
   }
 

@@ -36,12 +36,7 @@ export type RechargePackage = {
   bonus: number
 }
 
-export function login(body: {
-  device_id: string
-  device_type: string
-  device_version: string
-  channel?: string
-}) {
+export function login(body: { device_id: string; device_type: string; device_version: string }) {
   return request<{ token: string; user: UserInfo }>('/user/login', {
     method: 'POST',
     body: JSON.stringify(body),
