@@ -14,3 +14,10 @@ export function takeSource() {
   if (code) localStorage.removeItem(KEY)
   return code
 }
+
+/** 开机登录早于路由守卫，必须先从当前地址读 source。 */
+export function captureSourceFromLocation(search = window.location.search) {
+  const raw = new URLSearchParams(search).get('source')
+  if (raw) rememberSource(raw)
+  return peekSource()
+}

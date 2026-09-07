@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import { useConfigStore } from '@/stores/config'
 import { useUserStore } from '@/stores/user'
+import { captureSourceFromLocation } from '@/utils/source'
 import 'vant/lib/index.css'
 import './styles/index.scss'
 import '@vant/touch-emulator'
@@ -15,6 +16,7 @@ app.use(router)
 
 const configStore = useConfigStore()
 const userStore = useUserStore()
+captureSourceFromLocation()
 Promise.all([
   configStore.load().catch((err) => console.warn('[boot] config/info failed', err)),
   userStore.ensureLogin().catch((err) => console.warn('[boot] user/login failed', err)),
