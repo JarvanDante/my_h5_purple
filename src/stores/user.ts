@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { bindInviteCode, fetchUserInfo, login, loginByAccount, logout as logoutApi, type UserInfo } from '@/api/user'
 import { peekInviteCode, takeInviteCode } from '@/utils/invite'
+import { peekSource, takeSource } from '@/utils/source'
 import { setToken } from '@/utils/request'
 
 const DEVICE_KEY = 'h5_device_id'
@@ -61,7 +62,9 @@ export const useUserStore = defineStore('user', () => {
       device_id: deviceId(),
       device_type: 'h5',
       device_version: '0.1.0',
+      source: peekSource() || undefined,
     })
+    takeSource()
     setToken(data.token)
     user.value = data.user
     ready.value = true
@@ -76,7 +79,9 @@ export const useUserStore = defineStore('user', () => {
       device_id: deviceId(),
       device_type: 'h5',
       device_version: '0.1.0',
+      source: peekSource() || undefined,
     })
+    takeSource()
     setSessionOff(false)
     setToken(data.token)
     user.value = data.user
