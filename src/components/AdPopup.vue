@@ -59,22 +59,38 @@ watch(
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 28px 72px;
+  box-sizing: border-box;
+  padding: 16px 20px calc(48px + env(safe-area-inset-bottom, 0px));
 }
 
 .box {
   position: relative;
-  width: min(78vw, 320px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 360px, calc((100dvh - 140px) * 600 / 800));
+  max-height: 100%;
 }
 
 .box :deep(.ad-image) {
+  width: fit-content;
+  max-width: 100%;
   border-radius: 12px;
   overflow: hidden;
-  aspect-ratio: 3 / 4;
+}
+
+.box :deep(.ad-image img) {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100dvh - 140px);
+  object-fit: contain;
 }
 
 .x {
   display: block;
+  flex-shrink: 0;
   margin: 14px auto 0;
   width: 32px;
   height: 32px;

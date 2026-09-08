@@ -71,7 +71,18 @@ onMounted(() => {
   scroll-snap-align: start;
 
   :deep(.ad-image) {
-    aspect-ratio: 16 / 5;
+    width: 100%;
+    aspect-ratio: 750 / 240;
+  }
+
+  :deep(.ad-image:has(img)) {
+    aspect-ratio: auto;
+  }
+
+  :deep(.ad-image img) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 }
 </style>
