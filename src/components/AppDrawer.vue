@@ -4,7 +4,7 @@
       <aside class="drawer-panel" @click.stop>
         <header class="drawer-head">
           <div class="head-brand">
-            <span class="head-mark">{{ mark }}</span>
+            <img class="head-mark" :src="configStore.appLogo" alt="" />
             <strong>{{ appName }}</strong>
           </div>
           <button type="button" class="head-close" aria-label="关闭" @click="drawer.hide()">
@@ -45,7 +45,6 @@ const configStore = useConfigStore()
 const userStore = useUserStore()
 
 const appName = computed(() => configStore.appName || '漫隐')
-const mark = computed(() => appName.value.replace(/\s+/g, '').slice(0, 1))
 const loggedIn = computed(() => userStore.loggedIn)
 const nickname = computed(() => userStore.user?.nickname || '我的')
 
@@ -138,16 +137,11 @@ const go = (path: string) => {
 
 .head-mark {
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  background: linear-gradient(145deg, #ff8fb3 0%, $primary-color 58%, $primary-color-deep 100%);
-  box-shadow: 0 0 10px rgba(255, 92, 147, 0.32);
-  color: #fff;
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 28px;
-  text-align: center;
+  object-fit: contain;
+  background: #fff;
 }
 
 .head-brand strong {
