@@ -111,7 +111,7 @@ const goHome = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
 }
 
 .menu-btn i {

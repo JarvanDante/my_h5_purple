@@ -56,14 +56,14 @@ const src = computed(() => channelArtSrc(props.label, props.active))
 
 .channel-img {
   display: block;
-  width: 58px;
-  height: 40px;
+  width: 56px;
+  height: 38px;
   object-fit: contain;
 }
 
 .channel-tab.art.active .channel-img {
-  width: 64px;
-  height: 42px;
+  width: 62px;
+  height: 40px;
 }
 
 .channel-text {

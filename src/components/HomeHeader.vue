@@ -126,6 +126,10 @@ defineEmits<{
     margin-top: 8px;
   }
 
+  &.home-header--dark .search-row {
+    margin-top: 10px;
+  }
+
   .sub-row {
     margin-top: 4px;
     padding: 0;
@@ -316,26 +320,102 @@ defineEmits<{
 
 .home-header--dark {
   background: transparent;
-  padding: var(--app-header-top) 12px 8px;
+  padding: var(--app-header-top) 16px 6px;
 
   :deep(.app-topbar) {
     position: relative;
     overflow: visible;
+    height: 40px;
+    min-height: 40px;
+    gap: 10px;
+  }
+
+  :deep(.top-center) {
+    align-items: center;
+    height: 40px;
+
+    > * {
+      width: auto;
+      max-width: 100%;
+    }
   }
 
   .channel-tabs {
     align-items: center;
     justify-content: center;
     height: 40px;
-    gap: 12px;
+    gap: 8px;
     overflow: visible;
   }
 
+  .search-row {
+    margin-top: 10px;
+    padding-top: 0;
+    border-top: 0;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .search-pill {
+    height: 32px;
+    border-radius: 18px;
+    background: $search-bg;
+    border: 1px solid $search-border;
+    color: $search-text;
+    font-size: 14px;
+  }
+
+  .search-ico {
+    width: 15px;
+    height: 15px;
+    color: #fff;
+    opacity: 0.85;
+  }
+
+  .util-btn {
+    flex-direction: column;
+    width: 42px;
+    min-width: 42px;
+    height: auto;
+    gap: 0;
+    padding: 0;
+    border-radius: 0;
+    font-size: 8px;
+    font-weight: 600;
+    background: transparent;
+
+    span {
+      margin-top: -2px;
+      padding: 1px 4px;
+      border-radius: $radius-pill;
+      background: $primary-color-deep;
+      color: #fff;
+      line-height: 1.35;
+      white-space: nowrap;
+    }
+
+    &.vip,
+    &.checkin {
+      background: transparent;
+    }
+
+    &.checkin {
+      width: 36px;
+      min-width: 36px;
+    }
+  }
+
+  .util-ico {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
   .sub-row {
-    margin-top: 2px;
+    margin-top: 6px;
     height: 40px;
-    padding: 0 4px 0 10px;
-    gap: 18px;
+    padding: 0;
+    gap: 16px;
   }
 
   .sub-item {
@@ -343,8 +423,8 @@ defineEmits<{
     color: #fff;
     font-size: 14px;
     font-weight: 400;
-    line-height: 42px;
-    padding: 0 2px;
+    line-height: 40px;
+    padding: 0 4px;
 
     &.active {
       color: $primary-color;
@@ -354,7 +434,7 @@ defineEmits<{
         content: '';
         position: absolute;
         left: 50%;
-        bottom: 8px;
+        bottom: 5px;
         width: 28px;
         height: 4px;
         border-radius: 2px;
@@ -362,55 +442,6 @@ defineEmits<{
         transform: translateX(-50%);
       }
     }
-  }
-
-  .search-row {
-    margin-top: 8px;
-    padding-top: 0;
-    border-top: 0;
-  }
-
-  .search-pill {
-    height: 32px;
-    background: $search-bg;
-    border: 1px solid $search-border;
-    color: $search-text;
-  }
-
-  .search-ico {
-    color: $primary-color;
-  }
-
-  .util-btn {
-    flex-direction: column;
-    min-width: 0;
-    height: auto;
-    gap: 2px;
-    padding: 0;
-    border-radius: 0;
-    font-size: 8px;
-    font-weight: 600;
-    background: transparent;
-
-    span {
-      padding: 1px 6px;
-      border-radius: $radius-pill;
-      background: $primary-color-deep;
-      color: #fff;
-      line-height: 1.3;
-    }
-
-    &.vip,
-    &.checkin {
-      background: transparent;
-    }
-  }
-
-  .util-ico {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-    mix-blend-mode: lighten;
   }
 }
 </style>
