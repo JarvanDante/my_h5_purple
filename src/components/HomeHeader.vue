@@ -28,39 +28,42 @@
       </div>
     </AppTopbar>
 
-    <div v-if="!hideSearch" class="search-row">
-      <div class="search-pill" @click="$emit('search')">
-        <span class="search-ico"><LineIcon name="search" /></span>
-        <span>{{ searchText || `搜索更多${channel}` }}</span>
+    <div ref="dockRef" class="header-dock" :class="{ 'is-stuck': stuck }">
+      <div v-if="!hideSearch" class="search-row">
+        <div class="search-pill" @click="$emit('search')">
+          <span class="search-ico"><LineIcon name="search" /></span>
+          <span>{{ searchText || `搜索更多${channel}` }}</span>
+        </div>
+        <button type="button" class="util-btn vip" @click="$emit('vip')">
+          <img v-if="dark" class="util-ico" :src="vipIcon" alt="" />
+          <LineIcon v-else name="vip" />
+          <span>{{ dark ? 'VIP充值' : 'VIP' }}</span>
+        </button>
+        <button v-if="dark" type="button" class="util-btn checkin" @click="$emit('checkin')">
+          <img class="util-ico" :src="signIcon" alt="" />
+          <span>签到</span>
+        </button>
+        <button v-else type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
       </div>
-      <button type="button" class="util-btn vip" @click="$emit('vip')">
-        <img v-if="dark" class="util-ico" :src="vipIcon" alt="" />
-        <LineIcon v-else name="vip" />
-        <span>{{ dark ? 'VIP充值' : 'VIP' }}</span>
-      </button>
-      <button v-if="dark" type="button" class="util-btn checkin" @click="$emit('checkin')">
-        <img class="util-ico" :src="signIcon" alt="" />
-        <span>签到</span>
-      </button>
-      <button v-else type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
-    </div>
 
-    <div v-if="subTabs.length" class="sub-row">
-      <button
-        v-for="item in subTabs"
-        :key="item"
-        type="button"
-        class="sub-item"
-        :class="{ active: subTab === item }"
-        @click="$emit('selectSub', item)"
-      >
-        {{ item }}
-      </button>
+      <div v-if="subTabs.length" class="sub-row">
+        <button
+          v-for="item in subTabs"
+          :key="item"
+          type="button"
+          class="sub-item"
+          :class="{ active: subTab === item }"
+          @click="$emit('selectSub', item)"
+        >
+          {{ item }}
+        </button>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
 import AppTopbar from '@/components/AppTopbar.vue'
 import ChannelTab from '@/components/ChannelTab.vue'
 import LineIcon from '@/components/LineIcon.vue'
@@ -88,17 +91,73 @@ defineEmits<{
   vip: []
   favorite: []
 }>()
+
+const dockRef = ref<HTMLElement>()
+const stuck = ref(false)
+let scroller: HTMLElement | null = null
+
+const findScroller = (el: HTMLElement | null) => {
+  let node = el?.parentElement || null
+  while (node && node !== document.body) {
+    const { overflowY } = getComputedStyle(node)
+    if (overflowY === 'auto' || overflowY === 'scroll') return node
+    node = node.parentElement
+  }
+  return null
+}
+
+const onDockScroll = () => {
+  const el = dockRef.value
+  if (!el) return
+  const top = getComputedStyle(el).top
+  const pin = Number.parseFloat(top) || 0
+  stuck.value = el.getBoundingClientRect().top <= pin + 1
+}
+
+onMounted(() => {
+  scroller = findScroller(dockRef.value || null)
+  scroller?.addEventListener('scroll', onDockScroll, { passive: true })
+  onDockScroll()
+})
+
+onUnmounted(() => {
+  scroller?.removeEventListener('scroll', onDockScroll)
+  scroller = null
+})
 </script>
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
 
 .home-header--pack {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 50;
-  background: $background-topbar;
-  padding: var(--app-header-top) 12px 12px;
+  background: transparent;
+  padding: var(--app-header-top) 12px 0;
+}
+
+.header-dock {
+  position: sticky;
+  top: var(--app-header-top);
+  z-index: 60;
+  margin: 0 -12px;
+  padding: 0 12px 8px;
+  background: #000;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 0;
+    background: #000;
+    pointer-events: none;
+  }
+
+  &.is-stuck::before {
+    height: var(--app-header-top);
+  }
 }
 
 .home-header--pack .channel-tabs {
@@ -320,7 +379,12 @@ defineEmits<{
 
 .home-header--dark {
   background: transparent;
-  padding: var(--app-header-top) 16px 6px;
+  padding: var(--app-header-top) 16px 0;
+
+  .header-dock {
+    margin: 0 -16px;
+    padding: 0 16px 6px;
+  }
 
   :deep(.app-topbar) {
     position: relative;
