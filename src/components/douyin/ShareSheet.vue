@@ -155,7 +155,7 @@ const savePoster = async () => {
     ctx.fillStyle = '#2a2a30'
     ctx.fillRect(0, 0, w, h)
 
-    ctx.fillStyle = '#1c1c22'
+    ctx.fillStyle = '#290f18'
     roundRect(ctx, 40, 40, 670, 120, 20)
     ctx.fill()
     const logo = ctx.createLinearGradient(64, 58, 156, 150)
@@ -204,7 +204,7 @@ const savePoster = async () => {
     }
     ctx.restore()
 
-    ctx.fillStyle = '#1c1c22'
+    ctx.fillStyle = '#290f18'
     roundRect(ctx, 40, 896, 670, 180, 20)
     ctx.fill()
     ctx.fillStyle = '#fff'
@@ -292,7 +292,7 @@ watch(
   gap: 10px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: #1c1c22;
+  background: #290f18;
 
   strong {
     display: block;
@@ -354,7 +354,7 @@ watch(
   margin-top: 12px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: #1c1c22;
+  background: #290f18;
 }
 
 .qr {

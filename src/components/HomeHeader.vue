@@ -315,7 +315,7 @@ defineEmits<{
 }
 
 .home-header--dark {
-  background: $background-page;
+  background: transparent;
   padding: var(--app-header-top) 12px 8px;
 
   :deep(.app-topbar) {
@@ -340,14 +340,14 @@ defineEmits<{
 
   .sub-item {
     position: relative;
-    color: #8a8a94;
-    font-size: 15px;
+    color: #fff;
+    font-size: 14px;
     font-weight: 400;
     line-height: 42px;
     padding: 0 2px;
 
     &.active {
-      color: #fff;
+      color: $primary-color;
       font-weight: 700;
 
       &::after {
@@ -355,8 +355,8 @@ defineEmits<{
         position: absolute;
         left: 50%;
         bottom: 8px;
-        width: 16px;
-        height: 3px;
+        width: 28px;
+        height: 4px;
         border-radius: 2px;
         background: $primary-color;
         transform: translateX(-50%);
@@ -371,32 +371,38 @@ defineEmits<{
   }
 
   .search-pill {
-    height: 36px;
-    background: #4a353c;
-    border-color: transparent;
-    color: #c4b4b8;
+    height: 32px;
+    background: $search-bg;
+    border: 1px solid $search-border;
+    color: $search-text;
   }
 
   .search-ico {
-    color: #d0c4c8;
+    color: $primary-color;
   }
 
   .util-btn {
-    flex-direction: row;
+    flex-direction: column;
     min-width: 0;
-    height: 36px;
-    gap: 4px;
-    padding: 0 10px;
-    border-radius: $radius-pill;
-    font-size: 11px;
+    height: auto;
+    gap: 2px;
+    padding: 0;
+    border-radius: 0;
+    font-size: 8px;
     font-weight: 600;
+    background: transparent;
 
-    &.vip {
-      background: #53405a;
+    span {
+      padding: 1px 6px;
+      border-radius: $radius-pill;
+      background: $primary-color-deep;
+      color: #fff;
+      line-height: 1.3;
     }
 
+    &.vip,
     &.checkin {
-      background: #4e3a32;
+      background: transparent;
     }
   }
 

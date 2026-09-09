@@ -82,7 +82,7 @@ const fallbackText = computed(() => (props.fallback || '用').slice(0, 1))
   height: 36%;
   min-width: 14px;
   min-height: 14px;
-  border: 1.6px solid #0b0b0d;
+  border: 1.6px solid #000000;
   border-radius: 50%;
   display: grid;
   place-items: center;

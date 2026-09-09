@@ -71,18 +71,20 @@ onMounted(async () => {
 .notice-bar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  height: 44px;
-  padding: 0 12px;
-  background: #111116;
-  color: #f2f2f5;
+  gap: 8px;
+  height: 24px;
+  margin: 8px 16px 4px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: rgba(217, 217, 217, 0.15);
+  color: #fff;
 }
 
 .notice-horn {
   flex-shrink: 0;
-  width: 22px;
-  height: 22px;
-  color: #c59bff;
+  width: 16px;
+  height: 16px;
+  color: #4ade80;
 }
 
 .notice-horn svg {
@@ -101,9 +103,9 @@ onMounted(async () => {
   display: inline-block;
   padding-left: 100%;
   white-space: nowrap;
-  font-size: 14px;
-  line-height: 44px;
-  color: #f5f5f8;
+  font-size: 12px;
+  line-height: 24px;
+  color: rgba(255, 255, 255, 0.7);
   animation: notice-marquee linear infinite;
 }
 

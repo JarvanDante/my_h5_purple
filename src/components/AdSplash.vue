@@ -251,7 +251,7 @@ onUnmounted(() => {
   position: fixed;
   inset: 0;
   z-index: 1120;
-  background: #0b0b0d;
+  background: #000000;
   overflow: hidden;
 }
 

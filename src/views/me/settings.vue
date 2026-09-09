@@ -228,7 +228,7 @@ onMounted(async () => {
 .bind-card {
   width: 100%;
   max-width: 300px;
-  background: #1c1c22;
+  background: #290f18;
   border-radius: 16px;
   padding: 18px 16px 12px;
   color: #f5f5f8;

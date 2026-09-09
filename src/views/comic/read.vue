@@ -408,7 +408,7 @@ h1 {
     padding: 0 28px;
     border: 0;
     border-radius: 20px;
-    background: linear-gradient(90deg, #ff5c93, #ff8a5c);
+    background: linear-gradient(90deg, #ff32b4, #ff8a5c);
     color: #fff;
     font-size: 14px;
     font-weight: 700;
@@ -466,7 +466,7 @@ h1 {
   padding: 0 28px;
   border: 0;
   border-radius: 20px;
-  background: linear-gradient(90deg, #ff5c93, #ff8a5c);
+  background: linear-gradient(90deg, #ff32b4, #ff8a5c);
   color: #fff;
   font-size: 14px;
   font-weight: 700;

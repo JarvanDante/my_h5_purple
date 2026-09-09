@@ -125,7 +125,7 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   background: $background-page;
-  box-shadow: 0 1px 0 rgba(255, 92, 147, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 50, 180, 0.35);
 }
 
 .back {

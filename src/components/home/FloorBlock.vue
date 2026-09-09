@@ -35,6 +35,8 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
+
 .floor-block {
   margin: 0 0 16px;
   padding: 4px 0 8px;
@@ -61,13 +63,16 @@ defineEmits<{
 
   h3 {
     margin: 0;
-    color: #fff;
-    font-size: 15px;
+    padding: 5px 14px 5px 16px;
+    color: #111;
+    font-size: 14px;
     font-weight: 700;
+    background: $primary-color;
+    border-radius: 4px 16px 16px 8px;
   }
 
   span {
-    color: #ff5c93;
+    color: $primary-color;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.06em;
@@ -92,8 +97,8 @@ defineEmits<{
 }
 
 .chip-cat {
-  color: #f3c6d4;
-  background: rgba(255, 92, 147, 0.16);
+  color: #ffd0e6;
+  background: $primary-soft;
 }
 
 .chip-tag {
@@ -102,9 +107,13 @@ defineEmits<{
 }
 
 .floor-more {
-  border: 0;
-  background: transparent;
-  color: #8d8d96;
-  font-size: 12px;
+  border: 1px solid $ink-deep;
+  background: $accent-yellow;
+  color: $ink-deep;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 5px 10px;
+  box-shadow: 1px 1px 0 $ink-deep;
 }
 </style>

@@ -484,7 +484,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   background: $background-page;
-  box-shadow: 0 1px 0 rgba(255, 92, 147, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 50, 180, 0.35);
 }
 
 .back {
@@ -646,7 +646,7 @@ onMounted(() => {
 
   button {
     border: 0;
-    background: #1c1c22;
+    background: #290f18;
     color: $text-color-secondary;
     border-radius: $radius-pill;
     padding: 6px 12px;

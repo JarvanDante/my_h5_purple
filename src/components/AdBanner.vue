@@ -48,7 +48,7 @@ onMounted(() => {
   margin: 8px 12px 4px;
   border-radius: 10px;
   overflow: hidden;
-  background: #1c1c22;
+  background: #290f18;
 }
 
 .hero-track {

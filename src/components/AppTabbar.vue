@@ -70,6 +70,7 @@ const go = (path: string) => {
   height: calc(#{$tabbar-height} + env(safe-area-inset-bottom, 0px));
   padding: 2px 4px env(safe-area-inset-bottom, 0px);
   background: $background-tabbar;
+  box-shadow: inset 0 0.5px 0 #782d5e;
   border-top: 0;
   display: flex;
   align-items: flex-start;
@@ -95,14 +96,14 @@ const go = (path: string) => {
   cursor: pointer;
 
   &.active {
-    color: $primary-color;
+    color: #fc659f;
 
     .tab-icon {
-      color: $primary-color;
+      color: #fc659f;
     }
 
     .tab-label {
-      font-weight: 600;
+      font-weight: 800;
     }
 
     .body {
@@ -121,7 +122,7 @@ const go = (path: string) => {
     }
 
     .ring {
-      stroke: $primary-color;
+      stroke: #fc659f;
     }
   }
 

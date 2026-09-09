@@ -160,7 +160,7 @@ const preview = async () => {
 
 .at {
   font-style: normal;
-  color: #ff5c93;
+  color: #ff32b4;
   margin-right: 2px;
 }
 
@@ -220,7 +220,7 @@ const preview = async () => {
     }
 
     &.on {
-      color: #ff5c93;
+      color: #ff32b4;
     }
   }
 }

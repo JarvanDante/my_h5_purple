@@ -110,9 +110,9 @@ const go = (path: string) => {
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(140% 42% at 100% 0%, rgba(255, 92, 147, 0.2), transparent 52%),
+    radial-gradient(140% 42% at 100% 0%, rgba(255, 50, 180, 0.28), transparent 52%),
     $background-page;
-  border-left: 1px solid rgba(255, 92, 147, 0.16);
+  border-left: 1px solid rgba(255, 50, 180, 0.16);
   border-radius: 18px 0 0 18px;
   box-shadow: -10px 0 28px rgba(0, 0, 0, 0.42);
   animation: drawer-in 0.22s ease-out;
@@ -124,7 +124,7 @@ const go = (path: string) => {
   justify-content: space-between;
   gap: 8px;
   padding: calc(10px + var(--app-header-top)) 12px 12px;
-  border-bottom: 1px solid rgba(255, 92, 147, 0.16);
+  border-bottom: 1px solid rgba(255, 50, 180, 0.16);
 }
 
 .head-brand {
@@ -202,7 +202,7 @@ const go = (path: string) => {
 .drawer-foot button {
   width: 100%;
   height: 42px;
-  border: 1px solid rgba(255, 92, 147, 0.28);
+  border: 1px solid rgba(255, 50, 180, 0.28);
   border-radius: $radius-pill;
   padding: 0 10px;
   background: $primary-soft;
@@ -240,7 +240,7 @@ const go = (path: string) => {
 
 .drawer-foot {
   padding: 8px 10px calc(14px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid rgba(255, 92, 147, 0.14);
+  border-top: 1px solid rgba(255, 50, 180, 0.14);
 }
 
 @keyframes drawer-in {

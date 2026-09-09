@@ -443,21 +443,21 @@ watch(channel, () => {
 
 <style scoped lang="scss">
 .comic-page {
-  background: #0b0b0d;
-  color: #f2f2f5;
+  background: transparent;
+  color: #fff;
 }
 
 .inner-slide {
   position: relative;
   overflow: hidden;
   min-height: 60vh;
-  background: #0b0b0d;
+  background: transparent;
 }
 
 .floor-pane {
   padding: 4px 0 20px;
   min-height: 60vh;
-  background: #0b0b0d;
+  background: transparent;
 }
 
 .cat-pane {
@@ -495,7 +495,7 @@ watch(channel, () => {
 }
 
 .quick-label {
-  color: #c8c8d0;
+  color: #fff;
   font-size: 11px;
   line-height: 1.1;
 }
@@ -524,12 +524,14 @@ watch(channel, () => {
 
 <style lang="scss">
 .page-shell.comic-page {
-  background: #0b0b0d;
+  background-color: #000;
+  background-image: radial-gradient(140% 42% at 50% -8%, #97005f 0%, #4c002f 32%, #13000c 58%, #000 80%);
+  background-repeat: no-repeat;
 }
 
 .comic-page .inner-slide,
 .comic-page .floor-pane {
-  background: #0b0b0d;
+  background: transparent;
 }
 
 .comic-page .quick-strip {
@@ -542,7 +544,7 @@ watch(channel, () => {
 }
 
 .comic-page .quick-strip .quick-label {
-  color: #c8c8d0;
+  color: #fff;
   background: transparent;
 }
 </style>

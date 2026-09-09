@@ -100,7 +100,7 @@ onMounted(async () => {
     height: 22px;
     padding: 0 8px;
     border-radius: $radius-pill;
-    background: #1c1c22;
+    background: #290f18;
     color: $text-color-secondary;
     font-size: 11px;
     line-height: 22px;

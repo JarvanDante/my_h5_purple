@@ -449,7 +449,7 @@ onBeforeUnmount(() => {
   margin-top: 10px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, #7b4dff, #ff5c93);
+  background: linear-gradient(90deg, #7b4dff, #ff32b4);
   color: #fff;
   font-size: 14px;
   font-weight: 700;

@@ -87,13 +87,17 @@ const onTouchEnd = (e: TouchEvent) => {
 #app {
   width: 100%;
   height: 100%;
-  background: $background-page;
+  background-color: $background-page;
+  background-image: $page-glow;
+  background-repeat: no-repeat;
 }
 
 .app-container {
   width: 100%;
   height: 100%;
-  background: $background-page;
+  background-color: $background-page;
+  background-image: $page-glow;
+  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
@@ -136,7 +140,7 @@ const onTouchEnd = (e: TouchEvent) => {
 
   .app-container {
     max-width: $phone-max-width;
-    box-shadow: 0 0 50px rgba(58, 47, 53, 0.18);
+    box-shadow: 0 0 50px rgba(151, 0, 95, 0.28);
   }
 }
 

@@ -80,7 +80,7 @@ const open = (tool: { key: string; title: string }) => {
   padding: 16px 16px 20px;
   border-radius: 18px;
   background:
-    radial-gradient(120% 140% at 20% 0%, rgba(255, 92, 147, 0.55), transparent 55%),
+    radial-gradient(120% 140% at 20% 0%, rgba(255, 50, 180, 0.55), transparent 55%),
     linear-gradient(135deg, #3a1a28 0%, #1a1218 70%);
   box-shadow: $shadow-card;
 }

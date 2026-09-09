@@ -1,34 +1,38 @@
-// 深色铺底 + 粉色强调：与运行时 .page-shell 对齐
-$primary-color: #ff5c93;
-$primary-color-deep: #f0568f;
-$primary-soft: rgba(255, 92, 147, 0.16);
-$secondary-color: #2a2230;
-$secondary-dark: #f0568f;
+// Page 3 黑色系统：纯黑铺底 + 品红强调 + 明黄「更多」
+$primary-color: #ff32b4;
+$primary-color-deep: #f7339f;
+$primary-soft: rgba(255, 50, 180, 0.18);
+$secondary-color: #290f18;
+$secondary-dark: #f7339f;
 $danger-color: #e31c5f;
 $on-accent: #ffffff;
 
-$text-color: #f2f2f5;
-$text-color-secondary: #8a8a94;
-$text-color-muted: #6e6e78;
+$text-color: #ffffff;
+$text-color-secondary: #ffb5d0;
+$text-color-muted: rgba(255, 255, 255, 0.55);
 $text-color-light: #ffffff;
 
-$background-color: #1c1c22;
-$background-page: #0b0b0d;
-$background-surface2: #1c1c22;
-$background-dark: #08080a;
-$background-topbar: #0b0b0d;
-$background-tabbar: #101014;
+$background-color: #0a0006;
+$background-page: #000000;
+$background-surface2: #290f18;
+$background-dark: #000000;
+$background-topbar: transparent;
+$background-tabbar: #2c2029;
 
-$accent-yellow: #ff5c93;
-$ink: #ff5c93;
-$line: #2e2e36;
-$tab-idle: #8a8a94;
-$search-border: #3a2a32;
-$search-text: #c4b4b8;
-$shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
-$radius-card: 14px;
+$accent-yellow: #f9be19;
+$ink: #ff32b4;
+$ink-deep: #2f0b12;
+$line: #76314a;
+$tab-idle: #ffb5d0;
+$search-border: #911260;
+$search-bg: #6f0044;
+$search-text: rgba(255, 255, 255, 0.6);
+$shadow-card: 0 2px 12px rgba(0, 0, 0, 0.45);
+$radius-card: 12px;
 $radius-thumb: 10px;
 $radius-pill: 999px;
 $tabbar-height: 56px;
 $phone-max-width: 480px;
 $desktop-preview-min: 960px;
+
+$page-glow: radial-gradient(140% 42% at 50% -8%, #97005f 0%, #4c002f 32%, #13000c 58%, #000 80%);

@@ -364,7 +364,7 @@ watch(
 .composer {
   flex-shrink: 0;
   padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
-  background: #0b0b0d;
+  background: #000000;
   border-top: 1px solid #22222b;
 }
 
@@ -378,7 +378,7 @@ watch(
   button {
     border: 0;
     background: transparent;
-    color: #ff5c93;
+    color: #ff32b4;
   }
 }
 

@@ -451,7 +451,7 @@ onUnmounted(() => {
 
   strong {
     display: block;
-    color: #ff5c93;
+    color: #ff32b4;
     font-size: 15px;
     font-weight: 700;
   }
@@ -496,7 +496,7 @@ onUnmounted(() => {
   border: 0;
   border-radius: 999px;
   padding: 0 12px;
-  background: #ff5c93;
+  background: #ff32b4;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -568,7 +568,7 @@ onUnmounted(() => {
 
   &.wallet {
     background: linear-gradient(135deg, #2a2438, #16141c);
-    box-shadow: inset 0 0 24px rgba(255, 92, 147, 0.12);
+    box-shadow: inset 0 0 24px rgba(255, 50, 180, 0.12);
   }
 }
 

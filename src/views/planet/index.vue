@@ -217,14 +217,14 @@ onMounted(() => {
 @use '@/styles/variables.scss' as *;
 
 .planet-page {
-  background: #0b0b0d;
+  background: #000000;
 }
 
 .planet-header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: #0b0b0d;
+  background: #000000;
   padding: var(--app-header-top) 8px 0 12px;
 }
 
@@ -275,7 +275,7 @@ onMounted(() => {
   gap: 10px;
   padding: 12px 12px 8px;
   overflow-x: auto;
-  background: #0b0b0d;
+  background: #000000;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 
@@ -293,7 +293,7 @@ onMounted(() => {
   width: 92px;
   aspect-ratio: 3 / 4;
   border-radius: 8px;
-  background: #1c1c22;
+  background: #290f18;
 }
 
 .ad-title {
@@ -308,7 +308,7 @@ onMounted(() => {
   margin-top: 3px;
   font-size: 10px;
   color: #9a9a9a;
-  background: #1c1c22;
+  background: #290f18;
   border-radius: 3px;
   padding: 1px 5px;
 }
@@ -321,7 +321,7 @@ onMounted(() => {
 
 .feed {
   padding: 8px 0 72px;
-  background: #0b0b0d;
+  background: #000000;
 }
 
 .empty {
@@ -329,7 +329,7 @@ onMounted(() => {
   color: #8d8d96;
   font-size: 13px;
   text-align: center;
-  background: #1c1c22;
+  background: #290f18;
 }
 
 .fab {

@@ -215,7 +215,7 @@ onActivated(loadList)
       height: 3px;
       transform: translateX(-50%);
       border-radius: 99px;
-      background: #ff5c93;
+      background: #ff32b4;
     }
   }
 }

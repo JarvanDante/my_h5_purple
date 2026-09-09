@@ -29,7 +29,7 @@ defineEmits<{
   height: 48px;
   border: 0;
   background: transparent;
-  color: #8a8a94;
+  color: #ffb5d0;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -50,7 +50,7 @@ defineEmits<{
   position: absolute;
   background: $primary-color;
   clip-path: polygon(50% 0, 64% 36%, 100% 50%, 64% 64%, 50% 100%, 36% 64%, 0 50%, 36% 36%);
-  filter: drop-shadow(0 0 3px rgba(255, 92, 147, 0.85));
+  filter: drop-shadow(0 0 3px rgba(255, 50, 180, 0.85));
   pointer-events: none;
 }
 
@@ -75,7 +75,7 @@ defineEmits<{
   font-weight: 800;
 
   .channel-text {
-    text-shadow: 0 0 12px rgba(255, 92, 147, 0.45);
+    text-shadow: 0 0 12px rgba(255, 50, 180, 0.55);
   }
 
   &::after {
@@ -87,7 +87,7 @@ defineEmits<{
     height: 3px;
     border-radius: 2px;
     background: $primary-color;
-    box-shadow: 0 0 8px rgba(255, 92, 147, 0.55);
+    box-shadow: 0 0 8px rgba(255, 50, 180, 0.55);
     transform: translateX(-50%);
   }
 }

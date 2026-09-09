@@ -196,7 +196,7 @@ const playVideo = () => {
 @use '@/styles/tones.scss' as *;
 
 .post-card {
-  background: #1c1c22;
+  background: #290f18;
   padding: 14px 14px 10px;
   border-bottom: 1px solid #2a2a32;
 }

@@ -45,7 +45,7 @@ defineEmits<{
     aspect-ratio: 16 / 9;
   }
   overflow: hidden;
-  background: #1a1a20;
+  background: #290f18;
 
   :deep(img) {
     width: 100%;
@@ -77,7 +77,7 @@ defineEmits<{
   text-transform: lowercase;
 
   &.new {
-    background: #ff5c93;
+    background: #ff32b4;
   }
 
   &.hot {
@@ -111,7 +111,7 @@ defineEmits<{
 
 .poster-title {
   margin: 6px 0 0;
-  color: #f2f2f5;
+  color: #fff;
   font-size: 12.5px;
   font-weight: 600;
 }
@@ -122,7 +122,7 @@ defineEmits<{
   line-height: 1.3;
 
   &.chapter {
-    color: #6ea8ff;
+    color: #ffb5d0;
   }
 
   &.end {

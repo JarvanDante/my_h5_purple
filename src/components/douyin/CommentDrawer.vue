@@ -293,7 +293,7 @@ watch(
   height: 4px;
   margin: 8px auto 0;
   border-radius: 99px;
-  background: #ff5c93;
+  background: #ff32b4;
 }
 
 .head {
@@ -359,7 +359,7 @@ watch(
   button {
     border: 0;
     background: transparent;
-    color: #ff5c93;
+    color: #ff32b4;
     margin-left: 8px;
   }
 }
