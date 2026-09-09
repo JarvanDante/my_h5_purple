@@ -5,12 +5,16 @@ import channelComicOn from './channel-comic-on.png'
 import channelNovelOff from './channel-novel-off.png'
 import channelNovelOn from './channel-novel-on.png'
 import notice from './notice.png'
+import utilCheckin from './util-checkin.png'
+import utilVip from './util-vip.png'
 import quickDaily from './quick-daily.png'
 import quickDone from './quick-done.png'
 import quickPick from './quick-pick.png'
 import quickTopic from './quick-topic.png'
 
 export const noticeArt = notice
+export const vipArt = utilVip
+export const checkinArt = utilCheckin
 
 const channelArt: Record<string, { on: string; off: string }> = {
   漫画: { on: channelComicOn, off: channelComicOff },
