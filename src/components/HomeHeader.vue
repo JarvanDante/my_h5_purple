@@ -324,10 +324,10 @@ defineEmits<{
   }
 
   .channel-tabs {
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    height: 48px;
-    gap: 26px;
+    height: 40px;
+    gap: 12px;
     overflow: visible;
   }
 

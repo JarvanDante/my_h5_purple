@@ -27,7 +27,8 @@
               class="quick-item"
               @click="onQuick(item)"
             >
-              <EncryptedImage class="quick-icon" :src="item.icon" :alt="item.label" />
+              <img v-if="item.local" class="quick-icon" :src="item.icon" :alt="item.label" />
+              <EncryptedImage v-else class="quick-icon" :src="item.icon" :alt="item.label" />
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -92,6 +93,7 @@ import PosterGrid from '@/components/home/PosterGrid.vue'
 import PosterRail from '@/components/home/PosterRail.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
+import { quickArtSrc } from '@/assets/theme'
 import { fetchCartoonCategories, fetchCartoonList, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsCategories, fetchComicsList, fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { fetchBannerList } from '@/api/banner'
@@ -170,6 +172,7 @@ type QuickItem = {
   open_mode: string
   link: string
   position: string
+  local?: boolean
 }
 
 const quicks = ref<QuickItem[]>([])
@@ -181,14 +184,18 @@ const loadQuicks = async () => {
   }
   try {
     const data = await fetchKingkongList(positionOfChannel(channel.value))
-    quicks.value = (data.list || []).map((r) => ({
-      key: `kk-${r.id}`,
-      icon: r.icon_url,
-      label: r.name,
-      open_mode: r.open_mode,
-      link: r.link,
-      position: r.position,
-    }))
+    quicks.value = (data.list || []).map((r, i) => {
+      const art = quickArtSrc(r.name, i)
+      return {
+        key: `kk-${r.id}`,
+        icon: art || r.icon_url,
+        label: r.name,
+        open_mode: r.open_mode,
+        link: r.link,
+        position: r.position,
+        local: Boolean(art),
+      }
+    })
   } catch {
     quicks.value = []
   }
@@ -491,7 +498,7 @@ watch(channel, () => {
   object-fit: contain;
   background: transparent;
   border-radius: 0;
-  mix-blend-mode: lighten;
+  mix-blend-mode: normal;
 }
 
 .quick-label {

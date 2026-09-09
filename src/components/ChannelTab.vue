@@ -1,13 +1,19 @@
 <template>
-  <button type="button" class="channel-tab" :class="{ active }" @click="$emit('select')">
-    <span class="channel-text">{{ label }}</span>
-    <i v-if="active" class="spark spark-a" aria-hidden="true" />
-    <i v-if="active" class="spark spark-b" aria-hidden="true" />
+  <button type="button" class="channel-tab" :class="{ active, art: !!src }" @click="$emit('select')">
+    <img v-if="src" class="channel-img" :src="src" :alt="label" />
+    <template v-else>
+      <span class="channel-text">{{ label }}</span>
+      <i v-if="active" class="spark spark-a" aria-hidden="true" />
+      <i v-if="active" class="spark spark-b" aria-hidden="true" />
+    </template>
   </button>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { computed } from 'vue'
+import { channelArtSrc } from '@/assets/theme'
+
+const props = defineProps<{
   label: string
   active?: boolean
 }>()
@@ -15,6 +21,8 @@ defineProps<{
 defineEmits<{
   select: []
 }>()
+
+const src = computed(() => channelArtSrc(props.label, props.active))
 </script>
 
 <style scoped lang="scss">
@@ -38,6 +46,24 @@ defineEmits<{
   display: inline-flex;
   align-items: flex-end;
   white-space: nowrap;
+}
+
+.channel-tab.art {
+  height: 40px;
+  padding: 0;
+  align-items: center;
+}
+
+.channel-img {
+  display: block;
+  width: 58px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.channel-tab.art.active .channel-img {
+  width: 64px;
+  height: 42px;
 }
 
 .channel-text {
@@ -69,7 +95,7 @@ defineEmits<{
   opacity: 0.75;
 }
 
-.channel-tab.active {
+.channel-tab.active:not(.art) {
   color: $primary-color;
   font-size: 20px;
   font-weight: 800;

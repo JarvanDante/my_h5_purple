@@ -1,21 +1,6 @@
 <template>
   <section v-if="text" class="notice-bar">
-    <span class="notice-horn" aria-hidden="true">
-      <svg viewBox="0 0 24 24" fill="none">
-        <path
-          d="M4 10v4h3l5 3V7L7 10H4z"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M16.2 8.4a5 5 0 0 1 0 7.2M18.6 6.2a8.2 8.2 0 0 1 0 11.6"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linecap="round"
-        />
-      </svg>
-    </span>
+    <img class="notice-horn" :src="noticeArt" alt="公告" />
     <div class="notice-track">
       <div class="notice-run" :style="{ animationDuration: duration }">
         {{ text }}
@@ -27,6 +12,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { noticeArt } from '@/assets/theme'
 import { fetchNoticeList } from '@/api/notice'
 
 const STORAGE_KEY = 'h5_home_notice_off'
@@ -71,10 +57,10 @@ onMounted(async () => {
 .notice-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 24px;
-  margin: 8px 16px 4px;
-  padding: 0 10px;
+  gap: 6px;
+  height: 36px;
+  margin: 6px 16px 4px;
+  padding: 0 10px 0 4px;
   border-radius: 12px;
   background: rgba(217, 217, 217, 0.15);
   color: #fff;
@@ -82,15 +68,9 @@ onMounted(async () => {
 
 .notice-horn {
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  color: #4ade80;
-}
-
-.notice-horn svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+  width: 42px;
+  height: 35px;
+  object-fit: contain;
 }
 
 .notice-track {
@@ -104,7 +84,7 @@ onMounted(async () => {
   padding-left: 100%;
   white-space: nowrap;
   font-size: 12px;
-  line-height: 24px;
+  line-height: 36px;
   color: rgba(255, 255, 255, 0.7);
   animation: notice-marquee linear infinite;
 }

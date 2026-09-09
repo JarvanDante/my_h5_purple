@@ -32,7 +32,8 @@
               class="quick-item"
               @click="onQuick(item)"
             >
-              <EncryptedImage class="quick-icon" :src="item.icon" :alt="item.label" />
+              <img v-if="item.local" class="quick-icon" :src="item.icon" :alt="item.label" />
+              <EncryptedImage v-else class="quick-icon" :src="item.icon" :alt="item.label" />
               <span class="quick-label">{{ item.label }}</span>
             </button>
           </section>
@@ -87,6 +88,7 @@ import { fetchVideoCategories, fetchVideoList, fetchVideoModules, type VideoItem
 import AdBanner from '@/components/AdBanner.vue'
 import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
+import { quickArtSrc } from '@/assets/theme'
 import FloorBlock from '@/components/home/FloorBlock.vue'
 import HomeHero from '@/components/home/HomeHero.vue'
 import NoticeMarquee from '@/components/home/NoticeMarquee.vue'
@@ -240,6 +242,7 @@ type QuickItem = {
   open_mode: string
   link: string
   position: string
+  local?: boolean
 }
 
 const quicks = ref<QuickItem[]>([])
@@ -251,14 +254,18 @@ const loadQuicks = async () => {
   }
   try {
     const data = await fetchKingkongList('movie')
-    quicks.value = (data.list || []).map((r) => ({
-      key: `kk-${r.id}`,
-      label: r.name,
-      icon: r.icon_url,
-      open_mode: r.open_mode,
-      link: r.link,
-      position: r.position,
-    }))
+    quicks.value = (data.list || []).map((r, i) => {
+      const art = quickArtSrc(r.name, i)
+      return {
+        key: `kk-${r.id}`,
+        label: r.name,
+        icon: art || r.icon_url,
+        open_mode: r.open_mode,
+        link: r.link,
+        position: r.position,
+        local: Boolean(art),
+      }
+    })
   } catch {
     quicks.value = []
   }
