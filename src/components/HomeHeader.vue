@@ -28,19 +28,6 @@
       </div>
     </AppTopbar>
 
-    <div v-if="subTabs.length" class="sub-row">
-      <button
-        v-for="item in subTabs"
-        :key="item"
-        type="button"
-        class="sub-item"
-        :class="{ active: subTab === item }"
-        @click="$emit('selectSub', item)"
-      >
-        {{ item }}
-      </button>
-    </div>
-
     <div v-if="!hideSearch" class="search-row">
       <div class="search-pill" @click="$emit('search')">
         <span class="search-ico"><LineIcon name="search" /></span>
@@ -56,6 +43,19 @@
         <span>签到</span>
       </button>
       <button v-else type="button" class="qbtn" @click="$emit('favorite')">收藏</button>
+    </div>
+
+    <div v-if="subTabs.length" class="sub-row">
+      <button
+        v-for="item in subTabs"
+        :key="item"
+        type="button"
+        class="sub-item"
+        :class="{ active: subTab === item }"
+        @click="$emit('selectSub', item)"
+      >
+        {{ item }}
+      </button>
     </div>
   </header>
 </template>
@@ -115,15 +115,19 @@ defineEmits<{
   padding-bottom: 8px;
 
   .search-row {
-    margin-top: 6px;
+    margin-top: 8px;
   }
 }
 
 .home-header--pack:not(.home-header--single) {
-  padding-bottom: 8px;
+  padding-bottom: 4px;
+
+  .search-row {
+    margin-top: 8px;
+  }
 
   .sub-row {
-    margin-top: 0;
+    margin-top: 4px;
     padding: 0;
     height: 40px;
     gap: 22px;
@@ -138,10 +142,6 @@ defineEmits<{
     &.active {
       font-weight: 700;
     }
-  }
-
-  .search-row {
-    margin-top: 6px;
   }
 }
 
@@ -332,9 +332,9 @@ defineEmits<{
   }
 
   .sub-row {
-    margin-top: 0;
-    height: 42px;
-    padding: 0 4px 0 16px;
+    margin-top: 2px;
+    height: 40px;
+    padding: 0 4px 0 10px;
     gap: 18px;
   }
 
@@ -365,8 +365,8 @@ defineEmits<{
   }
 
   .search-row {
-    margin-top: 0;
-    padding-top: 6px;
+    margin-top: 8px;
+    padding-top: 0;
     border-top: 0;
   }
 
