@@ -93,7 +93,7 @@ export type ComicsModule = {
   items: ComicsItem[]
 }
 
-export function fetchComicsModules(position = 'comic_home') {
+export function fetchComicsModules(position = '') {
   const q = new URLSearchParams()
   if (position) q.set('position', position)
   const suffix = q.toString() ? `?${q}` : ''

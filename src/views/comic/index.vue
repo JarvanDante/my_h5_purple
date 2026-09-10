@@ -133,18 +133,20 @@ const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c
 const catItems = ref<CoverItem[]>([])
 const catLoading = ref(false)
 
+const firstComicName = () => catsByChannel.value.漫画[0]?.name || ''
+
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
-  subTab.value = ''
   catItems.value = []
+  subTab.value = item === '漫画' ? firstComicName() : ''
 }
 
 const selectSub = (name: string) => {
   if (subTab.value === name) {
+    if (isComic.value) return
     subTab.value = ''
     catItems.value = []
-    if (isComic.value) loadComicFloors()
     return
   }
   subTab.value = name
@@ -168,6 +170,7 @@ const loadSubCats = async () => {
   if (cartoon.status === 'fulfilled') catsByChannel.value.动漫 = toCats(cartoon.value.list)
   if (novel.status === 'fulfilled') catsByChannel.value.小说 = toCats(novel.value.list)
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
+  if (isComic.value && !subTab.value) subTab.value = firstComicName()
 }
 
 type QuickItem = {
@@ -379,7 +382,11 @@ const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categori
 const loadComicFloors = async () => {
   try {
     const cat = (catsByChannel.value.漫画 || []).find((c) => c.name === subTab.value)
-    const position = cat?.id ? `cat_${cat.id}` : 'comic_home'
+    if (!cat?.id) {
+      floors.value = []
+      return
+    }
+    const position = `cat_${cat.id}`
     const mods = (await fetchComicsModules(position)).list || []
     if (!mods.length) {
       floors.value = []
@@ -446,13 +453,17 @@ const loadFloors = () => {
   }
 }
 
-onMounted(() => {
-  loadSubCats()
+onMounted(async () => {
+  await loadSubCats()
   loadFloors()
   loadQuicks()
   loadBanners()
 })
 watch(channel, () => {
+  if (isComic.value) {
+    const names = (catsByChannel.value.漫画 || []).map((c) => c.name)
+    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
+  }
   loadFloors()
   loadQuicks()
   loadBanners()
