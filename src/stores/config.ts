@@ -4,7 +4,7 @@ import { fetchConfig, type ConfigMap } from '@/api/config'
 import { mediaUrl } from '@/utils/request'
 
 /** 本站默认 logo，跟仓库走；后台配了 app_logo / logo 时再覆盖 */
-const DEFAULT_APP_LOGO = '/logo.jpg'
+const DEFAULT_APP_LOGO = '/logo.png'
 
 export const useConfigStore = defineStore('config', () => {
   const configs = ref<ConfigMap>({})
