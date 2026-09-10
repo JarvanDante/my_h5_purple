@@ -33,7 +33,7 @@
             </button>
           </section>
 
-          <div v-if="subTab" class="cat-pane">
+          <div v-if="subTab && !isComic" class="cat-pane">
             <p v-if="catLoading" class="page-empty">加载中…</p>
             <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
             <PosterGrid
@@ -121,7 +121,7 @@ const isCartoon = computed(() => channel.value === '动漫')
 const isComic = computed(() => channel.value === '漫画')
 const ready = computed(() => isComic.value || isCartoon.value)
 
-type SubCat = { name: string; kind: number }
+type SubCat = { id: number; name: string; kind: number }
 const catsByChannel = ref<Record<string, SubCat[]>>({
   漫画: [],
   动漫: [],
@@ -144,15 +144,20 @@ const selectSub = (name: string) => {
   if (subTab.value === name) {
     subTab.value = ''
     catItems.value = []
+    if (isComic.value) loadComicFloors()
     return
   }
   subTab.value = name
+  if (isComic.value) {
+    loadComicFloors()
+    return
+  }
   loadCatItems()
 }
 
 const loadSubCats = async () => {
-  const toCats = (list?: { name: string; kind: number }[]) =>
-    (list || []).filter((x) => x.name).map((x) => ({ name: x.name, kind: x.kind || 0 }))
+  const toCats = (list?: { id?: number; name: string; kind: number }[]) =>
+    (list || []).filter((x) => x.name).map((x) => ({ id: x.id || 0, name: x.name, kind: x.kind || 0 }))
   const [comics, cartoon, novel, video] = await Promise.allSettled([
     fetchComicsCategories(),
     fetchCartoonCategories(),
@@ -330,7 +335,11 @@ const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
   if (isCartoon.value && !floors.value.length) return '暂无模块，请在子后台「动漫模块」配置'
-  if (!floors.value.length) return '暂无模块，请在子后台「漫画模块」配置'
+  if (!floors.value.length) {
+    return subTab.value
+      ? `暂无「${subTab.value}」模块，请在子后台「漫画模块」把位置选成该分类`
+      : '暂无模块，请在子后台「漫画模块」配置'
+  }
   return '暂无漫画，子后台「漫画管理」上架后显示'
 })
 
@@ -369,7 +378,9 @@ const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categori
 
 const loadComicFloors = async () => {
   try {
-    const mods = (await fetchComicsModules('comic_home')).list || []
+    const cat = (catsByChannel.value.漫画 || []).find((c) => c.name === subTab.value)
+    const position = cat?.id ? `cat_${cat.id}` : 'comic_home'
+    const mods = (await fetchComicsModules(position)).list || []
     if (!mods.length) {
       floors.value = []
       return
