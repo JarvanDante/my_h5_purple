@@ -47,9 +47,12 @@ import { toastError } from '@/utils/request'
 
 const HOLD_MS = 2000
 const SLIDE_MS = 1000
+const SEEN_KEY = 'h5_splash_seen'
 
 const adsStore = useAdsStore()
-adsStore.splashOpen = true
+const seen = () => sessionStorage.getItem(SEEN_KEY) === '1'
+const markSeen = () => sessionStorage.setItem(SEEN_KEY, '1')
+if (!seen()) adsStore.splashOpen = true
 const track = ref<HTMLElement>()
 const visible = ref(false)
 const left = ref(5)
@@ -163,6 +166,7 @@ const scheduleNext = (delay = HOLD_MS) => {
 }
 
 const close = () => {
+  markSeen()
   visible.value = false
   adsStore.splashOpen = false
   window.clearInterval(countTimer)
@@ -213,6 +217,10 @@ const onEnter = async () => {
 }
 
 onMounted(async () => {
+  if (seen()) {
+    adsStore.splashOpen = false
+    return
+  }
   await adsStore.load(AD_SLOT.splash, 10)
   const hits = adsStore.listOf(AD_SLOT.splash)
   if (!hits.length) {
