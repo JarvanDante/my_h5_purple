@@ -246,7 +246,7 @@ const playVideo = () => {
 
 .follow {
   border: 0;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -256,8 +256,8 @@ const playVideo = () => {
   flex-shrink: 0;
 
   &.on {
-    background: #331020;
-    color: #ff6699;
+    background: $primary-soft;
+    color: $primary-color;
   }
 }
 
@@ -450,8 +450,8 @@ const playVideo = () => {
 
   span {
     font-size: 12px;
-    color: #ff6699;
-    background: #331020;
+    color: $primary-color;
+    background: $primary-soft;
     border-radius: $radius-pill;
     padding: 4px 10px;
     line-height: 1.2;

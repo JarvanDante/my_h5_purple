@@ -158,7 +158,7 @@ onMounted(load)
   font-weight: 600;
 
   &.on {
-    background: #ff3d7f;
+    background: $primary-color;
     color: #fff;
   }
 }
@@ -227,7 +227,7 @@ textarea {
 
   b {
     font-size: 13px;
-    color: #ff6699;
+    color: $primary-color;
   }
 
   em {
@@ -254,8 +254,8 @@ textarea {
   margin-top: 8px;
   padding: 8px 10px;
   border-radius: 8px;
-  background: #331020;
-  color: #ffb3cc;
+  background: $primary-soft;
+  color: $accent-chip-text;
   font-size: 13px;
   line-height: 1.45;
 }
@@ -275,7 +275,7 @@ textarea {
   height: 46px;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 16px;
   font-weight: 800;

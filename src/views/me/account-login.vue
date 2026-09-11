@@ -63,6 +63,7 @@ const resume = async () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .edit-page {
   background: #0d0d12;
   min-height: 100%;
@@ -97,7 +98,7 @@ button {
   margin-top: 14px;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 15px;
   font-weight: 800;
@@ -109,8 +110,8 @@ button {
 
 .ghost {
   margin-top: 10px;
-  border: 1.5px solid #ff3d7f;
+  border: 1.5px solid $primary-color;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
 }
 </style>

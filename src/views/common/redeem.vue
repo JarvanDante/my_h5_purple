@@ -89,7 +89,7 @@ onMounted(async () => {
   margin-top: 12px;
   padding: 20px 16px 18px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #2a0b1a 0%, #5a1238 58%, #ff3d7f 140%);
+  background: $hero-card-gradient;
   color: #fff;
 
   p {
@@ -135,7 +135,7 @@ input {
   margin-top: 14px;
   border: 0;
   border-radius: 22px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 16px;
   font-weight: 800;

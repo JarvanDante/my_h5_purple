@@ -32,6 +32,7 @@ defineEmits<{
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .poster-card {
   min-width: 0;
 }
@@ -77,11 +78,11 @@ defineEmits<{
   text-transform: lowercase;
 
   &.new {
-    background: #ff32b4;
+    background: $primary-color;
   }
 
   &.hot {
-    background: #ff3b5c;
+    background: $primary-color;
   }
 }
 

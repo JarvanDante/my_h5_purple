@@ -69,6 +69,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .edit-page {
   background: #0d0d12;
   color: #f5f5f8;
@@ -103,7 +104,7 @@ onMounted(async () => {
   padding: 0;
 
   &.on {
-    border-color: #ff3d7f;
+    border-color: $primary-color;
   }
 
   :deep(img) {
@@ -120,7 +121,7 @@ onMounted(async () => {
   margin: 18px 16px 0;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 15px;
   font-weight: 800;

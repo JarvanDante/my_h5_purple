@@ -303,6 +303,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .reader {
   position: relative;
   height: 100%;
@@ -408,7 +409,7 @@ h1 {
     padding: 0 28px;
     border: 0;
     border-radius: 20px;
-    background: linear-gradient(90deg, #ff32b4, #ff8a5c);
+    background: linear-gradient(90deg, $primary-color, #ff8a5c);
     color: #fff;
     font-size: 14px;
     font-weight: 700;
@@ -466,7 +467,7 @@ h1 {
   padding: 0 28px;
   border: 0;
   border-radius: 20px;
-  background: linear-gradient(90deg, #ff32b4, #ff8a5c);
+  background: linear-gradient(90deg, $primary-color, #ff8a5c);
   color: #fff;
   font-size: 14px;
   font-weight: 700;

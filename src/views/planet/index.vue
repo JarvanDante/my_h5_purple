@@ -340,7 +340,7 @@ onMounted(() => {
   height: 56px;
   border: 0;
   border-radius: 50%;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 34px;
   line-height: 1;

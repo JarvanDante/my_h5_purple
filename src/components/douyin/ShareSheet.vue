@@ -48,6 +48,7 @@ import { useUserStore } from '@/stores/user'
 import { encodeId } from '@/utils/idcrypt'
 import { buildPromoText, buildPromoUrl, officialShareBase, promoSlogan } from '@/utils/promoShare'
 import { mediaUrl, toastError } from '@/utils/request'
+import { themePrimary } from '@/utils/themeColor'
 
 const props = defineProps<{
   open: boolean
@@ -160,7 +161,7 @@ const savePoster = async () => {
     ctx.fill()
     const logo = ctx.createLinearGradient(64, 58, 156, 150)
     logo.addColorStop(0, '#7b4dff')
-    logo.addColorStop(1, '#ff3d7f')
+    logo.addColorStop(1, themePrimary())
     ctx.fillStyle = logo
     roundRect(ctx, 64, 58, 84, 84, 18)
     ctx.fill()
@@ -319,7 +320,7 @@ watch(
   font-size: 18px;
   font-weight: 800;
   color: #fff;
-  background: linear-gradient(135deg, #7b4dff, #ff3d7f);
+  background: linear-gradient(135deg, #7b4dff, $primary-color);
 }
 
 .cover {

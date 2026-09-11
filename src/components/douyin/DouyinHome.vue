@@ -215,7 +215,7 @@ onActivated(loadList)
       height: 3px;
       transform: translateX(-50%);
       border-radius: 99px;
-      background: #ff32b4;
+      background: $primary-color;
     }
   }
 }
@@ -260,7 +260,7 @@ onActivated(loadList)
   height: 56px;
   border: 0;
   border-radius: 50%;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 34px;
   line-height: 1;

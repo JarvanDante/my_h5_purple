@@ -128,7 +128,7 @@ onMounted(async () => {
   border-radius: 16px;
   background:
     radial-gradient(circle at 88% 8%, rgba(255, 255, 255, 0.16), transparent 26%),
-    linear-gradient(160deg, #2a0b1a 0%, #6a1542 56%, #ff3d7f 120%);
+    $hero-card-gradient;
   color: #fff;
 }
 
@@ -187,14 +187,14 @@ onMounted(async () => {
   }
 
   .code {
-    color: #ffb3cc;
+    color: $accent-chip-text;
   }
 
   em {
     font-style: normal;
     font-size: 13px;
     font-weight: 800;
-    color: #ffb3cc;
+    color: $accent-chip-text;
 
     &.ok {
       color: #7dffc2;
@@ -239,14 +239,14 @@ onMounted(async () => {
 }
 
 .ghost {
-  border: 1.5px solid #ff3d7f;
+  border: 1.5px solid $primary-color;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
 }
 
 .solid {
   border: 0;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
 }
 

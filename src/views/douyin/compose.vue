@@ -266,7 +266,7 @@ textarea::placeholder {
 
 .row input:focus,
 textarea:focus {
-  box-shadow: inset 0 0 0 1px #d91259;
+  box-shadow: inset 0 0 0 1px $primary-color-deep;
 }
 
 .block {
@@ -319,8 +319,8 @@ textarea:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #331020;
-  color: #ff8fb3;
+  background: $primary-soft;
+  color: $accent-chip-text;
   font-size: 12px;
   text-align: center;
   padding: 8px;
@@ -358,7 +358,7 @@ textarea:focus {
   height: 44px;
   border: 0;
   border-radius: 14px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #1a0a12;
   font-size: 16px;
   font-weight: 700;

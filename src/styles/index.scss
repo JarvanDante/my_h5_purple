@@ -13,6 +13,9 @@ html.van-theme-dark {
   --color-text: #{$text-color};
   --color-text-secondary: #{$text-color-secondary};
   --color-danger: #{$danger-color};
+  --color-hero-from: #{$hero-from};
+  --color-hero-mid: #{$hero-mid};
+  --color-accent-chip: #{$accent-chip-text};
 
   --van-primary-color: #{$primary-color};
   --van-danger-color: #{$danger-color};

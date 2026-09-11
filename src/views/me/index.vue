@@ -339,7 +339,7 @@ onUnmounted(() => {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #ff3b5c;
+  background: $primary-color;
 }
 
 .profile {
@@ -451,7 +451,7 @@ onUnmounted(() => {
 
   strong {
     display: block;
-    color: #ff32b4;
+    color: $primary-color;
     font-size: 15px;
     font-weight: 700;
   }
@@ -496,7 +496,7 @@ onUnmounted(() => {
   border: 0;
   border-radius: 999px;
   padding: 0 12px;
-  background: #ff32b4;
+  background: $primary-color;
   color: #fff;
   font-size: 12px;
   font-weight: 700;

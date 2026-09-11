@@ -245,7 +245,7 @@ onMounted(load)
 .read-btn {
   border: 0;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
   font-size: 13px;
   font-weight: 700;
   padding: 0 8px;
@@ -281,7 +281,7 @@ onMounted(load)
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      background: $primary-color;
       transform: translateX(-50%);
     }
   }
@@ -295,7 +295,7 @@ onMounted(load)
   height: 16px;
   padding: 0 4px;
   border-radius: 8px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 10px;
   font-weight: 800;
@@ -353,7 +353,7 @@ onMounted(load)
   height: 8px;
   margin-top: 6px;
   border-radius: 50%;
-  background: #ff3d7f;
+  background: $primary-color;
   flex-shrink: 0;
 
   &.side {
@@ -431,7 +431,7 @@ onMounted(load)
   align-items: center;
   gap: 2px;
   font-size: 12px;
-  color: #ff3d7f;
+  color: $primary-color;
   font-weight: 700;
 
   svg {
@@ -442,6 +442,6 @@ onMounted(load)
 
 .unread .meta b,
 .unread .body strong {
-  color: #ff6699;
+  color: $primary-color;
 }
 </style>

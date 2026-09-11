@@ -39,6 +39,7 @@ import { useUserStore } from '@/stores/user'
 import { encodeId } from '@/utils/idcrypt'
 import { buildPromoText, buildPromoUrl, officialShareBase, promoSlogan } from '@/utils/promoShare'
 import { toastError } from '@/utils/request'
+import { themeChip, themeHeroStops } from '@/utils/themeColor'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -114,9 +115,10 @@ const savePoster = async () => {
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('canvas')
     const g = ctx.createLinearGradient(0, 0, w, h)
-    g.addColorStop(0, '#2a0b1a')
-    g.addColorStop(0.45, '#5a1238')
-    g.addColorStop(1, '#ff3d7f')
+    const stops = themeHeroStops()
+    g.addColorStop(0, stops.from)
+    g.addColorStop(0.45, stops.mid)
+    g.addColorStop(1, stops.to)
     ctx.fillStyle = g
     ctx.fillRect(0, 0, w, h)
     ctx.fillStyle = 'rgba(255,255,255,0.08)'
@@ -153,7 +155,7 @@ const savePoster = async () => {
     ctx.font = '400 24px sans-serif'
     ctx.fillStyle = 'rgba(255,255,255,0.72)'
     ctx.fillText('最新官方网址', 320, 980)
-    ctx.fillStyle = '#ffb3cc'
+    ctx.fillStyle = themeChip()
     ctx.font = '700 26px sans-serif'
     ctx.fillText(officialHost.value, 320, 1030)
 
@@ -204,7 +206,7 @@ onMounted(load)
 .logs-btn {
   border: 0;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
   font-size: 13px;
   font-weight: 700;
   padding: 0 8px;
@@ -217,7 +219,7 @@ onMounted(load)
   border-radius: 18px;
   background:
     radial-gradient(circle at 86% 12%, rgba(255, 255, 255, 0.16), transparent 28%),
-    linear-gradient(160deg, #2a0b1a 0%, #6a1542 52%, #ff3d7f 100%);
+    $hero-card-gradient;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -289,7 +291,7 @@ onMounted(load)
     font-style: normal;
     font-size: 13px;
     font-weight: 700;
-    color: #ffb3cc;
+    color: $accent-chip-text;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -312,14 +314,14 @@ onMounted(load)
 }
 
 .ghost {
-  border: 1.5px solid #ff3d7f;
+  border: 1.5px solid $primary-color;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
 }
 
 .solid {
   border: 0;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
 }
 
@@ -327,6 +329,6 @@ onMounted(load)
   margin-top: 14px;
   text-align: center;
   font-size: 12px;
-  color: #ff6699;
+  color: $primary-color;
 }
 </style>

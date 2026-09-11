@@ -77,7 +77,7 @@ onMounted(() => {
 .done {
   border: 0;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
   font-size: 14px;
   font-weight: 700;
   padding: 0 4px;
@@ -107,8 +107,8 @@ onMounted(() => {
   line-height: 1.2;
 
   &.on {
-    background: #331020;
-    color: #ff6699;
+    background: $primary-soft;
+    color: $primary-color;
     font-weight: 700;
   }
 }

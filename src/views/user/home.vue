@@ -245,7 +245,7 @@ onMounted(load)
 
 .follow {
   border: 0;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -254,8 +254,8 @@ onMounted(load)
   flex-shrink: 0;
 
   &.on {
-    background: #331020;
-    color: #ff6699;
+    background: $primary-soft;
+    color: $primary-color;
   }
 }
 

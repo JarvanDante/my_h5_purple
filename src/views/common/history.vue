@@ -65,6 +65,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
 import { comicPath, videoPath } from '@/utils/idcrypt'
 import { listBrowse, removeBrowse, type BrowseItem, type BrowseKind } from '@/utils/browseHistory'
+import { themePrimary } from '@/utils/themeColor'
 
 const tabs = [
   { key: 'comic', title: '漫画' },
@@ -124,7 +125,7 @@ const removeSelected = async () => {
       title: '删除记录',
       message: `确定删除已选的 ${selected.value.size} 项？`,
       confirmButtonText: '删除',
-      confirmButtonColor: '#ff3d7f',
+      confirmButtonColor: themePrimary(),
     })
   } catch {
     return
@@ -158,7 +159,7 @@ onMounted(reload)
 .manage-btn {
   border: 0;
   background: transparent;
-  color: #ff6699;
+  color: $primary-color;
   font-size: 14px;
   padding: 0 4px;
 }
@@ -199,7 +200,7 @@ onMounted(reload)
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      background: $primary-color;
       transform: translateX(-50%);
     }
   }
@@ -261,8 +262,8 @@ onMounted(reload)
   background: rgba(13, 13, 18, 0.35);
 
   &.on {
-    border-color: #ff3d7f;
-    background: #ff3d7f;
+    border-color: $primary-color;
+    background: $primary-color;
 
     &::after {
       content: '';
@@ -290,7 +291,7 @@ onMounted(reload)
 .sub {
   margin-top: 3px;
   font-size: 11px;
-  color: #ff6699;
+  color: $primary-color;
 }
 
 .empty,
@@ -337,8 +338,8 @@ onMounted(reload)
     position: relative;
 
     &.on {
-      border-color: #ff3d7f;
-      background: #ff3d7f;
+      border-color: $primary-color;
+      background: $primary-color;
 
       &::after {
         content: '';
@@ -360,7 +361,7 @@ onMounted(reload)
   height: 40px;
   border: 0;
   border-radius: 20px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 15px;
   font-weight: 700;

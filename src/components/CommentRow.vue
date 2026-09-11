@@ -96,6 +96,7 @@ const preview = async () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .cmt {
   display: flex;
   gap: 10px;
@@ -115,8 +116,8 @@ const preview = async () => {
   }
 
   50% {
-    outline: 1px solid rgba(255, 61, 127, 0.7);
-    background: rgba(255, 61, 127, 0.18);
+    outline: 1px solid $primary-color;
+    background: $primary-soft;
   }
 }
 
@@ -160,7 +161,7 @@ const preview = async () => {
 
 .at {
   font-style: normal;
-  color: #ff32b4;
+  color: $primary-color;
   margin-right: 2px;
 }
 
@@ -220,7 +221,7 @@ const preview = async () => {
     }
 
     &.on {
-      color: #ff32b4;
+      color: $primary-color;
     }
   }
 }

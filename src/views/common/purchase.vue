@@ -88,7 +88,7 @@ const select = (item: string) => slide.select(item)
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      background: $primary-color;
       transform: translateX(-50%);
     }
   }

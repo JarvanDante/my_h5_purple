@@ -59,7 +59,7 @@
             <svg viewBox="0 0 28 28" fill="none">
               <path
                 d="M14 23s-8-5-8-10.3A4.3 4.3 0 0 1 14 9.2a4.3 4.3 0 0 1 8 3.5C22 18 14 23 14 23Z"
-                :fill="liked.has(item.id) ? '#ff32b4' : 'none'"
+                :fill="liked.has(item.id) ? themePrimary() : 'none'"
                 stroke="currentColor"
                 stroke-width="1.7"
               />
@@ -162,6 +162,7 @@ import { toggleFollow } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { formatDuration, formatViews } from '@/utils/format'
 import { userPath } from '@/utils/idcrypt'
+import { themePrimary } from '@/utils/themeColor'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 import {
   applyMark,
@@ -542,7 +543,7 @@ onMounted(() => {
   margin-top: 10px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, #7b4dff, #ff32b4);
+  background: linear-gradient(90deg, #7b4dff, $primary-color);
   color: #fff;
   font-size: 14px;
   font-weight: 700;
@@ -715,7 +716,7 @@ onMounted(() => {
   padding: 0 12px;
   border: 0;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ff32b4, #c45cff);
+  background: linear-gradient(90deg, $primary-color, #c45cff);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -787,7 +788,7 @@ onMounted(() => {
   input[type='range'] {
     flex: 1;
     height: 3px;
-    accent-color: #ff32b4;
+    accent-color: $primary-color;
   }
 }
 

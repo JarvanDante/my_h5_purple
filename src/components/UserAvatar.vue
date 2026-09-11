@@ -39,6 +39,7 @@ const fallbackText = computed(() => (props.fallback || '用').slice(0, 1))
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .user-avatar {
   position: relative;
   display: inline-block;
@@ -99,7 +100,7 @@ const fallbackText = computed(() => (props.fallback || '用').slice(0, 1))
   }
 
   &.female {
-    background: #ff3d7f;
+    background: $primary-color;
   }
 }
 </style>

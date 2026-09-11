@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
 }
 
 .fail {
-  color: #ffb3c4;
+  color: $accent-chip-text;
 }
 
 .empty,

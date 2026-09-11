@@ -354,7 +354,7 @@ h2 {
     margin: 0 auto 4px;
     border-radius: 50%;
     background: #5a2a32;
-    color: #ff8fa3;
+    color: $accent-chip-text;
     line-height: 18px;
   }
 

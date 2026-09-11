@@ -42,3 +42,6 @@ $hero-shine: radial-gradient(88% 140% at 100% -18%, rgba(255, 255, 255, 0.34) 0%
 $accent-btn-shadow: rgba(255, 50, 180, 0.36);
 $accent-chip-bg: rgba(255, 50, 180, 0.16);
 $accent-chip-text: #ffb5d0;
+$hero-from: #2a0b1a;
+$hero-mid: #6a1542;
+$hero-card-gradient: linear-gradient(160deg, $hero-from 0%, $hero-mid 52%, $primary-color 100%);

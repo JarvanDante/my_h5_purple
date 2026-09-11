@@ -59,6 +59,7 @@ import { bindInviteCode } from '@/api/user'
 import { useUserStore } from '@/stores/user'
 import { publicUid } from '@/utils/userid'
 import { toastError } from '@/utils/request'
+import { themePrimary } from '@/utils/themeColor'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -119,7 +120,7 @@ const onLogout = async () => {
       title: '退出登录',
       message: '退出后本机不会自动登录。重新进入或换号请用登录账号+密码。',
       confirmButtonText: '退出',
-      confirmButtonColor: '#ff3d7f',
+      confirmButtonColor: themePrimary(),
     })
   } catch {
     return
@@ -139,6 +140,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .settings-page {
   background: #0d0d12;
   color: #f5f5f8;
@@ -189,7 +191,7 @@ onMounted(async () => {
   }
 
   .code {
-    color: #ffb3cc;
+    color: $accent-chip-text;
     font-weight: 700;
   }
 }
@@ -206,10 +208,10 @@ onMounted(async () => {
   width: calc(100% - 32px);
   height: 46px;
   margin: 24px 16px 0;
-  border: 1.5px solid #ff3d7f;
+  border: 1.5px solid $primary-color;
   border-radius: 23px;
   background: transparent;
-  color: #ff3d7f;
+  color: $primary-color;
   font-size: 15px;
   font-weight: 800;
 }
@@ -272,7 +274,7 @@ onMounted(async () => {
   }
 
   .ok {
-    color: #ff3d7f;
+    color: $primary-color;
     font-weight: 800;
     border-left: 1px solid #2a2a32;
   }

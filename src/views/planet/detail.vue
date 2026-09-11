@@ -468,7 +468,7 @@ onMounted(load)
   button {
     border: 0;
     background: transparent;
-    color: #ff32b4;
+    color: $primary-color;
   }
 }
 

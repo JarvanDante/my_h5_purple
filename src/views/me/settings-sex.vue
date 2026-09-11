@@ -72,6 +72,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
+@use '@/styles/variables.scss' as *;
 .edit-page {
   background: #0d0d12;
   min-height: 100%;
@@ -109,7 +110,7 @@ onMounted(async () => {
   }
 
   &.female.on {
-    background: #ff3d7f;
+    background: $primary-color;
   }
 
   &.on {
@@ -141,7 +142,7 @@ onMounted(async () => {
   margin-top: 28px;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
+  background: $primary-color;
   color: #fff;
   font-size: 16px;
   font-weight: 800;
