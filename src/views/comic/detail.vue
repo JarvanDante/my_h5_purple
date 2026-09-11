@@ -257,6 +257,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .comic-detail {
   padding-bottom: 0;
@@ -410,8 +411,8 @@ h1 {
 
 .cate {
   flex-shrink: 0;
-  background: #331020;
-  color: #ff6699;
+  background: $primary-soft;
+  color: $accent-chip-text;
   font-size: 10px;
   line-height: 1;
   padding: 3px 7px;
@@ -450,15 +451,13 @@ h1 {
   padding: 0 18px;
   border: 0;
   border-radius: 15px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 13px;
   font-weight: 700;
-  box-shadow: 0 3px 10px rgba(255, 61, 127, 0.28);
 
   &.on {
-    background: #331020;
-    color: #ff6699;
+    background: $primary-soft;
+    color: $accent-chip-text;
     box-shadow: none;
   }
 }
@@ -503,7 +502,7 @@ h1 {
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      @include theme-ink-bar;
       transform: translateX(-50%);
     }
   }
@@ -533,8 +532,8 @@ h1 {
 
   span {
     font-size: 12px;
-    color: #ff6699;
-    background: #331020;
+    color: $accent-chip-text;
+    background: $primary-soft;
     border-radius: 999px;
     padding: 4px 10px;
   }
@@ -554,7 +553,7 @@ h1 {
 .reason {
   margin: 8px 0 0;
   font-size: 12px;
-  color: #ff8fb3;
+  color: $accent-chip-text;
 }
 
 .catalog {
@@ -576,7 +575,7 @@ h1 {
 
   span {
     font-size: 12px;
-    color: #ff6699;
+    color: $primary-color;
   }
 }
 
@@ -621,8 +620,8 @@ h1 {
   height: 26px;
   padding: 0 12px;
   border-radius: 13px;
-  border: 1px solid #ff6699;
-  color: #ff6699;
+  border: 1px solid $primary-color;
+  color: $primary-color;
   font-size: 12px;
   line-height: 24px;
 }
@@ -645,8 +644,7 @@ h1 {
   height: 44px;
   border: 0;
   border-radius: 22px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 16px;
   font-weight: 800;
 }

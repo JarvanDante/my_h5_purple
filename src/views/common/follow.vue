@@ -127,10 +127,11 @@ onMounted(load)
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .follow-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   min-height: 100%;
 }
 
@@ -164,7 +165,7 @@ onMounted(load)
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      @include theme-ink-bar;
       transform: translateX(-50%);
     }
   }
@@ -218,7 +219,7 @@ onMounted(load)
   height: 28px;
   padding: 0 12px;
   border-radius: 14px;
-  background: #ff3d7f;
+  @include theme-cta;
   color: #fff;
   font-size: 12px;
   font-weight: 700;

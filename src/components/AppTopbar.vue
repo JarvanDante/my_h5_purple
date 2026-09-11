@@ -51,7 +51,7 @@ const goHome = () => {
   padding: 0;
   border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(180deg, #ff76cb 0%, #df008b 100%);
+  background: linear-gradient(180deg, $primary-color 0%, $primary-color-deep 100%);
 }
 
 .brand-img {
@@ -106,7 +106,7 @@ const goHome = () => {
   border: 0;
   padding: 0;
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 118, 203, 0.3), rgba(223, 0, 139, 0.3));
+  background: $primary-soft;
   display: flex;
   flex-direction: column;
   align-items: center;

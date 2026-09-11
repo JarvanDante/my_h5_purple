@@ -201,10 +201,11 @@ onMounted(load)
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .creator-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   min-height: 100%;
 }
 
@@ -214,8 +215,7 @@ onMounted(load)
   padding: 0 12px;
   border: 0;
   border-radius: 14px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 13px;
   font-weight: 700;
 }
@@ -225,9 +225,8 @@ onMounted(load)
   grid-template-columns: 1fr 1fr;
   margin: 12px 16px 0;
   padding: 16px 12px;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
-  color: #fff;
+  border-radius: 16px;
+  @include theme-hero;
 }
 
 .col {
@@ -251,7 +250,7 @@ onMounted(load)
     border: 0;
     border-radius: 13px;
     background: #fff;
-    color: #ff3d7f;
+    color: $primary-color-deep;
     font-size: 11px;
     font-weight: 700;
   }
@@ -286,7 +285,7 @@ onMounted(load)
       width: 28px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      @include theme-ink-bar;
       transform: translateX(-50%);
     }
   }
@@ -322,7 +321,7 @@ onMounted(load)
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      @include theme-ink-bar;
       transform: translateX(-50%);
     }
   }

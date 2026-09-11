@@ -58,10 +58,11 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .logs-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   min-height: 100%;
   padding-bottom: 24px;
 }
@@ -69,9 +70,8 @@ onMounted(async () => {
 .hero {
   margin: 12px 16px 0;
   padding: 18px 16px;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
-  color: #fff;
+  border-radius: 16px;
+  @include theme-hero;
 }
 
 .hero-copy p {
@@ -122,8 +122,8 @@ onMounted(async () => {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  background: rgba(255, 61, 127, 0.18);
-  color: #ff3d7f;
+  background: $primary-soft;
+  color: $primary-color;
   font-size: 15px;
   font-weight: 800;
   font-style: normal;
@@ -155,8 +155,8 @@ onMounted(async () => {
   max-width: 42%;
   padding: 5px 8px;
   border-radius: 8px;
-  background: rgba(255, 61, 127, 0.12);
-  color: #ff3d7f;
+  background: $primary-soft;
+  color: $primary-color;
   font-style: normal;
   font-size: 12px;
   font-weight: 800;

@@ -12,7 +12,7 @@
 .home-header:not(.home-header--pack) {
   background: $background-page;
   padding: var(--app-header-top) 12px 8px;
-  box-shadow: 0 1px 0 rgba(255, 50, 180, 0.35);
+  box-shadow: 0 1px 0 $header-line;
   color: $text-color;
 }
 

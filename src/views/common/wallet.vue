@@ -96,10 +96,11 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .wallet-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
 }
 
@@ -109,9 +110,8 @@ onMounted(async () => {
   justify-content: space-between;
   margin: 12px 16px 0;
   padding: 18px 16px;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
-  color: #fff;
+  border-radius: 16px;
+  @include theme-hero;
 }
 
 .hero-copy p {
@@ -140,7 +140,7 @@ onMounted(async () => {
   border: 0;
   border-radius: 8px;
   background: #fff;
-  color: #ff3d7f;
+  color: $primary-color-deep;
   font-size: 12px;
   font-weight: 700;
 }
@@ -174,8 +174,8 @@ onMounted(async () => {
   overflow: hidden;
 
   &.active {
-    box-shadow: inset 0 0 0 2px #ff3d7f;
-    background: #331020;
+    box-shadow: inset 0 0 0 2px $primary-color;
+    background: $primary-soft;
   }
 
   b {
@@ -198,7 +198,7 @@ onMounted(async () => {
     font-style: normal;
     font-size: 10px;
     color: #fff;
-    background: #e23b3b;
+    background: $primary-color-deep;
     border-radius: 0 8px 0 0;
     padding: 2px 7px;
   }
@@ -225,7 +225,7 @@ onMounted(async () => {
   bottom: 0;
   z-index: 20;
   padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, transparent, #0d0d12 18%);
+  background: linear-gradient(180deg, transparent, $background-page 18%);
 }
 
 .pay-btn {
@@ -233,8 +233,7 @@ onMounted(async () => {
   height: 46px;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 16px;
   font-weight: 800;
 

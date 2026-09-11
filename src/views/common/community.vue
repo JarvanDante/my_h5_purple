@@ -63,10 +63,11 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .community-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   min-height: 100%;
   padding-bottom: 28px;
 }
@@ -74,9 +75,8 @@ onMounted(async () => {
 .hero {
   margin: 12px 16px 8px;
   padding: 20px 16px;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
-  color: #fff;
+  border-radius: 16px;
+  @include theme-hero;
 
   p {
     font-size: 13px;
@@ -106,8 +106,8 @@ onMounted(async () => {
   height: 48px;
   border-radius: 14px;
   overflow: hidden;
-  background: rgba(255, 61, 127, 0.16);
-  color: #ff3d7f;
+  background: $primary-soft;
+  color: $primary-color;
   display: grid;
   place-items: center;
   font-size: 18px;
@@ -143,8 +143,8 @@ onMounted(async () => {
     flex-shrink: 0;
     padding: 1px 6px;
     border-radius: 6px;
-    background: rgba(255, 61, 127, 0.14);
-    color: #ff3d7f;
+    background: $primary-soft;
+    color: $primary-color;
     font-style: normal;
     font-size: 10px;
     font-weight: 700;
@@ -166,8 +166,7 @@ onMounted(async () => {
   padding: 0 14px;
   border: 0;
   border-radius: 16px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 13px;
   font-weight: 800;
 }

@@ -106,10 +106,11 @@ watch(tab, () => load(), { immediate: true })
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .waters-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   min-height: 100%;
 }
 
@@ -119,9 +120,8 @@ watch(tab, () => load(), { immediate: true })
   justify-content: space-between;
   margin: 12px 16px 0;
   padding: 18px 16px;
-  border-radius: 14px;
-  background: linear-gradient(90deg, #d91259, #ff3d7f 52%, #ff8fb3);
-  color: #fff;
+  border-radius: 16px;
+  @include theme-hero;
 }
 
 .hero-copy p {
@@ -184,7 +184,7 @@ watch(tab, () => load(), { immediate: true })
       width: 22px;
       height: 3px;
       border-radius: 2px;
-      background: #ff3d7f;
+      @include theme-ink-bar;
       transform: translateX(-50%);
     }
   }

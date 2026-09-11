@@ -170,17 +170,18 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 @use '@/styles/variables.scss' as *;
+@use '@/styles/accent.scss' as *;
 
 .vip-page {
-  background: #0d0d12;
-  color: #f5f5f8;
+  background: $background-page;
+  color: $text-color;
   padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
 }
 
 .record {
   border: 0;
   background: transparent;
-  color: #ff6699;
+  color: $primary-color;
   font-size: 13px;
   padding: 0 4px;
 }
@@ -191,7 +192,8 @@ onUnmounted(() => {
   gap: 12px;
   margin: 12px 16px 0;
   padding: 14px;
-  background: linear-gradient(135deg, #2a1c28, #16141c);
+  background: linear-gradient(135deg, $background-surface2, $background-page);
+  box-shadow: inset 0 0 0 1px $line;
   border-radius: 13px;
 }
 
@@ -255,8 +257,8 @@ onUnmounted(() => {
   box-shadow: inset 0 0 0 1px #2a2a34;
 
   &.active {
-    background: linear-gradient(180deg, #2a1c28, #16141c);
-    box-shadow: inset 0 0 0 1px #ff3d7f;
+    background: linear-gradient(180deg, $background-surface2, $background-page);
+    box-shadow: inset 0 0 0 1px $primary-color, 0 8px 20px $accent-btn-shadow;
   }
 
   h3 {
@@ -277,7 +279,7 @@ onUnmounted(() => {
 
 .price {
   margin-top: 8px;
-  color: #ff6699;
+  color: $primary-color;
   font-size: 12px;
 
   em {
@@ -303,7 +305,7 @@ onUnmounted(() => {
   height: 24px;
   padding: 0 10px;
   border-radius: 999px;
-  background: #e23b3b;
+  background: $primary-color-deep;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -322,7 +324,7 @@ onUnmounted(() => {
   h3 {
     font-size: 16px;
     font-weight: 700;
-    color: #ff6699;
+    color: $primary-color;
     letter-spacing: 0.04em;
   }
 }
@@ -344,8 +346,8 @@ onUnmounted(() => {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #331020;
-  color: #ff6699;
+  background: $primary-soft;
+  color: $primary-color;
   font-size: 11px;
   display: flex;
   align-items: center;
@@ -373,7 +375,7 @@ onUnmounted(() => {
   bottom: 0;
   z-index: 20;
   padding: 10px 16px calc(12px + env(safe-area-inset-bottom, 0px));
-  background: linear-gradient(180deg, transparent, #0d0d12 18%);
+  background: linear-gradient(180deg, transparent, $background-page 18%);
 }
 
 .pay-btn {
@@ -381,8 +383,7 @@ onUnmounted(() => {
   height: 46px;
   border: 0;
   border-radius: 23px;
-  background: #ff3d7f;
-  color: #fff;
+  @include theme-cta;
   font-size: 16px;
   font-weight: 800;
 
@@ -399,7 +400,7 @@ onUnmounted(() => {
 
   em {
     font-style: normal;
-    color: #e23b3b;
+    color: $primary-color;
   }
 }
 

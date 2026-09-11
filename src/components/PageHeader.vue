@@ -40,7 +40,7 @@ const back = () => {
   display: flex;
   align-items: center;
   padding: var(--app-header-top) 8px 0;
-  box-shadow: 0 1px 0 rgba(255, 50, 180, 0.35);
+  box-shadow: 0 1px 0 $header-line;
 }
 
 .back {

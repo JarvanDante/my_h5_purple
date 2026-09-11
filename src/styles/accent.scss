@@ -1,0 +1,48 @@
+@use './variables.scss' as *;
+
+@mixin theme-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: $hero-gradient;
+  color: #fff;
+  box-shadow:
+    0 12px 28px $accent-btn-shadow,
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: $hero-shine;
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 148px;
+    height: 148px;
+    right: -40px;
+    top: -52px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    pointer-events: none;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+@mixin theme-cta {
+  background: linear-gradient(180deg, $primary-color 0%, $primary-color-deep 100%);
+  color: $on-accent;
+  box-shadow: 0 8px 18px $accent-btn-shadow;
+}
+
+@mixin theme-ink-bar {
+  background: $primary-color;
+  box-shadow: 0 0 8px $accent-btn-shadow;
+}
