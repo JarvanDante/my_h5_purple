@@ -33,7 +33,7 @@
             </button>
           </section>
 
-          <div v-if="subTab && !isComic" class="cat-pane">
+          <div v-if="subTab && !isComic && !isCartoon" class="cat-pane">
             <p v-if="catLoading" class="page-empty">加载中…</p>
             <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
             <PosterGrid
@@ -94,7 +94,7 @@ import PosterRail from '@/components/home/PosterRail.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import HomeHeader from '@/components/HomeHeader.vue'
 import { quickArtSrc } from '@/assets/theme'
-import { fetchCartoonCategories, fetchCartoonList, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
+import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsCategories, fetchComicsList, fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
@@ -134,17 +134,20 @@ const catItems = ref<CoverItem[]>([])
 const catLoading = ref(false)
 
 const firstComicName = () => catsByChannel.value.漫画[0]?.name || ''
+const firstCartoonName = () => catsByChannel.value.动漫[0]?.name || ''
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
   catItems.value = []
-  subTab.value = item === '漫画' ? firstComicName() : ''
+  if (item === '漫画') subTab.value = firstComicName()
+  else if (item === '动漫') subTab.value = firstCartoonName()
+  else subTab.value = ''
 }
 
 const selectSub = (name: string) => {
   if (subTab.value === name) {
-    if (isComic.value) return
+    if (isComic.value || isCartoon.value) return
     subTab.value = ''
     catItems.value = []
     return
@@ -152,6 +155,10 @@ const selectSub = (name: string) => {
   subTab.value = name
   if (isComic.value) {
     loadComicFloors()
+    return
+  }
+  if (isCartoon.value) {
+    loadCartoonFloors()
     return
   }
   loadCatItems()
@@ -171,6 +178,7 @@ const loadSubCats = async () => {
   if (novel.status === 'fulfilled') catsByChannel.value.小说 = toCats(novel.value.list)
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
   if (isComic.value && !subTab.value) subTab.value = firstComicName()
+  if (isCartoon.value && !subTab.value) subTab.value = firstCartoonName()
 }
 
 type QuickItem = {
@@ -290,17 +298,6 @@ const loadCatItems = async () => {
       catItems.value = (data.list || []).map((c) => toComicCover(c))
       return
     }
-    if (isCartoon.value) {
-      let sort = 1
-      let cate = ''
-      if (cat?.kind === 2 || cat?.kind === 3) sort = 0
-      else if (cat?.kind !== 1) {
-        cate = name
-      }
-      const data = await fetchCartoonList(1, 36, '', cate, sort)
-      catItems.value = (data.list || []).map((c) => toCartoonCover(c))
-      return
-    }
     const cate = !cat || cat.kind === 0 ? name : ''
     const sort = cat?.kind === 3 ? 1 : 2
     const data = await fetchNovelList(1, 36, '', cate, sort)
@@ -337,7 +334,11 @@ const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 
 const emptyText = computed(() => {
   if (!ready.value) return `${channel.value}即将上线`
-  if (isCartoon.value && !floors.value.length) return '暂无模块，请在子后台「动漫模块」配置'
+  if (isCartoon.value && !floors.value.length) {
+    return subTab.value
+      ? `暂无「${subTab.value}」模块，请在子后台「动漫模块」把位置选成该分类`
+      : '暂无模块，请在子后台「动漫模块」配置'
+  }
   if (!floors.value.length) {
     return subTab.value
       ? `暂无「${subTab.value}」模块，请在子后台「漫画模块」把位置选成该分类`
@@ -415,7 +416,12 @@ const loadComicFloors = async () => {
 
 const loadCartoonFloors = async () => {
   try {
-    const mods = (await fetchCartoonModules('cartoon_home')).list || []
+    const cat = (catsByChannel.value.动漫 || []).find((c) => c.name === subTab.value)
+    if (!cat?.id) {
+      floors.value = []
+      return
+    }
+    const mods = (await fetchCartoonModules(`cat_${cat.id}`)).list || []
     if (!mods.length) {
       floors.value = []
       return
@@ -462,6 +468,10 @@ onMounted(async () => {
 watch(channel, () => {
   if (isComic.value) {
     const names = (catsByChannel.value.漫画 || []).map((c) => c.name)
+    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
+  }
+  if (isCartoon.value) {
+    const names = (catsByChannel.value.动漫 || []).map((c) => c.name)
     if (!names.includes(subTab.value)) subTab.value = names[0] || ''
   }
   loadFloors()

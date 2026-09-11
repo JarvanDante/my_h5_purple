@@ -38,13 +38,7 @@
             </button>
           </section>
 
-          <div v-if="subTab" class="cat-pane">
-            <p v-if="catLoading" class="page-empty">加载中…</p>
-            <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」视频</p>
-            <PosterGrid v-else :items="catItems" :cols="2" wide @select="open" />
-          </div>
-
-          <template v-else-if="floors.length">
+          <template v-if="floors.length">
             <template v-for="(floor, i) in floors" :key="floor.id">
               <FloorBlock
                 :title="floor.title"
@@ -84,7 +78,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
-import { fetchVideoCategories, fetchVideoList, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
+import { fetchVideoCategories, fetchVideoModules, type VideoItem, type VideoModule } from '@/api/video'
 import AdBanner from '@/components/AdBanner.vue'
 import DouyinHome from '@/components/douyin/DouyinHome.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
@@ -115,31 +109,25 @@ const channel = computed(() => channelSlide.current.value)
 const isDouyin = computed(() => channel.value === '抖音')
 const innerName = ref('tab-left')
 
-type SubCat = { name: string; kind: number }
+type SubCat = { id: number; name: string; kind: number }
 const catsByChannel = ref<Record<string, SubCat[]>>({
   视频: [],
   抖音: [],
 })
 const subTab = ref('')
 const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c) => c.name))
-const catItems = ref<CoverItem[]>([])
-const catLoading = ref(false)
+const firstVideoName = () => catsByChannel.value.视频[0]?.name || ''
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
-  subTab.value = ''
-  catItems.value = []
+  subTab.value = item === '视频' ? firstVideoName() : ''
 }
 
 const selectSub = (name: string) => {
-  if (subTab.value === name) {
-    subTab.value = ''
-    catItems.value = []
-    return
-  }
+  if (subTab.value === name) return
   subTab.value = name
-  loadCatItems()
+  loadFloors()
 }
 
 type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
@@ -167,31 +155,6 @@ const toCover = (v: VideoItem, mark?: CoverItem['mark']): CoverItem => ({
   tone: v.id % 6,
 })
 
-const loadCatItems = async () => {
-  const name = subTab.value
-  if (!name) {
-    catItems.value = []
-    return
-  }
-  const cat = (catsByChannel.value[channel.value] || []).find((c) => c.name === name)
-  catLoading.value = true
-  try {
-    let sort = 1
-    let cate = ''
-    if (cat?.kind === 2 || cat?.kind === 3) sort = 0
-    else if (cat?.kind !== 1) {
-      cate = name
-    }
-    const data = await fetchVideoList(1, 36, '', sort, cate)
-    catItems.value = (data.list || []).map((v) => toCover(v))
-  } catch (err) {
-    toastError(err)
-    catItems.value = []
-  } finally {
-    catLoading.value = false
-  }
-}
-
 const banners = ref<CoverItem[]>([])
 const loadBanners = async () => {
   if (isDouyin.value) {
@@ -213,7 +176,11 @@ const loadBanners = async () => {
 }
 const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 
-const emptyText = '暂无模块，请在子后台「视频模块」配置'
+const emptyText = computed(() =>
+  subTab.value
+    ? `暂无「${subTab.value}」模块，请在子后台「视频模块」把位置选成该分类`
+    : '暂无模块，请在子后台「视频模块」配置',
+)
 
 const moduleLayout = (style: number): FloorLayout => {
   if (style === 1) return 'hero-mix'
@@ -283,11 +250,12 @@ const onQuick = (item: QuickItem) => {
 }
 
 const loadSubCats = async () => {
-  const toCats = (list?: { name: string; kind: number }[]) =>
-    (list || []).filter((x) => x.name).map((x) => ({ name: x.name, kind: x.kind || 0 }))
+  const toCats = (list?: { id?: number; name: string; kind: number }[]) =>
+    (list || []).filter((x) => x.name).map((x) => ({ id: x.id || 0, name: x.name, kind: x.kind || 0 }))
   try {
     const video = await fetchVideoCategories()
     catsByChannel.value.视频 = toCats(video.list)
+    if (!isDouyin.value && !subTab.value) subTab.value = firstVideoName()
   } catch {
     catsByChannel.value.视频 = []
   }
@@ -296,7 +264,12 @@ const loadSubCats = async () => {
 const loadFloors = async () => {
   if (isDouyin.value) return
   try {
-    const mods = (await fetchVideoModules('video_home')).list || []
+    const cat = (catsByChannel.value.视频 || []).find((c) => c.name === subTab.value)
+    if (!cat?.id) {
+      floors.value = []
+      return
+    }
+    const mods = (await fetchVideoModules(`cat_${cat.id}`)).list || []
     floors.value = mods.map((mod) => {
       const mark = moduleMark(mod.icon)
       const chips = moduleChips(mod)
@@ -319,13 +292,17 @@ const loadFloors = async () => {
 }
 
 watch(channel, () => {
+  if (!isDouyin.value) {
+    const names = (catsByChannel.value.视频 || []).map((c) => c.name)
+    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
+  }
   loadFloors()
   loadQuicks()
   loadBanners()
 })
 
-onMounted(() => {
-  loadSubCats()
+onMounted(async () => {
+  await loadSubCats()
   loadFloors()
   loadQuicks()
   loadBanners()
