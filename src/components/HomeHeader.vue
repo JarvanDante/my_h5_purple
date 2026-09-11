@@ -5,17 +5,7 @@
   >
     <AppTopbar>
       <div class="channel-tabs">
-        <template v-if="dark">
-          <ChannelTab
-            v-for="item in channels"
-            :key="item"
-            :label="item"
-            :active="channel === item"
-            @select="$emit('selectChannel', item)"
-          />
-        </template>
         <button
-          v-else
           v-for="item in channels"
           :key="item"
           type="button"
@@ -65,7 +55,6 @@
 
 <script setup lang="ts">
 import AppTopbar from '@/components/AppTopbar.vue'
-import ChannelTab from '@/components/ChannelTab.vue'
 import LineIcon from '@/components/LineIcon.vue'
 import { checkinArt, vipArt } from '@/assets/theme'
 
@@ -350,8 +339,23 @@ defineEmits<{
     align-items: center;
     justify-content: center;
     height: 40px;
-    gap: 8px;
-    overflow: visible;
+    gap: 22px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .channel-item {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 0;
+    line-height: 22px;
+
+    &.active {
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+    }
   }
 
   .search-row {

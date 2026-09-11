@@ -1,13 +1,15 @@
 <template>
   <div class="page-shell ai-home">
-    <header class="ai-top">
-      <AppTopbar title="AI智能创作" />
-    </header>
-    <header class="hero">
-      <div class="hero-copy">
-        <button type="button" class="works-link" @click="router.push('/ai/works')">查看我的AI作品 ›</button>
-      </div>
-    </header>
+    <HomeHeader
+      dark
+      :channels="channels"
+      :channel="channel"
+      search-text="搜索更多AI"
+      @select-channel="selectChannel"
+      @search="router.push(searchPath('ai'))"
+      @vip="router.push('/vip')"
+      @checkin="router.push('/checkin')"
+    />
 
     <section class="grid">
       <button
@@ -31,13 +33,19 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import AppTopbar from '@/components/AppTopbar.vue'
+import HomeHeader from '@/components/HomeHeader.vue'
 import { showToast } from 'vant'
 import { aiTools } from '@/data/mock'
+import { searchPath } from '@/utils/searchScope'
 
 defineOptions({ name: 'Ai' })
 
 const router = useRouter()
+const channels = ['智能创作', '我的作品']
+const channel = '智能创作'
+const selectChannel = (item: string) => {
+  if (item === '我的作品') router.push('/ai/works')
+}
 const marks: Record<string, string> = {
   i2v: '片',
   face: '换',
@@ -67,49 +75,11 @@ const open = (tool: { key: string; title: string }) => {
   padding-bottom: calc(#{$tabbar-height} + 16px + env(safe-area-inset-bottom, 0px));
 }
 
-.ai-top {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding: var(--app-header-top) 12px 0;
-  background: $background-page;
-}
-
-.hero {
-  margin: 8px 12px 14px;
-  padding: 16px 16px 20px;
-  border-radius: 18px;
-  background:
-    radial-gradient(120% 140% at 20% 0%, rgba(255, 50, 180, 0.55), transparent 55%),
-    linear-gradient(135deg, #3a1a28 0%, #1a1218 70%);
-  box-shadow: $shadow-card;
-}
-
-.hero-copy h1 {
-  margin: 0;
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #fff;
-}
-
-.works-link {
-  margin-top: 12px;
-  height: 32px;
-  padding: 0 14px;
-  border: 0;
-  border-radius: $radius-pill;
-  background: #fff;
-  color: $primary-color;
-  font-size: 13px;
-  font-weight: 700;
-}
-
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 0 12px;
+  padding: 10px 12px 0;
 }
 
 .card {
