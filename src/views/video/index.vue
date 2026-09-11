@@ -103,7 +103,7 @@ import { formatDuration, isRecent } from '@/utils/format'
 import { videoPath } from '@/utils/idcrypt'
 import { mediaUrl, toastError } from '@/utils/request'
 import { searchHint as videoSearchHint, searchPath } from '@/utils/searchScope'
-import { moduleChips, moduleMorePath } from '@/utils/moduleFilter'
+import { moduleChips, moduleLayout, moduleMorePath, moduleTake } from '@/utils/moduleFilter'
 import { openPromoLink } from '@/utils/promoLink'
 
 defineOptions({ name: 'Video' })
@@ -215,16 +215,6 @@ const openBanner = (item: CoverItem) => openPromoLink(router, item.href)
 
 const emptyText = '暂无模块，请在子后台「视频模块」配置'
 
-const moduleLayout = (style: number): FloorLayout => {
-  if (style === 1) return 'hero-mix'
-  if (style === 2) return 'wide-grid'
-  if (style === 3) return 'one-wide'
-  if (style === 4) return 'grid-2'
-  if (style === 5) return 'rail'
-  if (style === 6) return 'wide-rail'
-  return 'grid-3'
-}
-
 const moduleSub = (icon: number) => {
   if (icon === 2) return 'STAR'
   if (icon === 3) return 'HOT'
@@ -309,7 +299,7 @@ const loadFloors = async () => {
         layout: moduleLayout(mod.style),
         more: moduleMore(mod),
         empty: `暂无「${mod.name}」视频`,
-        items: (mod.items || []).map((v, i) => toCover(v, i < 2 ? mark : undefined)),
+        items: moduleTake(mod.style, mod.size, (mod.items || []).map((v, i) => toCover(v, i < 2 ? mark : undefined))),
       }
     })
   } catch (err) {
