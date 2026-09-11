@@ -48,12 +48,12 @@ export const posts = [
 ]
 
 export const aiTools = [
-  { key: 'i2v', title: 'AI图生视频', desc: '一键成片，动态呈现' },
-  { key: 'face', title: 'AI图片换脸', desc: '上传照片快速生成' },
-  { key: 'undress', title: 'AI一键去衣', desc: '上传照片智能成图' },
-  { key: 'draw', title: 'AI绘画', desc: '一句话出图，风格自选' },
-  { key: 'novel', title: 'AI小说创作', desc: '按设定生成章节' },
-  { key: 'dress', title: 'AI换装', desc: '换套造型，稍后接入' },
+  { key: 'i2v', title: 'AI图生视频', desc: '一键成像，点燃你的幻想' },
+  { key: 'face', title: 'AI图片/视频换脸', desc: '一键换脸，满足您的欲望' },
+  { key: 'undress', title: 'AI一键去衣', desc: '一键去衣，窥见隐秘胴体' },
+  { key: 'draw', title: 'AI绘画', desc: '笔尖勾勒，绘出你的春梦' },
+  { key: 'novel', title: 'AI小说创作', desc: '禁忌篇章，引动无限遐想' },
+  { key: 'dress', title: 'AI换装', desc: '根据需求，定制心仪服装' },
 ]
 
 export const hotWords = ['星河旅人', '夜色书店', '今日上新', '韩漫', '完结推荐']

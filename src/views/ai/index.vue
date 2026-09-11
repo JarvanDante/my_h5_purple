@@ -1,11 +1,16 @@
 <template>
   <div class="page-shell ai-home">
-    <header class="ai-top">
-      <AppTopbar title="AI智能创作" />
-    </header>
     <header class="hero">
-      <div class="hero-copy">
-        <button type="button" class="works-link" @click="router.push('/ai/works')">查看我的AI作品 ›</button>
+      <img class="hero-art" :src="heroArt" alt="" />
+      <div class="hero-ui">
+        <AppTopbar />
+        <div class="hero-copy">
+          <h1>AI智能创作</h1>
+          <button type="button" class="works-link" @click="router.push('/ai/works')">
+            查看我的AI作品
+            <span class="works-go" aria-hidden="true">›</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -15,15 +20,9 @@
         :key="tool.key"
         type="button"
         class="card"
-        :class="`card--${tool.key}`"
         @click="open(tool)"
       >
-        <div class="card-top">
-          <h3>{{ tool.title }}</h3>
-          <span class="go" aria-hidden="true">›</span>
-        </div>
-        <div class="visual">{{ marks[tool.key] }}</div>
-        <p>{{ tool.desc }}</p>
+        <img :src="arts[tool.key]" :alt="tool.title" />
       </button>
     </section>
   </div>
@@ -34,17 +33,24 @@ import { useRouter } from 'vue-router'
 import AppTopbar from '@/components/AppTopbar.vue'
 import { showToast } from 'vant'
 import { aiTools } from '@/data/mock'
+import heroArt from '@/assets/ai/hero.png'
+import artI2v from '@/assets/ai/i2v.png'
+import artFace from '@/assets/ai/face.png'
+import artUndress from '@/assets/ai/undress.png'
+import artDraw from '@/assets/ai/draw.png'
+import artNovel from '@/assets/ai/novel.png'
+import artDress from '@/assets/ai/dress.png'
 
 defineOptions({ name: 'Ai' })
 
 const router = useRouter()
-const marks: Record<string, string> = {
-  i2v: '片',
-  face: '换',
-  undress: '衣',
-  draw: '绘',
-  novel: '文',
-  dress: '装',
+const arts: Record<string, string> = {
+  i2v: artI2v,
+  face: artFace,
+  undress: artUndress,
+  draw: artDraw,
+  novel: artNovel,
+  dress: artDress,
 }
 
 const open = (tool: { key: string; title: string }) => {
@@ -64,131 +70,131 @@ const open = (tool: { key: string; title: string }) => {
 @use '@/styles/variables.scss' as *;
 
 .ai-home {
-  padding-bottom: calc(#{$tabbar-height} + 16px + env(safe-area-inset-bottom, 0px));
-}
-
-.ai-top {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  padding: var(--app-header-top) 12px 0;
-  background: $background-page;
+  background-color: $primary-color;
+  background-image: none;
+  color: #fff;
+  padding-bottom: calc(#{$tabbar-height} + 12px + env(safe-area-inset-bottom, 0px));
 }
 
 .hero {
-  margin: 8px 12px 14px;
-  padding: 16px 16px 20px;
-  border-radius: 18px;
-  background:
-    radial-gradient(120% 140% at 20% 0%, rgba(255, 50, 180, 0.55), transparent 55%),
-    linear-gradient(135deg, #3a1a28 0%, #1a1218 70%);
-  box-shadow: $shadow-card;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-art {
+  display: block;
+  width: 100%;
+  height: 228px;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
+.hero-ui {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--app-header-top) 12px 18px;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  background: linear-gradient(180deg, transparent, $primary-color);
+  pointer-events: none;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 58%;
+  padding-left: 4px;
 }
 
 .hero-copy h1 {
   margin: 0;
-  font-size: 26px;
+  color: #fff;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: #fff;
+  line-height: 1.2;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
 }
 
 .works-link {
   margin-top: 12px;
+  align-self: flex-start;
   height: 32px;
-  padding: 0 14px;
+  padding: 0 8px 0 12px;
   border: 0;
   border-radius: $radius-pill;
-  background: #fff;
-  color: $primary-color;
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
   font-size: 13px;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.works-go {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  color: $primary-color;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.hero-ui :deep(.app-topbar) {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-ui :deep(.menu-btn) {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.hero-ui :deep(.menu-btn i) {
+  background: #fff;
 }
 
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  padding: 0 12px;
+  padding: 2px 12px 0;
 }
 
 .card {
-  min-height: 168px;
-  padding: 12px;
+  margin: 0;
+  padding: 0;
   border: 0;
-  border-radius: 16px;
-  text-align: left;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  background: #2a1620;
+  background: transparent;
+  border-radius: 18px;
+  overflow: hidden;
+  line-height: 0;
 
   &:active {
     transform: scale(0.98);
   }
 
-  h3 {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 800;
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
-
-  p {
-    margin-top: auto;
-    font-size: 11px;
-    line-height: 1.4;
-    color: rgba(255, 255, 255, 0.72);
-  }
-}
-
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.go {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1;
-}
-
-.visual {
-  width: 56px;
-  height: 56px;
-  margin: 16px auto 12px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.card--face {
-  background: linear-gradient(180deg, #ff6b9d 0%, #c43d72 100%);
-}
-.card--i2v {
-  background: linear-gradient(180deg, #ff8f6b 0%, #c45a3d 100%);
-}
-.card--undress {
-  background: linear-gradient(180deg, #c59bff 0%, #7a4cc4 100%);
-}
-.card--draw {
-  background: linear-gradient(180deg, #7eb6ff 0%, #3d6ec4 100%);
-}
-.card--novel {
-  background: linear-gradient(180deg, #ffc27a 0%, #c47a3d 100%);
-}
-.card--dress {
-  background: linear-gradient(180deg, #7ad4c4 0%, #3d9a8a 100%);
 }
 </style>
