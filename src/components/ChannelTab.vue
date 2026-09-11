@@ -16,13 +16,14 @@ import { channelArtSrc } from '@/assets/theme'
 const props = defineProps<{
   label: string
   active?: boolean
+  plain?: boolean
 }>()
 
 defineEmits<{
   select: []
 }>()
 
-const src = computed(() => channelArtSrc(props.label, props.active))
+const src = computed(() => (props.plain ? '' : channelArtSrc(props.label, props.active)))
 </script>
 
 <style scoped lang="scss">
