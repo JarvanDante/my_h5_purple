@@ -108,7 +108,7 @@ import { comicPath, videoPath } from '@/utils/idcrypt'
 import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
-import { moduleChips, moduleLayout, moduleMorePath, moduleTake } from '@/utils/moduleFilter'
+import { moduleChips, moduleMorePath } from '@/utils/moduleFilter'
 
 defineOptions({ name: 'Comic' })
 
@@ -358,6 +358,16 @@ const open = (item: CoverItem) => {
   router.push(comicPath(item.id))
 }
 
+const moduleLayout = (style: number): FloorLayout => {
+  if (style === 1) return 'hero-mix'
+  if (style === 2) return 'wide-grid'
+  if (style === 3) return 'one-wide'
+  if (style === 4) return 'grid-2'
+  if (style === 5) return 'rail'
+  if (style === 6) return 'wide-rail'
+  return 'grid-3'
+}
+
 const moduleSub = (icon: number) => {
   if (icon === 2) return 'STAR'
   if (icon === 3) return 'HOT'
@@ -394,7 +404,7 @@ const loadComicFloors = async () => {
         layout: moduleLayout(mod.style),
         more: moduleMore('comic', mod),
         empty: `暂无「${mod.name}」漫画`,
-        items: moduleTake(mod.style, mod.size, (mod.items || []).map((c, i) => toComicCover(c, i < 2 ? mark : undefined))),
+        items: (mod.items || []).map((c, i) => toComicCover(c, i < 2 ? mark : undefined)),
       }
     })
   } catch (err) {
@@ -422,7 +432,7 @@ const loadCartoonFloors = async () => {
         layout: moduleLayout(mod.style),
         more: moduleMore('cartoon', mod),
         empty: `暂无「${mod.name}」动漫`,
-        items: moduleTake(mod.style, mod.size, (mod.items || []).map((c, i) => toCartoonCover(c, i < 2 ? mark : undefined))),
+        items: (mod.items || []).map((c, i) => toCartoonCover(c, i < 2 ? mark : undefined)),
       }
     })
   } catch (err) {

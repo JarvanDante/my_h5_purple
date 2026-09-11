@@ -43,21 +43,3 @@ export function moduleChips(mod: { tags?: string[]; categories?: string[] }) {
     tags: (mod.tags || []).map((s) => s.trim()).filter(Boolean),
   }
 }
-
-export type FloorLayout = 'rail' | 'wide-rail' | 'grid-2' | 'grid-3' | 'wide-grid' | 'hero-mix' | 'one-wide'
-
-export function moduleLayout(style: number): FloorLayout {
-  if (style === 1) return 'hero-mix'
-  if (style === 2) return 'wide-grid'
-  if (style === 3) return 'one-wide'
-  if (style === 4) return 'grid-2'
-  if (style === 5) return 'rail'
-  if (style === 6) return 'wide-rail'
-  return 'grid-3'
-}
-
-export function moduleTake<T>(style: number, size: number, items: T[]): T[] {
-  if (style !== 8) return items
-  const n = size > 0 ? size : 6
-  return items.slice(0, n)
-}
