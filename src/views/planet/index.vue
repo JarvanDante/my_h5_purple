@@ -1,15 +1,22 @@
 <template>
   <div class="page-shell planet-page">
-    <HomeHeader
-      dark
-      :channels="tabs"
-      :channel="tab"
-      search-text="搜索更多社区"
-      @select-channel="select"
-      @search="go(searchPath('planet'))"
-      @vip="go('/vip')"
-      @checkin="go('/checkin')"
-    />
+    <header class="planet-header">
+      <AppTopbar title="社区" />
+      <div class="channel-row">
+        <div class="channel-tabs">
+          <ChannelTab
+            v-for="item in tabs"
+            :key="item"
+            :label="item"
+            :active="tab === item"
+            @select="select(item)"
+          />
+        </div>
+        <button type="button" class="search-btn" aria-label="搜索" @click="go(searchPath('planet'))">
+          <LineIcon name="search" />
+        </button>
+      </div>
+    </header>
 
     <AdBanner />
 
@@ -48,8 +55,10 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import AdBanner from '@/components/AdBanner.vue'
-import HomeHeader from '@/components/HomeHeader.vue'
+import AppTopbar from '@/components/AppTopbar.vue'
+import ChannelTab from '@/components/ChannelTab.vue'
 import PostCard from '@/components/PostCard.vue'
+import LineIcon from '@/components/LineIcon.vue'
 import { COLLECT_LIKE, MEDIA_POST, operateCollect } from '@/api/collect'
 import { fetchPostCategories, fetchPostList, type PostItem } from '@/api/ops'
 import { fetchFollows, toggleFollow } from '@/api/user'
@@ -209,6 +218,56 @@ onMounted(() => {
 
 .planet-page {
   background: #000000;
+}
+
+.planet-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #000000;
+  padding: var(--app-header-top) 8px 0 12px;
+}
+
+.channel-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 48px;
+}
+
+.channel-tabs {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  height: 48px;
+  gap: 22px;
+  padding-left: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.search-btn {
+  width: 40px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  color: #d5d5dc;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  :deep(.line-icon) {
+    width: 20px;
+    height: 20px;
+  }
 }
 
 .ad-strip {
