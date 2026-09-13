@@ -1,8 +1,6 @@
 /** 前台 JSON 接口: AES-128-ECB + PKCS7 + Base64, 与后端 aesapi / 公司 H5 一致。与封面 .bnc 密钥分开。 */
 
 const DEFAULT_KEY = '9f3a6c1e8b4d0275'
-const DEFAULT_DEBUG_KEY = 'myh5dbg7k2p9q4x1'
-const DEFAULT_DEBUG_HEADER = 'c7e4a19b3f6820d54e8a16c2b9f735d1'
 const DEBUG_STORE = 'h5_api_debug'
 
 const SBOX = new Uint8Array([
@@ -193,14 +191,18 @@ export function decryptBase64(text: string) {
 }
 
 function expectedDebugKey() {
-  return (import.meta.env.VITE_API_DEBUG_KEY || DEFAULT_DEBUG_KEY).trim()
+  return String(import.meta.env.VITE_API_DEBUG_KEY || '').trim()
 }
 
 export function apiDebugHeader() {
-  return (import.meta.env.VITE_API_DEBUG_HEADER || DEFAULT_DEBUG_HEADER).trim()
+  return String(import.meta.env.VITE_API_DEBUG_HEADER || '').trim()
 }
 
 export function isApiDebug() {
+  const expect = expectedDebugKey()
+  if (!expect || !apiDebugHeader()) {
+    return false
+  }
   try {
     const u = new URL(window.location.href)
     if (u.searchParams.has('debug_key')) {
@@ -209,7 +211,7 @@ export function isApiDebug() {
       else sessionStorage.removeItem(DEBUG_STORE)
     }
     const got = (u.searchParams.get('debug_key') || sessionStorage.getItem(DEBUG_STORE) || '').trim()
-    return got === expectedDebugKey()
+    return got === expect
   } catch {
     return false
   }
