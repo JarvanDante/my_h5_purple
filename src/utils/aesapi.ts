@@ -1,8 +1,8 @@
 /** 前台 JSON 接口: AES-128-ECB + PKCS7 + Base64, 与后端 aesapi / 公司 H5 一致。与封面 .bnc 密钥分开。 */
 
-const DEFAULT_KEY = 'c4e91b7a02d65f38'
-const DEFAULT_DEBUG_KEY = 'weaas821862941ws'
-const DEFAULT_DEBUG_HEADER = '8ed1a631a6ab789a34256b44ff571476'
+const DEFAULT_KEY = '9f3a6c1e8b4d0275'
+const DEFAULT_DEBUG_KEY = 'myh5dbg7k2p9q4x1'
+const DEFAULT_DEBUG_HEADER = 'c7e4a19b3f6820d54e8a16c2b9f735d1'
 const DEBUG_STORE = 'h5_api_debug'
 
 const SBOX = new Uint8Array([
