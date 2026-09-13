@@ -7,8 +7,8 @@ import {
 import { isNativeApp } from '@/utils/nativeApp'
 
 const showDelayMs = 300
-const minLoadingMs = 100
-const maxLoadingMs = 2000
+const minLoadingMs = 1000
+const maxLoadingMs = 2500
 
 export function useGlobalLoading() {
   const enabled = isNativeApp()
