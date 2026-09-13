@@ -10,6 +10,9 @@ interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_API_BASE?: string
   readonly VITE_AES_BNC_KEY?: string
+  readonly VITE_API_AES_KEY?: string
+  readonly VITE_API_DEBUG_KEY?: string
+  readonly VITE_API_DEBUG_HEADER?: string
 }
 
 interface ImportMeta {

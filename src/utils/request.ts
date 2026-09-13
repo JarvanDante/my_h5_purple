@@ -1,4 +1,5 @@
 import { showToast } from 'vant'
+import { apiDebugHeader, encryptBase64, isApiDebug, parseApiBody } from '@/utils/aesapi'
 import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from '@/utils/globalLoading'
 
 const BASE = import.meta.env.VITE_API_BASE || '/front/v1'
@@ -33,7 +34,17 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
   emitGlobalLoadingStart()
   try {
     const headers = new Headers(init.headers)
-    if (!headers.has('Content-Type') && init.body) {
+    const debug = isApiDebug()
+    if (debug) {
+      headers.set('debugKey', apiDebugHeader())
+    } else {
+      headers.set('X-Encrypted', '1')
+    }
+    let body = init.body
+    if (!debug && typeof body === 'string' && body) {
+      body = encryptBase64(body)
+      headers.set('Content-Type', 'text/plain')
+    } else if (!headers.has('Content-Type') && body) {
       headers.set('Content-Type', 'application/json')
     }
     const token = getToken()
@@ -41,8 +52,13 @@ export async function request<T>(path: string, init: RequestInit = {}): Promise<
       headers.set('Authorization', token)
     }
 
-    const res = await fetch(`${BASE}${path}`, { ...init, headers })
-    const json = (await res.json()) as Envelope<T>
+    const res = await fetch(`${BASE}${path}`, { ...init, headers, body })
+    let json: Envelope<T>
+    try {
+      json = parseApiBody(await res.text()) as Envelope<T>
+    } catch {
+      throw new ApiError(-1, res.ok ? '数据解密失败' : `请求失败(${res.status})`)
+    }
     if (json.code !== 0) {
       const err = new ApiError(json.code, json.message || '请求失败')
       if (json.code === 61) {
