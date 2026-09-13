@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { useNavStore } from '@/stores/nav'
+import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from '@/utils/globalLoading'
 import { rememberInviteCode } from '@/utils/invite'
 import { rememberSource } from '@/utils/source'
 
@@ -286,6 +287,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  emitGlobalLoadingStart()
   document.title = (to.meta.title as string | undefined) || 'Purple'
   if (to.query.invite) rememberInviteCode(to.query.invite)
   if (to.query.code) rememberInviteCode(to.query.code)
@@ -294,6 +296,14 @@ router.beforeEach((to, from, next) => {
     useNavStore().setByRoute(to.path, from.path)
   }
   next()
+})
+
+router.afterEach(() => {
+  emitGlobalLoadingEnd()
+})
+
+router.onError(() => {
+  emitGlobalLoadingEnd()
 })
 
 export default router

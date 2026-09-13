@@ -1,4 +1,5 @@
 import { showToast } from 'vant'
+import { emitGlobalLoadingEnd, emitGlobalLoadingStart } from '@/utils/globalLoading'
 
 const BASE = import.meta.env.VITE_API_BASE || '/front/v1'
 
@@ -29,25 +30,30 @@ export function setToken(token: string) {
 }
 
 export async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const headers = new Headers(init.headers)
-  if (!headers.has('Content-Type') && init.body) {
-    headers.set('Content-Type', 'application/json')
-  }
-  const token = getToken()
-  if (token && !headers.has('Authorization')) {
-    headers.set('Authorization', token)
-  }
-
-  const res = await fetch(`${BASE}${path}`, { ...init, headers })
-  const json = (await res.json()) as Envelope<T>
-  if (json.code !== 0) {
-    const err = new ApiError(json.code, json.message || '请求失败')
-    if (json.code === 61) {
-      setToken('')
+  emitGlobalLoadingStart()
+  try {
+    const headers = new Headers(init.headers)
+    if (!headers.has('Content-Type') && init.body) {
+      headers.set('Content-Type', 'application/json')
     }
-    throw err
+    const token = getToken()
+    if (token && !headers.has('Authorization')) {
+      headers.set('Authorization', token)
+    }
+
+    const res = await fetch(`${BASE}${path}`, { ...init, headers })
+    const json = (await res.json()) as Envelope<T>
+    if (json.code !== 0) {
+      const err = new ApiError(json.code, json.message || '请求失败')
+      if (json.code === 61) {
+        setToken('')
+      }
+      throw err
+    }
+    return json.data
+  } finally {
+    emitGlobalLoadingEnd()
   }
-  return json.data
 }
 
 export function toastError(err: unknown) {
@@ -92,22 +98,27 @@ function uploadFailMessage(text: string, status: number) {
 
 /** H5 图片上传：服务端加密 .bnc 后写入统一存储 my-storage。 */
 export async function uploadMedia(file: File, purpose: 'image' | 'avatar' | 'video' | 'ad' | 'cover' | 'post' = 'image') {
-  const headers = new Headers()
-  const token = getToken()
-  if (token) headers.set('Authorization', token)
-  const body = new FormData()
-  body.append('file', file)
-  body.append('purpose', purpose)
-  const res = await fetch(`${BASE}/media/upload`, { method: 'POST', headers, body })
-  const text = await res.text()
-  let json: Envelope<{ url: string; object_key: string }>
+  emitGlobalLoadingStart()
   try {
-    json = JSON.parse(text) as Envelope<{ url: string; object_key: string }>
-  } catch {
-    throw new ApiError(-1, uploadFailMessage(text, res.status))
+    const headers = new Headers()
+    const token = getToken()
+    if (token) headers.set('Authorization', token)
+    const body = new FormData()
+    body.append('file', file)
+    body.append('purpose', purpose)
+    const res = await fetch(`${BASE}/media/upload`, { method: 'POST', headers, body })
+    const text = await res.text()
+    let json: Envelope<{ url: string; object_key: string }>
+    try {
+      json = JSON.parse(text) as Envelope<{ url: string; object_key: string }>
+    } catch {
+      throw new ApiError(-1, uploadFailMessage(text, res.status))
+    }
+    if (json.code !== 0) {
+      throw new ApiError(json.code, json.message || '上传失败')
+    }
+    return json.data
+  } finally {
+    emitGlobalLoadingEnd()
   }
-  if (json.code !== 0) {
-    throw new ApiError(json.code, json.message || '上传失败')
-  }
-  return json.data
 }

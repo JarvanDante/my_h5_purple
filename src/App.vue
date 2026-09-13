@@ -1,5 +1,10 @@
 <template>
   <div id="app">
+    <div v-if="showGlobalLoading" class="global-loading-overlay">
+      <div class="global-loading-dots">
+        <span v-for="i in 5" :key="i"></span>
+      </div>
+    </div>
     <div class="app-container">
       <div v-if="maintenance" class="maintain-bar">站点维护中 · {{ appName }}</div>
       <div class="page-view" @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
@@ -23,6 +28,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useGlobalLoading } from '@/composables/useGlobalLoading'
 import { useAppStore } from '@/stores/app'
 import { useDrawerStore } from '@/stores/drawer'
 import { useConfigStore } from '@/stores/config'
@@ -35,6 +41,7 @@ import AppTabbar from '@/components/AppTabbar.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { showGlobalLoading } = useGlobalLoading()
 const appStore = useAppStore()
 const navStore = useNavStore()
 const cacheViews = computed(() => appStore.cacheViews)
@@ -90,6 +97,65 @@ const onTouchEnd = (e: TouchEvent) => {
   background-color: $background-page;
   background-image: $page-glow;
   background-repeat: no-repeat;
+}
+
+.global-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.global-loading-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.global-loading-dots span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+.global-loading-dots span:nth-child(1) {
+  animation-delay: 0s;
+  background: #f472b6;
+}
+
+.global-loading-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+  background: #c084fc;
+}
+
+.global-loading-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+  background: #818cf8;
+}
+
+.global-loading-dots span:nth-child(4) {
+  animation-delay: 0.45s;
+  background: #22d3ee;
+}
+
+.global-loading-dots span:nth-child(5) {
+  animation-delay: 0.6s;
+  background: #34d399;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
 }
 
 .app-container {
