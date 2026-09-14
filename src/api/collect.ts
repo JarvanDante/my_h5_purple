@@ -3,6 +3,7 @@ import { request } from '@/utils/request'
 export const MEDIA_VIDEO = 1
 export const MEDIA_POST = 2
 export const MEDIA_COMICS = 3
+export const MEDIA_NOVEL = 4
 export const COLLECT_FAV = 1
 export const COLLECT_LIKE = 2
 

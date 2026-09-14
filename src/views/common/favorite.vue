@@ -67,21 +67,22 @@ import PageHeader from '@/components/PageHeader.vue'
 import {
   COLLECT_FAV,
   MEDIA_COMICS,
+  MEDIA_NOVEL,
   MEDIA_POST,
   MEDIA_VIDEO,
   fetchCollectList,
   operateCollect,
 } from '@/api/collect'
 import { fetchComicsDetail } from '@/api/comics'
+import { fetchNovelDetail } from '@/api/novel'
 import { fetchVideoDetail } from '@/api/video'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { comicPath, postPath, videoPath } from '@/utils/idcrypt'
+import { comicPath, novelPath, postPath, videoPath } from '@/utils/idcrypt'
 import { toastError } from '@/utils/request'
 import { themePrimary } from '@/utils/themeColor'
 
 type FavItem = { id: number; title: string; cover?: string; tag?: string; sub?: string }
 
-const MEDIA_NOVEL = 4
 const tabs = [
   { key: 'comic', title: '漫画', media: MEDIA_COMICS },
   { key: 'video', title: '视频', media: MEDIA_VIDEO },
@@ -135,6 +136,10 @@ const onCard = (item: FavItem) => {
   }
   if (tab.value === 'post') {
     router.push(postPath(item.id))
+    return
+  }
+  if (tab.value === 'novel') {
+    router.push(novelPath(item.id))
   }
 }
 
@@ -164,6 +169,17 @@ const load = async () => {
         title: v!.title,
         cover: v!.cover_url,
         tag: '视频',
+      }))
+      return
+    }
+    if (tab.value === 'novel') {
+      const rows = await Promise.all(ids.map((id) => fetchNovelDetail(id).catch(() => null)))
+      items.value = rows.filter(Boolean).map((n) => ({
+        id: n!.id,
+        title: n!.title,
+        cover: n!.cover,
+        tag: n!.is_vip ? 'VIP' : 'Free',
+        sub: n!.chapter_count ? `共${n!.chapter_count}章` : '',
       }))
       return
     }

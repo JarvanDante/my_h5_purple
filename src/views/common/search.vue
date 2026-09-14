@@ -163,12 +163,13 @@ import LineIcon from '@/components/LineIcon.vue'
 import MediaGrid from '@/components/MediaGrid.vue'
 import { fetchCartoonList, fetchCartoonCategories, cartoonCategories, type CartoonItem } from '@/api/cartoon'
 import { fetchComicsList, fetchComicsCategories, comicCategories, type ComicsItem } from '@/api/comics'
+import { fetchNovelList, fetchNovelCategories, novelCategories, type NovelItem } from '@/api/novel'
 import { fetchRepoTags } from '@/api/ops'
 import { fetchHotSearch } from '@/api/ranks'
 import { fetchDouyinCategories, fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, fetchVideoCategories, type VideoItem } from '@/api/video'
 import type { CoverItem } from '@/data/mock'
-import { comicPath, videoPath } from '@/utils/idcrypt'
+import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 import { clearSearchHistory, listSearchHistory, pushSearchHistory } from '@/utils/searchHistory'
@@ -214,7 +215,7 @@ const sortChips = SORT_CHIPS
 const scope = computed(() => parseScope(route.query.scope))
 const scopeName = computed(() => scopeLabel(scope.value))
 const placeholder = computed(() => searchHint(scope.value))
-const ready = computed(() => ['comic', 'cartoon', 'video', 'short', 'douyin'].includes(scope.value))
+const ready = computed(() => ['comic', 'cartoon', 'novel', 'video', 'short', 'douyin'].includes(scope.value))
 const gridCols = computed(() => (scope.value === 'comic' || scope.value === 'novel' ? 'cols-3' : 'cols-2'))
 const emptyText = computed(() => {
   if (!ready.value) return `${scopeName.value}搜索即将接入`
@@ -239,6 +240,20 @@ const toComicCover = (c: ComicsItem): CoverItem => {
     views: formatViews(c.view_count),
     badge: `共${c.chapter_count || 0}话${cate ? `·${cate}` : ''}`,
     tone: c.id % 6,
+  }
+}
+
+const toNovelCover = (n: NovelItem): CoverItem => {
+  const cate = novelCategories(n)[0] || ''
+  const ended = n.update_status === 2
+  return {
+    id: String(n.id),
+    title: n.title,
+    tag: n.is_vip ? 'VIP' : Number(n.price) > 0 ? '付费' : 'Free',
+    cover: mediaUrl(n.cover),
+    views: formatViews(n.view_count),
+    badge: `${ended ? '已完结' : `共${n.chapter_count || 0}章`}${cate ? `·${cate}` : ''}`,
+    tone: n.id % 6,
   }
 }
 
@@ -289,6 +304,10 @@ const fetchByScope = async (word = '') => {
     const data = await fetchComicsList(1, 30, word, '', word ? 0 : 2)
     return (data.list || []).map(toComicCover)
   }
+  if (scope.value === 'novel') {
+    const data = await fetchNovelList(1, 30, word, '', word ? 0 : 2)
+    return (data.list || []).map(toNovelCover)
+  }
   return []
 }
 
@@ -335,6 +354,8 @@ const loadFilterChips = async () => {
     let list: CategoryChip[] = []
     if (scope.value === 'comic') {
       list = (await fetchComicsCategories()).list || []
+    } else if (scope.value === 'novel') {
+      list = (await fetchNovelCategories()).list || []
     } else if (scope.value === 'cartoon') {
       list = (await fetchCartoonCategories()).list || []
     } else if (scope.value === 'video' || scope.value === 'short') {
@@ -383,6 +404,13 @@ const fetchLibraryList = async () => {
     const data = await fetchComicsList(1, 36, '', category, listSort, recommend, tag)
     return (data.list || []).map(toComicCover)
   }
+  if (scope.value === 'novel') {
+    const recommend = kind === 2 && cate ? 1 : 0
+    const category = recommend || kind === 1 ? '' : cate
+    const listSort = kind === 1 && cate && sort === 0 ? 2 : sort
+    const data = await fetchNovelList(1, 36, '', category, listSort, recommend, tag)
+    return (data.list || []).map(toNovelCover)
+  }
   return []
 }
 
@@ -429,6 +457,10 @@ const clearHistory = () => {
 const open = (item: CoverItem) => {
   if (scope.value === 'cartoon' || scope.value === 'video' || scope.value === 'short' || scope.value === 'douyin') {
     router.push(videoPath(item.id))
+    return
+  }
+  if (scope.value === 'novel') {
+    router.push(novelPath(item.id))
     return
   }
   router.push(comicPath(item.id))

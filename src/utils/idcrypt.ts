@@ -49,6 +49,14 @@ export function comicReadPath(comicId: number | string, chapterId: number | stri
   return `/comic/${encodeId(comicId)}/read/${encodeId(chapterId)}`
 }
 
+export function novelPath(id: number | string) {
+  return `/novel/${encodeId(id)}`
+}
+
+export function novelReadPath(novelId: number | string, chapterId: number | string) {
+  return `/novel/${encodeId(novelId)}/read/${encodeId(chapterId)}`
+}
+
 export function postPath(
   id: number | string,
   extra?: { comment?: number; page?: number },

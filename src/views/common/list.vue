@@ -30,7 +30,7 @@ import { AD_SLOT, type AdItem } from '@/api/ads'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { interleaveAds } from '@/utils/interleaveAds'
 import { useAdsStore } from '@/stores/ads'
-import { comicPath, videoPath } from '@/utils/idcrypt'
+import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
 import { openPromoLink } from '@/utils/promoLink'
 import { mediaUrl, toastError } from '@/utils/request'
 import { splitNames } from '@/utils/moduleFilter'
@@ -196,6 +196,10 @@ const open = (item: CoverItem) => {
     router.push(videoPath(item.id))
     return
   }
+  if (media.value === 'novel') {
+    router.push(novelPath(item.id))
+    return
+  }
   router.push(comicPath(item.id))
 }
 
@@ -231,7 +235,16 @@ const load = async () => {
       return
     }
     if (media.value === 'novel') {
-      const data = await fetchNovelList(1, 40, '', category.value, 2)
+      let sort = 2
+      let recommend = 0
+      let cate = category.value
+      if (type.value === 'rank' || type.value === 'hot') sort = 1
+      else if (type.value === 'recommend') {
+        sort = 0
+        recommend = 1
+        cate = ''
+      }
+      const data = await fetchNovelList(1, 40, '', cate, sort, recommend, tag.value)
       items.value = withAds((data.list || []).map(toNovelCover), 3, feedAds)
       return
     }

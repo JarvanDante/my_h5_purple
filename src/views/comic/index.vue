@@ -104,7 +104,7 @@ import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { openPromoLink } from '@/utils/promoLink'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
-import { comicPath, videoPath } from '@/utils/idcrypt'
+import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
 import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -275,9 +275,10 @@ const toNovelCover = (n: NovelItem, mark?: CoverItem['mark']): CoverItem => {
     id: String(n.id),
     title: n.title,
     cover: mediaUrl(n.cover),
+    views: formatViews(n.view_count),
     badge: ended ? '已完结' : `共${n.chapter_count || 0}章`,
     statusTone: ended ? 'end' : 'chapter',
-    mark: mark || (isRecent(n.created_at) ? 'new' : undefined),
+    mark: mark || (isRecent(n.created_at) ? 'new' : n.view_count >= 1000 ? 'hot' : undefined),
     tone: n.id % 6,
   }
 }
@@ -367,6 +368,10 @@ const go = (path: string) => {
 const open = (item: CoverItem) => {
   if (isCartoon.value) {
     router.push(videoPath(item.id))
+    return
+  }
+  if (isNovel.value) {
+    router.push(novelPath(item.id))
     return
   }
   router.push(comicPath(item.id))

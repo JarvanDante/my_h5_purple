@@ -97,6 +97,18 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '阅读' },
   },
   {
+    path: '/novel/:id',
+    name: 'NovelDetail',
+    component: () => import('@/views/novel/detail.vue'),
+    meta: { title: '作品详情' },
+  },
+  {
+    path: '/novel/:id/read/:chapterId',
+    name: 'NovelRead',
+    component: () => import('@/views/novel/read.vue'),
+    meta: { title: '阅读' },
+  },
+  {
     path: '/video/:id',
     name: 'VideoDetail',
     component: () => import('@/views/video/detail.vue'),

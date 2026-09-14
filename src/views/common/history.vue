@@ -63,7 +63,7 @@ import { showConfirmDialog, showToast } from 'vant'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { useTabSlide } from '@/composables/useTabSlide'
-import { comicPath, videoPath } from '@/utils/idcrypt'
+import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
 import { listBrowse, removeBrowse, type BrowseItem, type BrowseKind } from '@/utils/browseHistory'
 import { themePrimary } from '@/utils/themeColor'
 
@@ -115,6 +115,10 @@ const onCard = (item: BrowseItem) => {
   }
   if (item.kind === 'comic') {
     router.push(comicPath(item.id))
+    return
+  }
+  if (item.kind === 'novel') {
+    router.push(novelPath(item.id))
   }
 }
 
