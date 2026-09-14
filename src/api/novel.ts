@@ -31,3 +31,21 @@ export function fetchNovelList(page = 1, size = 20, keyword = '', category = '',
   if (category) q.set('category', category)
   return request<{ list: NovelItem[]; total: number }>(`/novel/list?${q}`)
 }
+
+export type NovelModule = {
+  id: number
+  name: string
+  style: number
+  icon: number
+  size: number
+  tags: string[]
+  categories?: string[]
+  items: NovelItem[]
+}
+
+export function fetchNovelModules(position = '') {
+  const q = new URLSearchParams()
+  if (position) q.set('position', position)
+  const suffix = q.toString() ? `?${q}` : ''
+  return request<{ list: NovelModule[] }>(`/novel/modules${suffix}`)
+}

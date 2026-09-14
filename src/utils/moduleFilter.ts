@@ -18,7 +18,7 @@ export function joinNames(list?: string[]): string {
 }
 
 export function moduleMorePath(
-  media: 'comic' | 'cartoon' | 'video',
+  media: 'comic' | 'cartoon' | 'video' | 'novel',
   mod: { tags?: string[]; categories?: string[] },
 ) {
   const q = new URLSearchParams({ media })

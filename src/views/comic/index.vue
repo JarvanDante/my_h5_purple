@@ -33,7 +33,7 @@
             </button>
           </section>
 
-          <div v-if="subTab && !isComic && !isCartoon" class="cat-pane">
+          <div v-if="subTab && !isComic && !isCartoon && !isNovel" class="cat-pane">
             <p v-if="catLoading" class="page-empty">加载中…</p>
             <p v-else-if="!catItems.length" class="page-empty">暂无「{{ subTab }}」{{ channel }}</p>
             <PosterGrid
@@ -98,7 +98,7 @@ import { fetchCartoonCategories, fetchCartoonModules, type CartoonItem } from '@
 import { fetchComicsCategories, fetchComicsList, fetchComicsModules, type ComicsItem } from '@/api/comics'
 import { fetchBannerList } from '@/api/banner'
 import { fetchKingkongList } from '@/api/kingkong'
-import { fetchNovelCategories, fetchNovelList, type NovelItem } from '@/api/novel'
+import { fetchNovelCategories, fetchNovelList, fetchNovelModules, type NovelItem } from '@/api/novel'
 import { fetchVideoCategories } from '@/api/video'
 import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { openPromoLink } from '@/utils/promoLink'
@@ -119,7 +119,8 @@ const channel = computed(() => channelSlide.current.value)
 const innerName = ref('tab-left')
 const isCartoon = computed(() => channel.value === '动漫')
 const isComic = computed(() => channel.value === '漫画')
-const ready = computed(() => isComic.value || isCartoon.value)
+const isNovel = computed(() => channel.value === '小说')
+const ready = computed(() => isComic.value || isCartoon.value || isNovel.value)
 
 type SubCat = { id: number; name: string; kind: number }
 const catsByChannel = ref<Record<string, SubCat[]>>({
@@ -135,6 +136,7 @@ const catLoading = ref(false)
 
 const firstComicName = () => catsByChannel.value.漫画[0]?.name || ''
 const firstCartoonName = () => catsByChannel.value.动漫[0]?.name || ''
+const firstNovelName = () => catsByChannel.value.小说[0]?.name || ''
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
@@ -142,12 +144,13 @@ const selectChannel = (item: string) => {
   catItems.value = []
   if (item === '漫画') subTab.value = firstComicName()
   else if (item === '动漫') subTab.value = firstCartoonName()
+  else if (item === '小说') subTab.value = firstNovelName()
   else subTab.value = ''
 }
 
 const selectSub = (name: string) => {
   if (subTab.value === name) {
-    if (isComic.value || isCartoon.value) return
+    if (isComic.value || isCartoon.value || isNovel.value) return
     subTab.value = ''
     catItems.value = []
     return
@@ -159,6 +162,10 @@ const selectSub = (name: string) => {
   }
   if (isCartoon.value) {
     loadCartoonFloors()
+    return
+  }
+  if (isNovel.value) {
+    loadNovelFloors()
     return
   }
   loadCatItems()
@@ -179,6 +186,7 @@ const loadSubCats = async () => {
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
   if (isComic.value && !subTab.value) subTab.value = firstComicName()
   if (isCartoon.value && !subTab.value) subTab.value = firstCartoonName()
+  if (isNovel.value && !subTab.value) subTab.value = firstNovelName()
 }
 
 type QuickItem = {
@@ -261,7 +269,7 @@ const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => 
   tone: c.id % 6,
 })
 
-const toNovelCover = (n: NovelItem): CoverItem => {
+const toNovelCover = (n: NovelItem, mark?: CoverItem['mark']): CoverItem => {
   const ended = n.update_status === 2
   return {
     id: String(n.id),
@@ -269,7 +277,7 @@ const toNovelCover = (n: NovelItem): CoverItem => {
     cover: mediaUrl(n.cover),
     badge: ended ? '已完结' : `共${n.chapter_count || 0}章`,
     statusTone: ended ? 'end' : 'chapter',
-    mark: isRecent(n.created_at) ? 'new' : undefined,
+    mark: mark || (isRecent(n.created_at) ? 'new' : undefined),
     tone: n.id % 6,
   }
 }
@@ -339,6 +347,11 @@ const emptyText = computed(() => {
       ? `暂无「${subTab.value}」模块，请在子后台「动漫模块」把位置选成该分类`
       : '暂无模块，请在子后台「动漫模块」配置'
   }
+  if (isNovel.value && !floors.value.length) {
+    return subTab.value
+      ? `暂无「${subTab.value}」模块，请在子后台「小说模块」把位置选成该分类`
+      : '暂无模块，请在子后台「小说模块」配置'
+  }
   if (!floors.value.length) {
     return subTab.value
       ? `暂无「${subTab.value}」模块，请在子后台「漫画模块」把位置选成该分类`
@@ -377,7 +390,7 @@ const moduleSub = (icon: number) => {
 
 const moduleMark = (icon: number): CoverItem['mark'] => (icon === 1 ? 'new' : 'hot')
 
-const moduleMore = (media: 'comic' | 'cartoon', mod: { tags?: string[]; categories?: string[] }) =>
+const moduleMore = (media: 'comic' | 'cartoon' | 'novel', mod: { tags?: string[]; categories?: string[] }) =>
   moduleMorePath(media, mod)
 
 const loadComicFloors = async () => {
@@ -406,6 +419,39 @@ const loadComicFloors = async () => {
         more: moduleMore('comic', mod),
         empty: `暂无「${mod.name}」漫画`,
         items: (mod.items || []).map((c, i) => toComicCover(c, i < 2 ? mark : undefined)),
+      }
+    })
+  } catch (err) {
+    toastError(err)
+    floors.value = []
+  }
+}
+
+const loadNovelFloors = async () => {
+  try {
+    const cat = (catsByChannel.value.小说 || []).find((c) => c.name === subTab.value)
+    if (!cat?.id) {
+      floors.value = []
+      return
+    }
+    const mods = (await fetchNovelModules(`cat_${cat.id}`)).list || []
+    if (!mods.length) {
+      floors.value = []
+      return
+    }
+    floors.value = mods.map((mod) => {
+      const mark = moduleMark(mod.icon)
+      const chips = moduleChips(mod)
+      return {
+        id: mod.id,
+        title: mod.name,
+        sub: moduleSub(mod.icon),
+        categories: chips.categories,
+        tags: chips.tags,
+        layout: moduleLayout(mod.style),
+        more: moduleMore('novel', mod),
+        empty: `暂无「${mod.name}」小说`,
+        items: (mod.items || []).map((c, i) => toNovelCover(c, i < 2 ? mark : undefined)),
       }
     })
   } catch (err) {
@@ -457,6 +503,9 @@ const loadFloors = () => {
     loadComicFloors()
     return
   }
+  if (isNovel.value) {
+    loadNovelFloors()
+  }
 }
 
 onMounted(async () => {
@@ -472,6 +521,10 @@ watch(channel, () => {
   }
   if (isCartoon.value) {
     const names = (catsByChannel.value.动漫 || []).map((c) => c.name)
+    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
+  }
+  if (isNovel.value) {
+    const names = (catsByChannel.value.小说 || []).map((c) => c.name)
     if (!names.includes(subTab.value)) subTab.value = names[0] || ''
   }
   loadFloors()
