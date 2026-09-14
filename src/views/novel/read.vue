@@ -43,6 +43,14 @@
           </span>
           目录
         </button>
+        <button type="button" class="act" :class="{ on: auto }" @click="toggleAuto">
+          <span class="act-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M8 6.5v11l10-5.5L8 6.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" />
+            </svg>
+          </span>
+          自动翻
+        </button>
         <button type="button" class="act" :disabled="!nextId" @click="goChapter(nextId)">下一章</button>
       </div>
     </footer>
@@ -89,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { showToast } from 'vant'
 import {
@@ -124,6 +132,8 @@ const cover = ref('')
 const coverSrc = useEncryptedSrc(cover)
 const chapters = ref<NovelChapter[]>([])
 const catalogOpen = ref(false)
+const auto = ref(false)
+let autoTimer = 0
 const wordCount = ref(0)
 const audioUrl = ref('')
 const prevId = ref(0)
@@ -187,8 +197,36 @@ const toggleChrome = () => {
   chrome.value = !chrome.value
 }
 
+const stopAuto = () => {
+  auto.value = false
+  if (autoTimer) {
+    window.clearInterval(autoTimer)
+    autoTimer = 0
+  }
+}
+
+const toggleAuto = () => {
+  if (auto.value) {
+    stopAuto()
+    return
+  }
+  auto.value = true
+  chrome.value = false
+  autoTimer = window.setInterval(() => {
+    const el = rootRef.value
+    if (!el) return
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 4) {
+      stopAuto()
+      chrome.value = true
+      return
+    }
+    el.scrollBy({ top: 2 })
+  }, 16)
+}
+
 const goChapter = (id: number) => {
   if (!id) return
+  stopAuto()
   router.replace(novelReadPath(routeId(route.params.id), id))
 }
 
@@ -206,10 +244,12 @@ const openChapter = (ch: NovelChapter) => {
 }
 
 const goVip = () => {
+  stopAuto()
   router.push('/vip')
 }
 
 const back = () => {
+  stopAuto()
   const prev = typeof window.history.state?.back === 'string' ? window.history.state.back : ''
   if (prev && prev !== route.fullPath) {
     router.back()
@@ -235,6 +275,10 @@ watch(
   },
   { immediate: true },
 )
+
+onBeforeUnmount(() => {
+  stopAuto()
+})
 </script>
 
 <style scoped lang="scss">
@@ -457,6 +501,10 @@ h1 {
   &:disabled {
     color: #666;
   }
+
+  &.on {
+    color: #ffd84d;
+  }
 }
 
 .act-ico {
@@ -472,6 +520,10 @@ h1 {
     width: 18px;
     height: 18px;
   }
+}
+
+.act.on .act-ico {
+  background: rgba(255, 216, 77, 0.18);
 }
 
 .drawer-mask {
