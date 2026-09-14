@@ -104,7 +104,7 @@ import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { openPromoLink } from '@/utils/promoLink'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
-import { coverItemPath, novelPath } from '@/utils/idcrypt'
+import { coverItemPath, novelPath, videoPath } from '@/utils/idcrypt'
 import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -141,17 +141,22 @@ const byWeight = (list: SubCat[]) => {
   }
   return rows
 }
-const firstComicName = () => catsByChannel.value.漫画[0]?.name || ''
-const firstCartoonName = () => catsByChannel.value.动漫[0]?.name || ''
-const firstNovelName = () => byWeight(catsByChannel.value.小说).at(0)?.name || ''
+const firstOf = (list: SubCat[]) => list[0]?.name || ''
+const firstComicName = () => firstOf(catsByChannel.value.漫画)
+const firstCartoonName = () => firstOf(catsByChannel.value.动漫)
+
+const ensureSubTab = (forceFirst = false) => {
+  const names = (catsByChannel.value[channel.value] || []).map((c) => c.name)
+  if (!names.length) return
+  if (forceFirst || !names.includes(subTab.value)) subTab.value = names[0]
+}
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
   innerName.value = channelSlide.name.value
   catItems.value = []
-  if (item === '漫画') subTab.value = firstComicName()
-  else if (item === '动漫') subTab.value = firstCartoonName()
-  else if (item === '小说') subTab.value = firstNovelName()
+  if (item === '小说') ensureSubTab(true)
+  else if (item === '漫画' || item === '动漫') ensureSubTab()
   else subTab.value = ''
 }
 
@@ -193,9 +198,9 @@ const loadSubCats = async () => {
   if (cartoon.status === 'fulfilled') catsByChannel.value.动漫 = toCats(cartoon.value.list)
   if (novel.status === 'fulfilled') catsByChannel.value.小说 = byWeight(toCats(novel.value.list))
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
-  if (isComic.value && !subTab.value) subTab.value = firstComicName()
-  if (isCartoon.value && !subTab.value) subTab.value = firstCartoonName()
-  if (isNovel.value && !subTab.value) subTab.value = firstNovelName()
+  if (isNovel.value) ensureSubTab(true)
+  else if (isComic.value && !subTab.value) subTab.value = firstComicName()
+  else if (isCartoon.value && !subTab.value) subTab.value = firstCartoonName()
 }
 
 type QuickItem = {
@@ -380,10 +385,15 @@ const go = (path: string) => {
 }
 
 const open = (item: CoverItem) => {
-  router.push(coverItemPath({
-    ...item,
-    kind: item.kind || (isNovel.value ? 'novel' : isCartoon.value ? 'cartoon' : 'comic'),
-  }))
+  if (isNovel.value || item.kind === 'novel') {
+    router.push(novelPath(item.id))
+    return
+  }
+  if (isCartoon.value || item.kind === 'cartoon') {
+    router.push(videoPath(item.id))
+    return
+  }
+  router.push(coverItemPath(item))
 }
 
 const moduleLayout = (style: number): FloorLayout => {
@@ -536,20 +546,17 @@ onMounted(async () => {
   loadBanners()
 })
 watch(channel, () => {
-  if (isComic.value) {
-    const names = (catsByChannel.value.漫画 || []).map((c) => c.name)
-    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
-  }
-  if (isCartoon.value) {
-    const names = (catsByChannel.value.动漫 || []).map((c) => c.name)
-    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
-  }
-  if (isNovel.value) {
-    subTab.value = firstNovelName()
-  }
+  if (isNovel.value) ensureSubTab(true)
+  else ensureSubTab()
   loadFloors()
   loadQuicks()
   loadBanners()
+})
+watch(subTabs, (names) => {
+  if (!isNovel.value || !names.length) return
+  if (names.includes(subTab.value)) return
+  subTab.value = names[0]
+  loadFloors()
 })
 </script>
 

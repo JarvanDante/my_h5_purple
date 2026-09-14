@@ -54,10 +54,13 @@ export function novelPath(id: number | string) {
 }
 
 export function coverItemPath(item: { id: number | string; kind?: string; href?: string }) {
-  const href = (item.href || '').trim()
-  if (href.startsWith('/')) return href
   if (item.kind === 'novel') return novelPath(item.id)
   if (item.kind === 'cartoon' || item.kind === 'video') return videoPath(item.id)
+  if (item.kind === 'comic') return comicPath(item.id)
+  const href = (item.href || '').trim()
+  if (href.startsWith('/novel/')) return href
+  if (href.startsWith('/video/')) return href
+  if (href.startsWith('/')) return href
   return comicPath(item.id)
 }
 
