@@ -54,7 +54,7 @@
           :key="item"
           type="button"
           class="sub-item"
-          :class="{ active: subTab === item || (!subTab && item === subTabs[0]) }"
+          :class="{ active: subTab === item || ((!subTab || !subTabs.includes(subTab)) && item === subTabs[0]) }"
           @click="$emit('selectSub', item)"
         >
           {{ item }}
