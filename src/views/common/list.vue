@@ -30,7 +30,7 @@ import { AD_SLOT, type AdItem } from '@/api/ads'
 import { listTitles, type CoverItem } from '@/data/mock'
 import { interleaveAds } from '@/utils/interleaveAds'
 import { useAdsStore } from '@/stores/ads'
-import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
+import { coverItemPath, novelPath } from '@/utils/idcrypt'
 import { openPromoLink } from '@/utils/promoLink'
 import { mediaUrl, toastError } from '@/utils/request'
 import { splitNames } from '@/utils/moduleFilter'
@@ -153,6 +153,8 @@ const toNovelCover = (n: NovelItem): CoverItem => {
   const ended = n.update_status === 2
   return {
     id: String(n.id),
+    kind: 'novel',
+    href: novelPath(n.id),
     title: n.title,
     tag: n.is_vip ? 'VIP' : 'Free',
     cover: mediaUrl(n.cover),
@@ -192,15 +194,14 @@ const open = (item: CoverItem) => {
     openPromoLink(router, item.href)
     return
   }
-  if (media.value === 'video' || media.value === 'cartoon' || media.value === 'douyin') {
-    router.push(videoPath(item.id))
-    return
-  }
-  if (media.value === 'novel') {
-    router.push(novelPath(item.id))
-    return
-  }
-  router.push(comicPath(item.id))
+  const kind =
+    item.kind ||
+    (media.value === 'novel'
+      ? 'novel'
+      : media.value === 'video' || media.value === 'cartoon' || media.value === 'douyin'
+        ? 'video'
+        : 'comic')
+  router.push(coverItemPath({ ...item, kind }))
 }
 
 const load = async () => {

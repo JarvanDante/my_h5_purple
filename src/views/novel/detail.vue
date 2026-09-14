@@ -126,6 +126,8 @@ import { pushBrowse } from '@/utils/browseHistory'
 import { novelReadPath, routeId } from '@/utils/idcrypt'
 import { getToken, mediaUrl, toastError } from '@/utils/request'
 
+defineOptions({ name: 'NovelDetail' })
+
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()

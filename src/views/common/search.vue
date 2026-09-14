@@ -169,7 +169,7 @@ import { fetchHotSearch } from '@/api/ranks'
 import { fetchDouyinCategories, fetchDouyinList } from '@/api/douyin'
 import { fetchVideoList, fetchVideoCategories, type VideoItem } from '@/api/video'
 import type { CoverItem } from '@/data/mock'
-import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
+import { coverItemPath, novelPath } from '@/utils/idcrypt'
 import { formatDuration, formatViews } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
 import { clearSearchHistory, listSearchHistory, pushSearchHistory } from '@/utils/searchHistory'
@@ -248,6 +248,8 @@ const toNovelCover = (n: NovelItem): CoverItem => {
   const ended = n.update_status === 2
   return {
     id: String(n.id),
+    kind: 'novel',
+    href: novelPath(n.id),
     title: n.title,
     tag: n.is_vip ? 'VIP' : Number(n.price) > 0 ? '付费' : 'Free',
     cover: mediaUrl(n.cover),
@@ -455,15 +457,14 @@ const clearHistory = () => {
 }
 
 const open = (item: CoverItem) => {
-  if (scope.value === 'cartoon' || scope.value === 'video' || scope.value === 'short' || scope.value === 'douyin') {
-    router.push(videoPath(item.id))
-    return
-  }
-  if (scope.value === 'novel') {
-    router.push(novelPath(item.id))
-    return
-  }
-  router.push(comicPath(item.id))
+  const kind =
+    item.kind ||
+    (scope.value === 'novel'
+      ? 'novel'
+      : scope.value === 'cartoon' || scope.value === 'video' || scope.value === 'short' || scope.value === 'douyin'
+        ? 'video'
+        : 'comic')
+  router.push(coverItemPath({ ...item, kind }))
 }
 
 const resetFilters = () => {

@@ -1,5 +1,8 @@
+export type CoverKind = 'comic' | 'cartoon' | 'novel' | 'video'
+
 export type CoverItem = {
   id: string
+  kind?: CoverKind
   title: string
   sub?: string
   tag?: string

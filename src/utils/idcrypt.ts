@@ -53,6 +53,14 @@ export function novelPath(id: number | string) {
   return `/novel/${encodeId(id)}`
 }
 
+export function coverItemPath(item: { id: number | string; kind?: string; href?: string }) {
+  const href = (item.href || '').trim()
+  if (href.startsWith('/')) return href
+  if (item.kind === 'novel') return novelPath(item.id)
+  if (item.kind === 'cartoon' || item.kind === 'video') return videoPath(item.id)
+  return comicPath(item.id)
+}
+
 export function novelReadPath(novelId: number | string, chapterId: number | string) {
   return `/novel/${encodeId(novelId)}/read/${encodeId(chapterId)}`
 }

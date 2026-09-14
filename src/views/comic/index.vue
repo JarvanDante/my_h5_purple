@@ -104,7 +104,7 @@ import { goKingkong, positionOfChannel } from '@/utils/kingkongJump'
 import { openPromoLink } from '@/utils/promoLink'
 import { useTabSlide } from '@/composables/useTabSlide'
 import type { CoverItem } from '@/data/mock'
-import { comicPath, novelPath, videoPath } from '@/utils/idcrypt'
+import { coverItemPath, novelPath } from '@/utils/idcrypt'
 import { searchPath } from '@/utils/searchScope'
 import { formatDuration, formatViews, isRecent } from '@/utils/format'
 import { mediaUrl, toastError } from '@/utils/request'
@@ -252,11 +252,13 @@ type FloorBlockItem = {
 }
 
 const floors = ref<FloorBlockItem[]>([])
+let floorSeq = 0
 
 const toComicCover = (c: ComicsItem, mark?: CoverItem['mark']): CoverItem => {
   const ended = c.update_status === 2
   return {
     id: String(c.id),
+    kind: 'comic',
     title: c.title,
     cover: mediaUrl(c.cover),
     views: formatViews(c.view_count),
@@ -269,6 +271,7 @@ const toComicCover = (c: ComicsItem, mark?: CoverItem['mark']): CoverItem => {
 
 const toCartoonCover = (c: CartoonItem, mark?: CoverItem['mark']): CoverItem => ({
   id: String(c.id),
+  kind: 'cartoon',
   title: c.title,
   cover: mediaUrl(c.cover_url),
   duration: formatDuration(c.duration),
@@ -282,6 +285,8 @@ const toNovelCover = (n: NovelItem, mark?: CoverItem['mark']): CoverItem => {
   const ended = n.update_status === 2
   return {
     id: String(n.id),
+    kind: 'novel',
+    href: novelPath(n.id),
     title: n.title,
     cover: mediaUrl(n.cover),
     views: formatViews(n.view_count),
@@ -375,15 +380,10 @@ const go = (path: string) => {
 }
 
 const open = (item: CoverItem) => {
-  if (isCartoon.value) {
-    router.push(videoPath(item.id))
-    return
-  }
-  if (isNovel.value) {
-    router.push(novelPath(item.id))
-    return
-  }
-  router.push(comicPath(item.id))
+  router.push(coverItemPath({
+    ...item,
+    kind: item.kind || (isNovel.value ? 'novel' : isCartoon.value ? 'cartoon' : 'comic'),
+  }))
 }
 
 const moduleLayout = (style: number): FloorLayout => {
@@ -408,14 +408,16 @@ const moduleMore = (media: 'comic' | 'cartoon' | 'novel', mod: { tags?: string[]
   moduleMorePath(media, mod)
 
 const loadComicFloors = async () => {
+  const seq = floorSeq
   try {
     const cat = (catsByChannel.value.漫画 || []).find((c) => c.name === subTab.value)
     if (!cat?.id) {
-      floors.value = []
+      if (seq === floorSeq) floors.value = []
       return
     }
     const position = `cat_${cat.id}`
     const mods = (await fetchComicsModules(position)).list || []
+    if (seq !== floorSeq) return
     if (!mods.length) {
       floors.value = []
       return
@@ -437,18 +439,20 @@ const loadComicFloors = async () => {
     })
   } catch (err) {
     toastError(err)
-    floors.value = []
+    if (seq === floorSeq) floors.value = []
   }
 }
 
 const loadNovelFloors = async () => {
+  const seq = floorSeq
   try {
     const cat = (catsByChannel.value.小说 || []).find((c) => c.name === subTab.value)
     if (!cat?.id) {
-      floors.value = []
+      if (seq === floorSeq) floors.value = []
       return
     }
     const mods = (await fetchNovelModules(`cat_${cat.id}`)).list || []
+    if (seq !== floorSeq) return
     if (!mods.length) {
       floors.value = []
       return
@@ -470,18 +474,20 @@ const loadNovelFloors = async () => {
     })
   } catch (err) {
     toastError(err)
-    floors.value = []
+    if (seq === floorSeq) floors.value = []
   }
 }
 
 const loadCartoonFloors = async () => {
+  const seq = floorSeq
   try {
     const cat = (catsByChannel.value.动漫 || []).find((c) => c.name === subTab.value)
     if (!cat?.id) {
-      floors.value = []
+      if (seq === floorSeq) floors.value = []
       return
     }
     const mods = (await fetchCartoonModules(`cat_${cat.id}`)).list || []
+    if (seq !== floorSeq) return
     if (!mods.length) {
       floors.value = []
       return
@@ -503,11 +509,12 @@ const loadCartoonFloors = async () => {
     })
   } catch (err) {
     toastError(err)
-    floors.value = []
+    if (seq === floorSeq) floors.value = []
   }
 }
 
 const loadFloors = () => {
+  floorSeq += 1
   floors.value = []
   if (isCartoon.value) {
     loadCartoonFloors()
