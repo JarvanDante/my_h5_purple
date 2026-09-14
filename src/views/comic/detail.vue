@@ -54,6 +54,8 @@
       <p v-if="item?.reason" class="reason">{{ item.reason }}</p>
     </div>
 
+    <AdBanner class="detail-ad" />
+
     <div class="panel">
       <div class="tab-row">
         <button type="button" class="tab" :class="{ active: tab === 'detail' }" @click="tab = 'detail'">
@@ -115,6 +117,7 @@ import {
 } from '@/api/comics'
 import { COMMENT_MEDIA_COMICS, fetchComments } from '@/api/ops'
 import { useUserStore } from '@/stores/user'
+import AdBanner from '@/components/AdBanner.vue'
 import CommentPanel from '@/components/CommentPanel.vue'
 import EncryptedImage from '@/components/EncryptedImage.vue'
 import { useEncryptedSrc } from '@/composables/useEncryptedSrc'
@@ -324,8 +327,12 @@ onMounted(() => {
 .hero-extra {
   flex-shrink: 0;
   width: 100%;
-  padding: 12px 16px 14px;
+  padding: 12px 16px 6px;
   background: #0d0d12;
+}
+
+.detail-ad {
+  flex-shrink: 0;
 }
 
 .nav,
