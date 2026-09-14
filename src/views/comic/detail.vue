@@ -36,9 +36,11 @@
               <i />
               <em>{{ formatCount(favCount) }}人收藏</em>
             </p>
-            <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
-              {{ collected ? '已收藏' : '+收藏' }}
-            </button>
+            <div class="fav-wrap">
+              <button type="button" class="fav-btn" :class="{ on: collected }" @click="onFav">
+                {{ collected ? '已收藏' : '+收藏' }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -274,7 +276,8 @@ onMounted(() => {
   position: relative;
   flex-shrink: 0;
   width: 100%;
-  height: 198px;
+  min-height: calc(198px + env(safe-area-inset-top, 0px));
+  height: auto;
   box-sizing: border-box;
   overflow: hidden;
   color: #fff;
@@ -284,9 +287,8 @@ onMounted(() => {
 .hero-visual {
   position: relative;
   z-index: 1;
-  height: 100%;
   box-sizing: border-box;
-  padding: 0 16px 10px;
+  padding: 0 16px 14px;
 }
 
 .hero-bg {
@@ -359,7 +361,7 @@ onMounted(() => {
 
 .hero-main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   margin-top: 12px;
   padding-left: 22px;
@@ -444,13 +446,27 @@ h1 {
   }
 }
 
-.fav-btn {
+.fav-wrap {
   align-self: flex-start;
   margin-top: 10px;
+  width: auto;
+  max-width: 100%;
+}
+
+.fav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  max-width: 100%;
   height: 30px;
   padding: 0 18px;
   border: 0;
   border-radius: 15px;
+  flex: 0 0 auto;
+  appearance: none;
+  -webkit-appearance: none;
+  white-space: nowrap;
   @include theme-cta;
   font-size: 13px;
   font-weight: 700;
