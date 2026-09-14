@@ -122,7 +122,7 @@ const isComic = computed(() => channel.value === '漫画')
 const isNovel = computed(() => channel.value === '小说')
 const ready = computed(() => isComic.value || isCartoon.value || isNovel.value)
 
-type SubCat = { id: number; name: string; kind: number }
+type SubCat = { id: number; name: string; kind: number; rank?: number }
 const catsByChannel = ref<Record<string, SubCat[]>>({
   漫画: [],
   动漫: [],
@@ -134,9 +134,16 @@ const subTabs = computed(() => (catsByChannel.value[channel.value] || []).map((c
 const catItems = ref<CoverItem[]>([])
 const catLoading = ref(false)
 
+const byWeight = (list: SubCat[]) => {
+  const rows = [...list]
+  if (rows.some((c) => (c.rank || 0) > 0)) {
+    rows.sort((a, b) => (b.rank || 0) - (a.rank || 0) || b.id - a.id)
+  }
+  return rows
+}
 const firstComicName = () => catsByChannel.value.漫画[0]?.name || ''
 const firstCartoonName = () => catsByChannel.value.动漫[0]?.name || ''
-const firstNovelName = () => catsByChannel.value.小说[0]?.name || ''
+const firstNovelName = () => byWeight(catsByChannel.value.小说).at(0)?.name || ''
 
 const selectChannel = (item: string) => {
   channelSlide.select(item)
@@ -172,8 +179,10 @@ const selectSub = (name: string) => {
 }
 
 const loadSubCats = async () => {
-  const toCats = (list?: { id?: number; name: string; kind: number }[]) =>
-    (list || []).filter((x) => x.name).map((x) => ({ id: x.id || 0, name: x.name, kind: x.kind || 0 }))
+  const toCats = (list?: { id?: number; name: string; kind: number; rank?: number }[]) =>
+    (list || [])
+      .filter((x) => x.name)
+      .map((x) => ({ id: x.id || 0, name: x.name, kind: x.kind || 0, rank: x.rank || 0 }))
   const [comics, cartoon, novel, video] = await Promise.allSettled([
     fetchComicsCategories(),
     fetchCartoonCategories(),
@@ -182,7 +191,7 @@ const loadSubCats = async () => {
   ])
   if (comics.status === 'fulfilled') catsByChannel.value.漫画 = toCats(comics.value.list)
   if (cartoon.status === 'fulfilled') catsByChannel.value.动漫 = toCats(cartoon.value.list)
-  if (novel.status === 'fulfilled') catsByChannel.value.小说 = toCats(novel.value.list)
+  if (novel.status === 'fulfilled') catsByChannel.value.小说 = byWeight(toCats(novel.value.list))
   if (video.status === 'fulfilled') catsByChannel.value.短剧 = toCats(video.value.list)
   if (isComic.value && !subTab.value) subTab.value = firstComicName()
   if (isCartoon.value && !subTab.value) subTab.value = firstCartoonName()
@@ -529,8 +538,7 @@ watch(channel, () => {
     if (!names.includes(subTab.value)) subTab.value = names[0] || ''
   }
   if (isNovel.value) {
-    const names = (catsByChannel.value.小说 || []).map((c) => c.name)
-    if (!names.includes(subTab.value)) subTab.value = names[0] || ''
+    subTab.value = firstNovelName()
   }
   loadFloors()
   loadQuicks()

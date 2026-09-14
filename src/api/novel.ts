@@ -44,6 +44,7 @@ export type NovelCategory = {
   id: number
   name: string
   kind: number
+  rank?: number
 }
 
 export function novelCategories(n: { category?: string; categories?: string[] }) {
