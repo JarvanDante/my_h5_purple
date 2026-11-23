@@ -8,6 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AdBanner: typeof import('./src/components/AdBanner.vue')['default']
+    AdFeedCell: typeof import('./src/components/AdFeedCell.vue')['default']
     AdFloat: typeof import('./src/components/AdFloat.vue')['default']
     AdIconGrid: typeof import('./src/components/AdIconGrid.vue')['default']
     AdImage: typeof import('./src/components/AdImage.vue')['default']
@@ -43,8 +44,6 @@ declare module 'vue' {
     SectionPanel: typeof import('./src/components/SectionPanel.vue')['default']
     ShareSheet: typeof import('./src/components/douyin/ShareSheet.vue')['default']
     UserAvatar: typeof import('./src/components/UserAvatar.vue')['default']
-    VanSwipe: typeof import('vant/es')['Swipe']
-    VanSwipeItem: typeof import('vant/es')['SwipeItem']
     VipBadge: typeof import('./src/components/VipBadge.vue')['default']
   }
 }

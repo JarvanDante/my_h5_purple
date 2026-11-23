@@ -35,3 +35,6 @@ Thumbs.db
 # Cache
 .cache
 .eslintcache
+
+# 打包产物
+*.zip
